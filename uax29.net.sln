@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Be
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrieGen", "TrieGen\TrieGen.csproj", "{A7F97597-996B-4D56-B69A-D0EF6649073C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trie", "Trie\Trie.csproj", "{901775A9-006B-4627-9B57-92EC4C921738}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uax29", "uax29\uax29.csproj", "{901775A9-006B-4627-9B57-92EC4C921738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

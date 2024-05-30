@@ -1,6 +1,6 @@
 using System.Text;
 using ProtoBuf;
-using Trie;
+using uax29;
 
 const string url = "https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/WordBreakProperty.txt";
 
@@ -13,7 +13,7 @@ using var reader = new StreamReader(responseStream);
 
 int currentCat = 0;
 var lastCat = "";
-var trie = new ByteTrie();
+var trie = new RuneTrie();
 
 while (true)
 {
@@ -73,16 +73,16 @@ while (true)
 	}
 }
 
-var protoPath = "../Trie/words.proto.bin";
+var protoPath = "../uax29/words.proto.bin";
 using (var file = File.Open(protoPath, FileMode.Create))
 {
 	Serializer.Serialize(file, trie);
 }
 
-ByteTrie trie2;
+RuneTrie trie2;
 using (var file2 = File.OpenRead(protoPath))
 {
-	trie2 = Serializer.Deserialize<ByteTrie>(file2);
+	trie2 = Serializer.Deserialize<RuneTrie>(file2);
 }
 
 

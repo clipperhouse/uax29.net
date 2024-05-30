@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../Trie/Trie.csproj" />
+    <ProjectReference Include="..\uax29\uax29.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

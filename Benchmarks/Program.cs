@@ -1,22 +1,25 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using Trie;
+using uax29;
 
 var summary = BenchmarkRunner.Run<ByteTrieBenchmark>();
 
 [MemoryDiagnoser]
 public class ByteTrieBenchmark
 {
-	private ByteTrie trie;
+	private RuneTrie trie;
 
 	[GlobalSetup]
 	public void Setup()
 	{
-		trie = Words.Get();
+		// trie = Words.Get();
 	}
 
+	// [Benchmark]
+	// public (bool found, int payload, int length) Search() => trie.Search("א");
+
 	[Benchmark]
-	public (bool found, int payload, int length) Search() => trie.Search("א");
+	public void Deserialize() => Words.Get();
 
 	// [Benchmark]
 	// public void Insert()
