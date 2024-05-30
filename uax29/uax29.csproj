@@ -10,8 +10,4 @@
     <PackageReference Include="protobuf-net" Version="3.2.30" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="words.proto.bin" />
-  </ItemGroup>
-
 </Project>
