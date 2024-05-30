@@ -9,11 +9,11 @@ public class Segmenter(SplitFunc split, byte[] data)
 
 	public bool Next()
 	{
-		while (this.pos < this.data.Length)
+		while (pos < data.Length)
 		{
-			var b = this.data[this.pos..];
-			(var advance, var token) = this.split(this.data[this.pos..], true);
-			this.pos += advance;
+			var b = data[pos..];
+			(var advance, var token) = split(data[pos..], true);
+			pos += advance;
 			this.token = token;
 
 			// Interpret as EOF
@@ -34,9 +34,8 @@ public class Segmenter(SplitFunc split, byte[] data)
 
 	public byte[] Bytes()
 	{
-		return this.token;
+		return token;
 	}
-
 }
 
 

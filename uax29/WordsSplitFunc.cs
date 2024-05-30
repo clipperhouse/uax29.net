@@ -1,15 +1,14 @@
-﻿namespace uax29;
+namespace uax29;
 using System.Text;
 using System.Buffers;
 
 /// A bitmap of Unicode categories
 using Property = int;
 
-public delegate (int advance, byte[] token) SplitFunc(Span<byte> data, bool atEOF);
+public delegate (int advance, byte[] token) SplitFunc(byte[] data, bool atEOF);
 
 public static partial class Words
 {
-	// is determines if lookup intersects one or more Properties
 	static bool Matches(this Property lookup, Property properties)
 	{
 		return (lookup & properties) != 0;
@@ -21,7 +20,7 @@ public static partial class Words
 
 	const Property Ignore = Extend | Format | ZWJ;
 
-	public static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
+	public static readonly SplitFunc SplitFunc = (byte[] data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
@@ -42,7 +41,7 @@ public static partial class Words
 			{
 				if (!atEOF)
 				{
-					// Token extends past current data, request more
+					// TODO Token extends past current data, request more
 					return (0, []);
 				}
 
@@ -107,14 +106,12 @@ public static partial class Words
 				continue;
 			}
 
-
 			// https://unicode.org/reports/tr29/#WB4
 			if (current.Matches(Extend | Format | ZWJ))
 			{
 				pos += w;
 				continue;
 			}
-
 
 			// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 			// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
@@ -184,12 +181,225 @@ public static partial class Words
 				}
 			}
 
+			// Optimization: determine if WB7a can possibly apply
+			var maybeWB7a = current.Matches(Single_Quote) && last.Matches(Hebrew_Letter | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB7a
+			if (maybeWB7a)
+			{
+				if (Previous(Hebrew_Letter, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// Optimization: determine if WB7b can possibly apply
+			var maybeWB7b = current.Matches(Double_Quote) && last.Matches(Hebrew_Letter | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB7b
+			if (maybeWB7b)
+			{
+				if (Subsequent(Hebrew_Letter, data[(pos + w)..]) && Previous(Hebrew_Letter, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// Optimization: determine if WB7c can possibly apply
+			var maybeWB7c = current.Matches(Hebrew_Letter) && last.Matches(Double_Quote | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB7c
+			if (maybeWB7c)
+			{
+				var i = PreviousIndex(Double_Quote, data[..pos]);
+				if (i > 0 && Previous(Hebrew_Letter, data[..i]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// https://unicode.org/reports/tr29/#WB8
+			// https://unicode.org/reports/tr29/#WB9
+			// https://unicode.org/reports/tr29/#WB10
+			if (current.Matches(Numeric | AHLetter) && last.Matches(Numeric | AHLetter | Ignore))
+			{
+				// Note: this logic de facto expresses WB5 as well, but harmless since WB5
+				// was already tested above
+
+				// Optimization: maybe a run without ignored characters
+				if (last.Matches(Numeric | AHLetter))
+				{
+					pos += w;
+					while (pos < data.Length)
+					{
+						var lookup = Lookup(data[pos..], out int w2, out OperationStatus _);
+
+						if (!lookup.Matches(Numeric | AHLetter))
+						{
+							break;
+						}
+
+						if (w2 == 0)
+						{
+							break;
+						}
+
+						// Update stateful vars
+						current = lookup;
+						w = w2;
+
+						pos += w;
+					}
+					continue;
+				}
+
+				// Otherwise, do proper lookback per WB4
+				if (Previous(Numeric | AHLetter, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// Optimization: determine if WB11 can possibly apply
+			var maybeWB11 = current.Matches(Numeric) && last.Matches(MidNum | MidNumLetQ | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB11
+			if (maybeWB11)
+			{
+				var i = PreviousIndex(MidNum | MidNumLetQ, data[..pos]);
+				if (i > 0 && Previous(Numeric, data[..i]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// Optimization: determine if WB12 can possibly apply
+			var maybeWB12 = current.Matches(MidNum | MidNumLetQ) && last.Matches(Numeric | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB12
+			if (maybeWB12)
+			{
+				if (Subsequent(Numeric, data[(pos + w)..]) && Previous(Numeric, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+			// https://unicode.org/reports/tr29/#WB13
+			if (current.Matches(Katakana) && last.Matches(Katakana | Ignore))
+			{
+				// Optimization: maybe a run without ignored characters
+				if (last.Matches(Katakana))
+				{
+					pos += w;
+					while (pos < data.Length)
+					{
+						var lookup = Lookup(data[pos..], out int w2, out OperationStatus _);
+
+						if (!lookup.Matches(Katakana))
+						{
+							break;
+						}
+
+						if (w2 == 0)
+						{
+							break;
+						}
+
+						// Update stateful vars
+						current = lookup;
+						w = w2;
+
+						pos += w;
+					}
+					continue;
+				}
+
+				// Otherwise, do proper lookback per WB4
+				if (Previous(Katakana, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+
+			// Optimization: determine if WB13a can possibly apply
+			var maybeWB13a = current.Matches(ExtendNumLet) && last.Matches(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB13a
+			if (maybeWB13a)
+			{
+				if (Previous(AHLetter | Numeric | Katakana | ExtendNumLet, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
+
+
+			// Optimization: determine if WB15 or WB16 can possibly apply
+			var maybeWB1516 = current.Matches(Regional_Indicator) && last.Matches(Regional_Indicator | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB15 and
+			// https://unicode.org/reports/tr29/#WB16
+			if (maybeWB1516)
+			{
+				// WB15: Odd number of RI before hitting start of text
+				// WB16: Odd number of RI before hitting [^RI], aka "not RI"
+
+				var i = pos;
+				var count = 0;
+
+				while (i > 0)
+				{
+					Rune.DecodeLastFromUtf8(data[..i], out Rune r, out int w2);
+					if (w2 == 0)
+					{
+						break;
+					}
+
+					i -= w2;
+
+					var lookup = Lookup(data[i..], out int _, out OperationStatus _);
+
+					if (lookup.Matches(Ignore))
+					{
+						continue;
+					}
+
+					if (!lookup.Matches(Regional_Indicator))
+					{
+						// It's WB16
+						break;
+					}
+
+					count++;
+				}
+
+				// If i == 0, we fell through and hit sot (start of text), so WB15 applies
+				// If i > 0, we hit a non-RI, so WB16 applies
+
+				var oddRI = (count % 2 == 1);
+				if (oddRI)
+				{
+					pos += w;
+					continue;
+				}
+			}
+
 			// https://unicode.org/reports/tr29/#WB999
 			// If we fall through all the above rules, it's a word break
 			break;
 		}
 
-		return (pos, data[..pos].ToArray());
+		return (pos, data[..pos]);
 	};
 
 

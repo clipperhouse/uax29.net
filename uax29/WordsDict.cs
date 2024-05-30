@@ -13,14 +13,15 @@ public static partial class Words
 		{
 			return 0;
 		}
-		if (dict.TryGetValue(r.Value, out Property property))
+		if (!dict.TryGetValue(r.Value, out Property property))
 		{
-			return property;
+			return 0;
 		}
-		return 0;
+
+		return property;
 	}
 
-	private static readonly Dictionary<int, Property> dict = new()
+	public static readonly Dictionary<int, Property> dict = new()
 	{
 		{34,1},
 		{39,2},
@@ -36846,7 +36847,7 @@ public static partial class Words
 		{131067,262144},
 		{131068,262144},
 		{131069,262144},
-	};	// end dict
+	};  // end dict
 	const Property Double_Quote = 1;
 	const Property Single_Quote = 2;
 	const Property Hebrew_Letter = 4;
@@ -36866,4 +36867,4 @@ public static partial class Words
 	const Property ZWJ = 65536;
 	const Property WSegSpace = 131072;
 	const Property Extended_Pictographic = 262144;
-};	// end class
+};  // end class
