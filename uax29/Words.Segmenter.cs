@@ -11,3 +11,4 @@ public static partial class Words
 		public Segmenter(string data) : this(Encoding.UTF8.GetBytes(data)) { }
 	}
 }
+

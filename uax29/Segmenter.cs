@@ -1,13 +1,27 @@
+using System.Collections;
 using System.Text;
 
 namespace uax29;
 
-public class Segmenter(SplitFunc split, byte[] data)
+public class Segmenter(SplitFunc split, byte[] data) : IEnumerable<byte[]>
 {
 	readonly SplitFunc split = split;
 	readonly byte[] data = data;
 	byte[] token = [];
 	int pos;
+
+	public IEnumerator<byte[]> GetEnumerator()
+	{
+		while (Next())
+		{
+			yield return Bytes();
+		}
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return GetEnumerator();
+	}
 
 	public bool Next()
 	{

@@ -17,11 +17,13 @@ public class Examples
 	public void Readme()
 	{
 		var example = "Here is some example text. 你好，世界.";
-		var segment = new Words.Segmenter(example);
+		var words = example.TokenizeWords();
 
-		while (segment.Next())
+		foreach (var word in words)
 		{
-			Console.WriteLine(segment);
+			// We return raw UTF-8 bytes
+			var s = Encoding.UTF8.GetString(word);
+			Console.WriteLine(s);
 		}
 	}
 }

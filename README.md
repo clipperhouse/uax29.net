@@ -11,14 +11,32 @@ using uax29;
 using System.Text;
 
 var example = "Here is some example text. 你好，世界.";
-var segment = new Words.Segmenter(example);
+var words = example.TokenizeWords();
 
-while (segment.Next())
+foreach (var word in words)
 {
-	Console.WriteLine(segment);
+	var s = Encoding.UTF8.GetString(word);	// We currently return raw UTF-8 bytes
+	Console.WriteLine(s);
 }
-
-// This API will improve, likely with extension methods for IEnumerables and a Nuget package.
+/*
+Here
+ 
+is
+ 
+some
+ 
+example
+ 
+text
+.
+ 
+你
+好
+，
+世
+界
+.
+*/
 ```
 
 ### Conformance
