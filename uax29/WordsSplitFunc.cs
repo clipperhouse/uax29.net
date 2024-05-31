@@ -330,7 +330,6 @@ public static partial class Words
 				}
 			}
 
-
 			// Optimization: determine if WB13a can possibly apply
 			var maybeWB13a = current.Matches(ExtendNumLet) && last.Matches(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
 
@@ -344,6 +343,18 @@ public static partial class Words
 				}
 			}
 
+			// Optimization: determine if WB13b can possibly apply
+			var maybeWB13b = current.Matches(AHLetter | Numeric | Katakana) && last.Matches(ExtendNumLet | Ignore);
+
+			// https://unicode.org/reports/tr29/#WB13b
+			if (maybeWB13b)
+			{
+				if (Previous(ExtendNumLet, data[..pos]))
+				{
+					pos += w;
+					continue;
+				}
+			}
 
 			// Optimization: determine if WB15 or WB16 can possibly apply
 			var maybeWB1516 = current.Matches(Regional_Indicator) && last.Matches(Regional_Indicator | Ignore);

@@ -25,4 +25,25 @@ public class Tests
 			Console.WriteLine(word);
 		}
 	}
+
+	[Test]
+	public void Unicode()
+	{
+		foreach (var test in UnicodeTests.Words)
+		{
+			var seg = Words.Segment(test.input);
+			var i = 0;
+			while (seg.Next())
+			{
+				var expected = test.expected[i];
+				var got = seg.Bytes();
+				Assert.That(expected.SequenceEqual(got), $@"Test {i}, {test.comment}
+				input {test.input}
+				expected {expected}
+				got {got}
+				");
+				i++;
+			}
+		}
+	}
 }
