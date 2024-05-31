@@ -13,79 +13,60 @@ public class Unicode
 	{
 	}
 
-	[Test]
-	public void Segmenter()
+	static readonly UnicodeTest[] wordTests = UnicodeTests.Words;
+	[Test, TestCaseSource(nameof(wordTests))]
+	public void Words(UnicodeTest test)
 	{
-		var s = Encoding.UTF8.GetBytes("This is a test, with some number or words you know.");
-		var seg = new Words.Segmenter(s);
-
+		var seg = new Words.Segmenter(test.input);
+		var i = 0;
 		while (seg.Next())
 		{
-			var word = Encoding.UTF8.GetString(seg.Bytes());
-			Console.WriteLine(word);
+			var expected = test.expected[i];
+			var got = seg.Bytes();
+			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
+				input {test.input}
+				expected {expected}
+				got {got}
+				");
+			i++;
 		}
 	}
 
-	[Test]
-	public void Words()
+	static readonly UnicodeTest[] graphemeTests = UnicodeTests.Graphemes;
+	[Test, TestCaseSource(nameof(graphemeTests))]
+	public void Graphemes(UnicodeTest test)
 	{
-		foreach (var test in UnicodeTests.Words)
+		var seg = new Graphemes.Segmenter(test.input);
+		var i = 0;
+		while (seg.Next())
 		{
-			var seg = new Words.Segmenter(test.input);
-			var i = 0;
-			while (seg.Next())
-			{
-				var expected = test.expected[i];
-				var got = seg.Bytes();
-				Assert.That(expected.SequenceEqual(got), $@"{test.comment}
+			var expected = test.expected[i];
+			var got = seg.Bytes();
+			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
 				got {got}
 				");
-				i++;
-			}
+			i++;
 		}
 	}
 
-	[Test]
-	public void Graphemes()
+	static readonly UnicodeTest[] sentenceTests = UnicodeTests.Sentences;
+	[Test, TestCaseSource(nameof(sentenceTests))]
+	public void Sentences(UnicodeTest test)
 	{
-		foreach (var test in UnicodeTests.Graphemes)
+		var seg = new Sentences.Segmenter(test.input);
+		var i = 0;
+		while (seg.Next())
 		{
-			var seg = new Graphemes.Segmenter(test.input);
-			var i = 0;
-			while (seg.Next())
-			{
-				var expected = test.expected[i];
-				var got = seg.Bytes();
-				Assert.That(expected.SequenceEqual(got), $@"{test.comment}
+			var expected = test.expected[i];
+			var got = seg.Bytes();
+			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
 				got {got}
 				");
-				i++;
-			}
-		}
-	}
-	[Test]
-	public void Sentences()
-	{
-		foreach (var test in UnicodeTests.Sentences)
-		{
-			var seg = new Sentences.Segmenter(test.input);
-			var i = 0;
-			while (seg.Next())
-			{
-				var expected = test.expected[i];
-				var got = seg.Bytes();
-				Console.WriteLine($"testing '{test.comment}'");
-				Assert.That(expected.SequenceEqual(got), $@"{test.comment}
-				input {test.input}
-				expected {expected}
-				got {got}
-				");
-				i++;
-			}
+			i++;
 		}
 	}
 }
