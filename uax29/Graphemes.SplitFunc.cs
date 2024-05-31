@@ -198,7 +198,7 @@ public static partial class Graphemes
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the Ignore property.
-	static bool Previous(Property property, Span<byte> data)
+	static bool Previous(Property property, byte[] data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;

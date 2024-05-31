@@ -416,7 +416,7 @@ public static partial class Words
 	// previousIndex works backward until it hits a rune in properties,
 	// ignoring runes with the _Ignore property (per WB4), and returns
 	// the index in data. It returns -1 if such a rune is not found.
-	static int PreviousIndex(Property property, Span<byte> data)
+	static int PreviousIndex(Property property, byte[] data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;
@@ -447,14 +447,14 @@ public static partial class Words
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Previous(Property property, Span<byte> data)
+	static bool Previous(Property property, byte[] data)
 	{
 		return PreviousIndex(property, data) != -1;
 	}
 
 	// subsequent looks ahead in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Subsequent(Property property, Span<byte> data)
+	static bool Subsequent(Property property, byte[] data)
 	{
 		var i = 0;
 		while (i < data.Length)

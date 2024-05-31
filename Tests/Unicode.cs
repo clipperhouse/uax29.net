@@ -67,4 +67,25 @@ public class Unicode
 			}
 		}
 	}
+	[Test]
+	public void Sentences()
+	{
+		foreach (var test in UnicodeTests.Sentences)
+		{
+			var seg = new Sentences.Segmenter(test.input);
+			var i = 0;
+			while (seg.Next())
+			{
+				var expected = test.expected[i];
+				var got = seg.Bytes();
+				Console.WriteLine($"testing '{test.comment}'");
+				Assert.That(expected.SequenceEqual(got), $@"{test.comment}
+				input {test.input}
+				expected {expected}
+				got {got}
+				");
+				i++;
+			}
+		}
+	}
 }
