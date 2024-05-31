@@ -3,7 +3,7 @@ using System.Text;
 
 internal class Program
 {
-	const string version = "15.1.0";
+	const string version = "15.0.0";
 
 	static async Task Main(string[] args)
 	{
@@ -19,7 +19,7 @@ internal class Program
 		static async Task WriteCategories(string typ)
 		{
 			List<string> urls = [$"https://www.unicode.org/Public/{version}/ucd/auxiliary/{typ}BreakProperty.txt"];
-			if (typ == "Word")
+			if (typ == "Word" || typ == "Grapheme")
 			{
 				// We need Extended_Pictographic
 				urls.Add($"https://www.unicode.org/Public/{version}/ucd/emoji/emoji-data.txt");
@@ -64,7 +64,7 @@ internal class Program
 				var range = parts[0].Trim();
 				var cat = parts[1].Split('#')[0].Trim();
 
-				if (typ == "Word" && cat.StartsWith("Emoji"))   // may be brittle if data changes
+				if ((typ == "Word" || typ == "Grapheme") && cat.StartsWith("Emoji"))   // may be brittle if data changes
 				{
 					// We only want Extended_Pictographic
 					continue;
