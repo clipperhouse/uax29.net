@@ -7,8 +7,5 @@ public static partial class Words
 		return new Segmenter(data);
 	}
 
-	public class Segmenter : uax29.Segmenter
-	{
-		public Segmenter(byte[] data) : base(Words.SplitFunc, data) { }
-	}
+	public class Segmenter(byte[] data) : uax29.Segmenter(SplitFunc, data) { }
 }

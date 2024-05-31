@@ -52,7 +52,7 @@ public static partial class Words
 
 			var last = current;
 
-			current = Lookup(data[pos..], out w, out _);   // TODO do something with the status
+			current = dict.Lookup(data[pos..], out w, out _);   // TODO do something with the status
 
 			if (w == 0)
 			{
@@ -127,7 +127,7 @@ public static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = Lookup(data[pos..], out int w2, out _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out _);
 						if (!lookup.Matches(AHLetter))
 						{
 							break;
@@ -236,7 +236,7 @@ public static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = Lookup(data[pos..], out int w2, out OperationStatus _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out OperationStatus _);
 
 						if (!lookup.Matches(Numeric | AHLetter))
 						{
@@ -301,7 +301,7 @@ public static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = Lookup(data[pos..], out int w2, out OperationStatus _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out OperationStatus _);
 
 						if (!lookup.Matches(Katakana))
 						{
@@ -379,7 +379,7 @@ public static partial class Words
 
 					i -= w2;
 
-					var lookup = Lookup(data[i..], out int _, out OperationStatus _);
+					var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
 
 					if (lookup.Matches(Ignore))
 					{
@@ -427,7 +427,7 @@ public static partial class Words
 			var _ = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);  // TODO handle status
 
 			i -= w;
-			var lookup = Lookup(data[i..], out int _, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
 			// I think it's OK to elide width here; will fall through to break
 
 			if (lookup.Matches(Ignore))
@@ -461,7 +461,7 @@ public static partial class Words
 		var i = 0;
 		while (i < data.Length)
 		{
-			var lookup = Lookup(data[i..], out int w, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int w, out OperationStatus _);
 
 			if (w == 0)
 			{

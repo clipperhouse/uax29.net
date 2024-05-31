@@ -3,28 +3,37 @@ using System.Text;
 
 internal class Program
 {
+	const string version = "15.1.0";
+
 	static async Task Main(string[] args)
 	{
-		const string version = "15.0.0";
-		//await WriteCategories();
-		await WriteTests();
 
-		static async Task WriteCategories()
+		string[] typs = ["Word", "Sentence", "Grapheme"];
+
+		foreach (var typ in typs)
 		{
-			/// Categories
-			const string url = $"https://www.unicode.org/Public/{version}/ucd/auxiliary/WordBreakProperty.txt";
-			const string url2 = $"https://www.unicode.org/Public/{version}/ucd/emoji/emoji-data.txt";
+			await WriteCategories(typ);
+			await WriteTests(typ);
+		}
+
+		static async Task WriteCategories(string typ)
+		{
+			List<string> urls = [$"https://www.unicode.org/Public/{version}/ucd/auxiliary/{typ}BreakProperty.txt"];
+			if (typ == "Word")
+			{
+				// We need Extended_Pictographic
+				urls.Add($"https://www.unicode.org/Public/{version}/ucd/emoji/emoji-data.txt");
+			}
 
 			var data = "";
 
-			using var client = new HttpClient();
-			var response = await client.GetAsync(url);
-			response.EnsureSuccessStatusCode();
-			data += await response.Content.ReadAsStringAsync();
-
-			var response2 = await client.GetAsync(url2);
-			response.EnsureSuccessStatusCode();
-			data += await response2.Content.ReadAsStringAsync();
+			foreach (var url in urls)
+			{
+				using var client = new HttpClient();
+				var response = await client.GetAsync(url);
+				response.EnsureSuccessStatusCode();
+				data += await response.Content.ReadAsStringAsync();
+			}
 
 			using var reader = new StringReader(data);
 
@@ -55,8 +64,9 @@ internal class Program
 				var range = parts[0].Trim();
 				var cat = parts[1].Split('#')[0].Trim();
 
-				if (cat.StartsWith("Emoji"))
+				if (typ == "Word" && cat.StartsWith("Emoji"))   // may be brittle if data changes
 				{
+					// We only want Extended_Pictographic
 					continue;
 				}
 
@@ -68,9 +78,8 @@ internal class Program
 					}
 					else
 					{
-						currentCat = currentCat << 1;
+						currentCat <<= 1;
 					}
-					// Console.WriteLine(Convert.ToString(currentCat, 2).PadLeft(8, '0'));
 					lastCat = cat;
 
 					cats.Add(cat, currentCat);
@@ -105,17 +114,17 @@ internal class Program
 			}
 
 			// write the file
-			using var dict = new StreamWriter("../uax29/WordsDict.cs");
+			using var dict = new StreamWriter($"../uax29/{typ}sDict.cs");
 
-			dict.WriteLine($"// generated from {url}");
+			dict.WriteLine($"// generated from {urls[0]}");
 
-			dict.Write(@"
+			dict.Write(@$"
 namespace uax29;
 
 using Property = int;
 
-public static partial class Words
-{
+public static partial class {typ}s
+{{
 ");
 
 			foreach (var kv in cats)
@@ -124,7 +133,7 @@ public static partial class Words
 			}
 
 			dict.Write(@"
-	private static readonly Dictionary<int, Property> dict = new()
+	private static readonly Dict dict = new()
 	{
 ");
 
@@ -140,10 +149,10 @@ public static partial class Words
 			dict.WriteLine("};	// end class");
 		}
 
-		static async Task WriteTests()
+		static async Task WriteTests(string typ)
 		{
 			/// Tests
-			const string url = $"https://www.unicode.org/Public/{version}/ucd/auxiliary/WordBreakTest.txt";
+			var url = $"https://www.unicode.org/Public/{version}/ucd/auxiliary/{typ}BreakTest.txt";
 
 			using var client = new HttpClient();
 			var response = await client.GetAsync(url);
@@ -152,12 +161,12 @@ public static partial class Words
 
 			using var reader = new StringReader(data);
 
-			using var dict = new StreamWriter("../Tests/UnicodeTests.cs");
+			using var dict = new StreamWriter($"../Tests/{typ}Tests.cs");
 			dict.WriteLine($"// generated from {url}");
-			dict.Write(@"namespace Tests;
+			dict.Write(@$"namespace Tests;
 public static partial class UnicodeTests
-{
-	public readonly static UnicodeTest[] Words = [
+{{
+	public readonly static UnicodeTest[] {typ}s = [
 ");
 			while (true)
 			{

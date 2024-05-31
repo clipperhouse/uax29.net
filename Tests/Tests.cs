@@ -29,20 +29,26 @@ public class Tests
 	[Test]
 	public void Unicode()
 	{
-		foreach (var test in UnicodeTests.Words)
+		//UnicodeTest[][] typs = [UnicodeTests.Words, UnicodeTests.Graphemes, UnicodeTests.Sentences];
+		UnicodeTest[][] typs = [UnicodeTests.Words];
+
+		foreach (var tests in typs)
 		{
-			var seg = Words.Segment(test.input);
-			var i = 0;
-			while (seg.Next())
+			foreach (var test in tests)
 			{
-				var expected = test.expected[i];
-				var got = seg.Bytes();
-				Assert.That(expected.SequenceEqual(got), $@"Test {i}, {test.comment}
+				var seg = Words.Segment(test.input);
+				var i = 0;
+				while (seg.Next())
+				{
+					var expected = test.expected[i];
+					var got = seg.Bytes();
+					Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
 				got {got}
 				");
-				i++;
+					i++;
+				}
 			}
 		}
 	}
