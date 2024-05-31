@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace uax29;
 
 public class Segmenter(SplitFunc split, byte[] data)
@@ -35,6 +37,11 @@ public class Segmenter(SplitFunc split, byte[] data)
 	public byte[] Bytes()
 	{
 		return token;
+	}
+
+	public override string ToString()
+	{
+		return Encoding.UTF8.GetString(token);
 	}
 }
 
