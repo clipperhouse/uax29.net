@@ -1,4 +1,5 @@
 namespace uax29;
+
 using System.Text;
 using System.Buffers;
 

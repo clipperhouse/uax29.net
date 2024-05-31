@@ -1,5 +1,5 @@
 
-const string version = "15.0.0";
+const string version = "15.1.0";
 const string url = $"https://www.unicode.org/Public/{version}/ucd/auxiliary/WordBreakProperty.txt";
 const string url2 = $"https://www.unicode.org/Public/{version}/ucd/emoji/emoji-data.txt";
 
@@ -19,35 +19,7 @@ using var reader = new StringReader(data);
 int currentCat = 0;
 var lastCat = "";
 var cats = new Dictionary<string, int>();
-
-using var dict = new StreamWriter("../uax29/WordsDict.cs");
-dict.Write(@"namespace uax29;
-
-using System.Buffers;
-using System.Text;
-using Property = int;
-
-public static partial class Words
-{
-	public static Property Lookup(Span<byte> data, out int width, out OperationStatus status)
-	{
-		status = Rune.DecodeFromUtf8(data, out Rune r, out width);
-		if (status != OperationStatus.Done)
-		{
-			return 0;
-		}
-		if (dict.TryGetValue(r.Value, out Property property))
-		{
-			return property;
-		}
-		return 0;
-	}
-
-	private static readonly Dictionary<int, Property> dict = new()
-	{
-");
-
-var catsByRune = new Dictionary<int, int>();
+var catsByRune = new Dictionary<int, string>();
 
 while (true)
 {
@@ -109,29 +81,49 @@ while (true)
 	// Console.WriteLine("Starting range " + range);
 	for (var i = start; i <= end; i++)
 	{
-		if (catsByRune.TryGetValue(i, out int existing))
+		if (catsByRune.TryGetValue(i, out string? existing))
 		{
-			catsByRune[i] = existing | currentCat;
+			catsByRune[i] = $"{existing} | {cat}";
 		}
 		else
 		{
-			catsByRune.Add(i, currentCat);
+			catsByRune.Add(i, cat);
 		}
 	}
 }
 
-foreach (var kv in catsByRune)
-{
-	// codegen the dict
-	dict.WriteLine($"		{{{kv.Key},{kv.Value}}},");
-}
+// write the file
+using var dict = new StreamWriter("../uax29/WordsDict.cs");
 
-dict.WriteLine("	};	// end dict");
+dict.WriteLine($"// generated from {url}");
+
+dict.Write(@"
+namespace uax29;
+
+using Property = int;
+
+public static partial class Words
+{
+");
 
 foreach (var kv in cats)
 {
 	dict.WriteLine($"	const Property {kv.Key} = {kv.Value};");
 }
+
+dict.Write(@"
+	private static readonly Dictionary<int, Property> dict = new()
+	{
+");
+
+foreach (var kv in catsByRune)
+{
+	// codegen the dict
+	dict.WriteLine($"		{{0x{kv.Key:X4}, {kv.Value}}},");
+}
+
+dict.WriteLine("	};	// end dict");
+
 
 dict.WriteLine("};	// end class");
 
