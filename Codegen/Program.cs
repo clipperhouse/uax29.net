@@ -114,7 +114,7 @@ internal class Program
 			}
 
 			// write the file
-			using var dict = new StreamWriter($"../uax29/{typ}sDict.cs");
+			using var dict = new StreamWriter($"../uax29/{typ}s.Dict.cs");
 
 			dict.WriteLine($"// generated from {urls[0]}");
 
@@ -133,7 +133,7 @@ public static partial class {typ}s
 			}
 
 			dict.Write(@"
-	private static readonly Dict dict = new()
+	static readonly Dict dict = new()
 	{
 ");
 
@@ -161,7 +161,7 @@ public static partial class {typ}s
 
 			using var reader = new StringReader(data);
 
-			using var dict = new StreamWriter($"../Tests/{typ}Tests.cs");
+			using var dict = new StreamWriter($"../Tests/{typ}s.Tests.cs");
 			dict.WriteLine($"// generated from {url}");
 			dict.Write(@$"namespace Tests;
 public static partial class UnicodeTests

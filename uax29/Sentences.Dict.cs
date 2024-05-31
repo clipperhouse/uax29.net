@@ -21,7 +21,7 @@ public static partial class Sentences
 	const Property Close = 4096;
 	const Property SContinue = 8192;
 
-	private static readonly Dict dict = new()
+	static readonly Dict dict = new()
 	{
 		{0x000D, CR},
 		{0x000A, LF},

@@ -17,7 +17,7 @@ public class Tests
 	public void Segmenter()
 	{
 		var s = Encoding.UTF8.GetBytes("This is a test, with some number or words you know.");
-		var seg = new Segmenter(Words.SplitFunc, s);
+		var seg = new Words.Segmenter(s);
 
 		while (seg.Next())
 		{
@@ -36,7 +36,7 @@ public class Tests
 		{
 			foreach (var test in tests)
 			{
-				var seg = Words.Segment(test.input);
+				var seg = new Words.Segmenter(test.input);
 				var i = 0;
 				while (seg.Next())
 				{

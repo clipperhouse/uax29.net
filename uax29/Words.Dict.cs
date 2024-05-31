@@ -26,7 +26,7 @@ public static partial class Words
 	const Property WSegSpace = 131072;
 	const Property Extended_Pictographic = 262144;
 
-	private static readonly Dict dict = new()
+	static readonly Dict dict = new()
 	{
 		{0x0022, Double_Quote},
 		{0x0027, Single_Quote},

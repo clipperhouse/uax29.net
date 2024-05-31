@@ -6,8 +6,6 @@ using System.Buffers;
 /// A bitmap of Unicode categories
 using Property = int;
 
-public delegate (int advance, byte[] token) SplitFunc(byte[] data, bool atEOF);
-
 public static partial class Words
 {
 	static bool Matches(this Property lookup, Property properties)
@@ -21,7 +19,7 @@ public static partial class Words
 
 	const Property Ignore = Extend | Format | ZWJ;
 
-	public static readonly SplitFunc SplitFunc = (byte[] data, bool atEOF) =>
+	static readonly SplitFunc SplitFunc = (byte[] data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{

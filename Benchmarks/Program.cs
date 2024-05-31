@@ -9,36 +9,21 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 [MemoryDiagnoser]
 public class Benchmark
 {
-	private Segmenter seg;
-	private byte[] somewords = Encoding.UTF8.GetBytes("This is a test, with some number or words you know.");
+	private Segmenter segmenter;
+	private byte[] words = Encoding.UTF8.GetBytes("This is a test, with some number or words you know.");
 
 	[GlobalSetup]
 	public void Setup()
 	{
-		seg = new Segmenter(uax29.Words.SplitFunc, somewords);
-		uax29.Words.dict.TryGetValue('א', out int val);
-	}
-
-	[Benchmark]
-	public void Lookup()
-	{
-		var b = Encoding.UTF8.GetBytes("א");
-		var p = uax29.Words.Lookup(b, out int w, out OperationStatus _);
-	}
-
-	[Benchmark]
-	public void Dict()
-	{
-		uax29.Words.dict.TryGetValue('א', out int val);
+		segmenter = new Words.Segmenter(words);
 	}
 
 	[Benchmark]
 	public void Words()
 	{
-		while (seg.Next())
+		while (segmenter.Next())
 		{
-			seg.Bytes();
+			segmenter.Bytes();
 		}
 	}
-
 }

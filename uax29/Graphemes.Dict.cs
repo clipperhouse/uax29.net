@@ -20,7 +20,7 @@ public static partial class Graphemes
 	const Property LVT = 2048;
 	const Property ZWJ = 4096;
 
-	private static readonly Dict dict = new()
+	static readonly Dict dict = new()
 	{
 		{0x0600, Prepend},
 		{0x0601, Prepend},
