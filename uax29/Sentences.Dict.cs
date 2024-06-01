@@ -21,8 +21,8 @@ static partial class Sentences
 	const Property Close = 4096;
 	const Property SContinue = 8192;
 
-	static readonly Dict dict = new()
-	{
+	static readonly Dict dict = new Dict(GetDict());
+	static Dictionary<int, Property> GetDict() => new Dictionary<int, Property>()	{
 		{0x000D, CR},
 		{0x000A, LF},
 		{0x0300, Extend},
@@ -140197,5 +140197,5 @@ static partial class Sentences
 		{0xFF0D, SContinue},
 		{0xFF1A, SContinue},
 		{0xFF64, SContinue},
-	};	// end dict
-};	// end class
+	}; // end dict
+};  // end class
