@@ -15,11 +15,11 @@ public static partial class Graphemes
 
 	const Property Ignore = Extend;
 
-	static readonly SplitFunc SplitFunc = (byte[] data, bool atEOF) =>
+	static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
-			return (0, []);
+			return 0;
 		}
 
 		// These vars are stateful across loop iterations
@@ -38,7 +38,7 @@ public static partial class Graphemes
 				if (!atEOF)
 				{
 					// Token extends past current data, request more
-					return (0, []); // TODO
+					return 0; // TODO
 				}
 
 				// https://unicode.org/reports/tr29/#GB2
@@ -69,7 +69,7 @@ public static partial class Graphemes
 				}
 
 				// Rune extends past current data, request more
-				return (0, []); // TODO
+				return 0; // TODO
 			}
 
 			// https://unicode.org/reports/tr29/#GB1
@@ -192,13 +192,13 @@ public static partial class Graphemes
 			break;
 		}
 
-		return (pos, data[..pos]);
+		return pos;
 	};
 
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the Ignore property.
-	static bool Previous(Property property, byte[] data)
+	static bool Previous(Property property, Span<byte> data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;

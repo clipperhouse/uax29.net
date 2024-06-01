@@ -6,9 +6,10 @@ namespace uax29;
 public class Segmenter(SplitFunc split, byte[] data) : IEnumerable<byte[]>
 {
 	readonly SplitFunc split = split;
-	readonly byte[] data = data;
-	byte[] token = [];
+	byte[] data = data;
 	int pos;
+	int start;
+	int end;
 
 	public IEnumerator<byte[]> GetEnumerator()
 	{
@@ -23,22 +24,25 @@ public class Segmenter(SplitFunc split, byte[] data) : IEnumerable<byte[]>
 		return GetEnumerator();
 	}
 
+	public void SetText(byte[] data)
+	{
+		this.data = data;
+		this.start = 0;
+		this.end = 0;
+	}
+
 	public bool Next()
 	{
 		while (pos < data.Length)
 		{
-			var b = data[pos..];
-			(var advance, var token) = split(data[pos..], true);
+			var b = data.AsSpan()[pos..];
+			var advance = split(b, true);
+			this.start = pos;
+			this.end = pos + advance;
 			pos += advance;
-			this.token = token;
 
 			// Interpret as EOF
 			if (advance == 0)
-			{
-				return false;
-			}
-			// Interpret as EOF
-			if (this.token.Length == 0)
 			{
 				return false;
 			}
@@ -50,12 +54,12 @@ public class Segmenter(SplitFunc split, byte[] data) : IEnumerable<byte[]>
 
 	public byte[] Bytes()
 	{
-		return token;
+		return this.data[this.start..this.end];
 	}
 
 	public override string ToString()
 	{
-		return Encoding.UTF8.GetString(token);
+		return Encoding.UTF8.GetString(Bytes());
 	}
 }
 

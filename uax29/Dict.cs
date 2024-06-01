@@ -8,7 +8,7 @@ using Property = int;
 
 public class Dict : Dictionary<int, Property>
 {
-	public Property Lookup(byte[] data, out int width, out OperationStatus status)
+	public Property Lookup(Span<byte> data, out int width, out OperationStatus status)
 	{
 		status = Rune.DecodeFromUtf8(data, out Rune r, out width);
 		if (status != OperationStatus.Done)

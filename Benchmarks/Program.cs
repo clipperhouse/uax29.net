@@ -16,6 +16,7 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 public class Benchmark
 {
 	private static byte[] sample = [];
+	private Segmenter words = new Words.Segmenter([]);
 
 	[GlobalSetup]
 	public void Setup()
@@ -26,10 +27,10 @@ public class Benchmark
 	[Benchmark]
 	public void Words()
 	{
+		// words.SetText(sample);
 		var words = sample.TokenizeWords();
 		foreach (var word in words)
 		{
-			Console.Write(word);
 		}
 	}
 

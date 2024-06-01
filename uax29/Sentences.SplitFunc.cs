@@ -15,11 +15,11 @@ public static partial class Sentences
 	const Property ParaSep = Sep | CR | LF;
 	const Property Ignore = Extend | Format;
 
-	static readonly SplitFunc SplitFunc = static (byte[] data, bool atEOF) =>
+	static readonly SplitFunc SplitFunc = static (Span<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
-			return (0, []);
+			return 0;
 		}
 
 		// These vars are stateful across loop iterations
@@ -37,7 +37,7 @@ public static partial class Sentences
 				if (!atEOF)
 				{
 					// Token extends past current data, request more
-					return (0, []); // TODO
+					return 0; // TODO
 				}
 
 				// https://unicode.org/reports/tr29/#SB2
@@ -67,7 +67,7 @@ public static partial class Sentences
 					break;
 				}
 				// Rune extends past current data, request more
-				return (0, []);
+				return 0;
 			}
 
 			// https://unicode.org/reports/tr29/#SB1
@@ -157,7 +157,7 @@ public static partial class Sentences
 							goto getout;    // i'd prefer a labeled break, I guess that's not thing? 
 						}
 						// Rune extends past current data, request more
-						return (0, []); // TODO
+						return 0; // TODO
 					}
 
 					if (lookup.Matches(OLetter | Upper | Lower | ParaSep | SATerm))
@@ -369,7 +369,7 @@ public static partial class Sentences
 		}
 
 	getout:
-		return (pos, data[..pos]);
+		return pos;
 	};
 
 
@@ -377,7 +377,7 @@ public static partial class Sentences
 	// previousIndex works backward until it hits a rune in properties,
 	// ignoring runes with the _Ignore property (per WB4), and returns
 	// the index in data. It returns -1 if such a rune is not found.
-	static int PreviousIndex(Property property, byte[] data)
+	static int PreviousIndex(Property property, Span<byte> data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;
@@ -408,14 +408,14 @@ public static partial class Sentences
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Previous(Property property, byte[] data)
+	static bool Previous(Property property, Span<byte> data)
 	{
 		return PreviousIndex(property, data) != -1;
 	}
 
 	// subsequent looks ahead in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Subsequent(Property property, byte[] data)
+	static bool Subsequent(Property property, Span<byte> data)
 	{
 		var i = 0;
 		while (i < data.Length)
