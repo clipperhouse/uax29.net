@@ -5,7 +5,7 @@ using System.Text;
 
 /// A bitmap of Unicode categories
 using Property = int;
-public static partial class Sentences
+internal static partial class Sentences
 {
 	static bool Matches(this Property lookup, Property properties)
 	{
@@ -15,7 +15,7 @@ public static partial class Sentences
 	const Property ParaSep = Sep | CR | LF;
 	const Property Ignore = Extend | Format;
 
-	static readonly SplitFunc SplitFunc = static (Span<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = static (Span<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{

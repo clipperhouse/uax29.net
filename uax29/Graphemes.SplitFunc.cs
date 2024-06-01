@@ -6,7 +6,7 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = int;
 
-public static partial class Graphemes
+internal static partial class Graphemes
 {
 	static bool Matches(this Property lookup, Property properties)
 	{
@@ -15,7 +15,7 @@ public static partial class Graphemes
 
 	const Property Ignore = Extend;
 
-	static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{

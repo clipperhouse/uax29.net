@@ -16,12 +16,11 @@ public class Unicode
 	[Test, TestCaseSource(nameof(wordTests))]
 	public void Words(UnicodeTest test)
 	{
-		var seg = new Words.Segmenter(test.input);
+		var words = test.input.TokenizeWords();
 		var i = 0;
-		while (seg.Next())
+		foreach (var got in words)
 		{
 			var expected = test.expected[i];
-			var got = seg.Bytes();
 			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
@@ -35,12 +34,11 @@ public class Unicode
 	[Test, TestCaseSource(nameof(graphemeTests))]
 	public void Graphemes(UnicodeTest test)
 	{
-		var seg = new Graphemes.Segmenter(test.input);
+		var words = test.input.TokenizeGraphemes();
 		var i = 0;
-		while (seg.Next())
+		foreach (var got in words)
 		{
 			var expected = test.expected[i];
-			var got = seg.Bytes();
 			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
@@ -54,12 +52,11 @@ public class Unicode
 	[Test, TestCaseSource(nameof(sentenceTests))]
 	public void Sentences(UnicodeTest test)
 	{
-		var seg = new Sentences.Segmenter(test.input);
+		var words = test.input.TokenizeSentences();
 		var i = 0;
-		while (seg.Next())
+		foreach (var got in words)
 		{
 			var expected = test.expected[i];
-			var got = seg.Bytes();
 			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}

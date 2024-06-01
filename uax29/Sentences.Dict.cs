@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = int;
 
-public static partial class Sentences
+internal static partial class Sentences
 {
 	const Property CR = 1;
 	const Property LF = 2;

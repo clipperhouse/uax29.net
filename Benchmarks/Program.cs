@@ -10,13 +10,12 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 // var benchmark = new Benchmark();
 // benchmark.Setup();
 // var throughput = benchmark.Throughput();
-// Console.WriteLine($"Throughput: {Math.Round(throughput, 8)} MB/s");
+// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark
 {
 	private static byte[] sample = [];
-	private Segmenter words = new Words.Segmenter([]);
 
 	[GlobalSetup]
 	public void Setup()
@@ -27,7 +26,6 @@ public class Benchmark
 	[Benchmark]
 	public void Words()
 	{
-		// words.SetText(sample);
 		var words = sample.TokenizeWords();
 		foreach (var word in words)
 		{
@@ -35,27 +33,27 @@ public class Benchmark
 	}
 
 	// [Benchmark]
-	// public double Throughput()
-	// {
-	// 	const int runs = 10;
-	// 	var stopwatch = Stopwatch.StartNew();
-	// 	double bytes = 0;
+	public double Throughput()
+	{
+		const int runs = 1000;
+		var stopwatch = Stopwatch.StartNew();
+		double bytes = 0;
 
-	// 	for (var i = 0; i < runs; i++)
-	// 	{
-	// 		var words = sample.TokenizeWords();
-	// 		foreach (var word in words)
-	// 		{
+		for (var i = 0; i < runs; i++)
+		{
+			var words = sample.TokenizeWords();
+			foreach (var word in words)
+			{
 
-	// 		}
-	// 		bytes += sample.Length;
-	// 	}
+			}
+			bytes += sample.Length;
+		}
 
-	// 	stopwatch.Stop();
+		stopwatch.Stop();
 
-	// 	double elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-	// 	var megabytes = bytes / (1024.0 * 1024.0);
+		double elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
+		var megabytes = bytes / (1024.0 * 1024.0);
 
-	// 	return megabytes / elapsedSeconds;
-	// }
+		return megabytes / elapsedSeconds;
+	}
 }

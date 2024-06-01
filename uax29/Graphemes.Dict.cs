@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = int;
 
-public static partial class Graphemes
+internal static partial class Graphemes
 {
 	const Property Prepend = 1;
 	const Property CR = 2;

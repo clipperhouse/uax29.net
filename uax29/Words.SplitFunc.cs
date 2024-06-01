@@ -5,8 +5,7 @@ using System.Buffers;
 
 /// A bitmap of Unicode categories
 using Property = int;
-
-public static partial class Words
+internal static partial class Words
 {
 	static bool Matches(this Property lookup, Property properties)
 	{
@@ -19,7 +18,7 @@ public static partial class Words
 
 	const Property Ignore = Extend | Format | ZWJ;
 
-	static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
