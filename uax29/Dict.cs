@@ -6,7 +6,7 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = int;
 
-public class Dict : Dictionary<int, Property>
+internal class Dict : Dictionary<int, Property>
 {
 	public Property Lookup(Span<byte> data, out int width, out OperationStatus status)
 	{
