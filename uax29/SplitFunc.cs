@@ -1,3 +1,3 @@
 ﻿namespace uax29;
 
-internal delegate int SplitFunc(Span<byte> data, bool atEOF);
+delegate int SplitFunc(Span<byte> data, bool atEOF = true);

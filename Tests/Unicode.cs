@@ -2,6 +2,7 @@ namespace Tests;
 
 using uax29;
 using NUnit.Framework.Internal;
+using System.Text;
 
 [TestFixture]
 public class Unicode
@@ -12,13 +13,10 @@ public class Unicode
 	{
 	}
 
-	static readonly UnicodeTest[] wordTests = UnicodeTests.Words;
-	[Test, TestCaseSource(nameof(wordTests))]
-	public void Words(UnicodeTest test)
+	static void TestEnumerable(IEnumerable<byte[]> results, UnicodeTest test)
 	{
-		var words = test.input.TokenizeWords();
 		var i = 0;
-		foreach (var got in words)
+		foreach (var got in results)
 		{
 			var expected = test.expected[i];
 			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
@@ -30,39 +28,70 @@ public class Unicode
 		}
 	}
 
-	static readonly UnicodeTest[] graphemeTests = UnicodeTests.Graphemes;
-	[Test, TestCaseSource(nameof(graphemeTests))]
-	public void Graphemes(UnicodeTest test)
+	static void TestTokenizer(Tokenizer tokens, UnicodeTest test)
 	{
-		var words = test.input.TokenizeGraphemes();
 		var i = 0;
-		foreach (var got in words)
+		while (tokens.MoveNext())
 		{
+			var got = tokens.Current;
 			var expected = test.expected[i];
-			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
+			Assert.That(expected.AsSpan().SequenceEqual(got), $@"{test.comment}
 				input {test.input}
 				expected {expected}
-				got {got}
+				got {got.ToArray()}
 				");
 			i++;
 		}
 	}
 
-	static readonly UnicodeTest[] sentenceTests = UnicodeTests.Sentences;
-	[Test, TestCaseSource(nameof(sentenceTests))]
-	public void Sentences(UnicodeTest test)
+	static readonly UnicodeTest[] WordsTests = UnicodeTests.Words;
+
+	[Test, TestCaseSource(nameof(WordsTests))]
+	public void WordsExtension(UnicodeTest test)
 	{
-		var words = test.input.TokenizeSentences();
-		var i = 0;
-		foreach (var got in words)
-		{
-			var expected = test.expected[i];
-			Assert.That(expected.SequenceEqual(got), $@"{test.comment}
-				input {test.input}
-				expected {expected}
-				got {got}
-				");
-			i++;
-		}
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = s.TokenizeWords();
+		TestEnumerable(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(WordsTests))]
+	public void WordsTokenizer(UnicodeTest test)
+	{
+		var tokens = new Tokenizer(test.input);
+		TestTokenizer(tokens, test);
+	}
+
+	static readonly UnicodeTest[] SentencesTests = UnicodeTests.Sentences;
+
+	[Test, TestCaseSource(nameof(SentencesTests))]
+	public void SentencesExtension(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = s.TokenizeSentences();
+		TestEnumerable(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(SentencesTests))]
+	public void SentencesTokenizer(UnicodeTest test)
+	{
+		var tokens = new Tokenizer(test.input, TokenType.Sentences);
+		TestTokenizer(tokens, test);
+	}
+
+	static readonly UnicodeTest[] GraphemesTests = UnicodeTests.Graphemes;
+
+	[Test, TestCaseSource(nameof(GraphemesTests))]
+	public void GraphemesExtension(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = s.TokenizeGraphemes();
+		TestEnumerable(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(GraphemesTests))]
+	public void GraphemesTokenizer(UnicodeTest test)
+	{
+		var tokens = new Tokenizer(test.input, TokenType.Graphemes);
+		TestTokenizer(tokens, test);
 	}
 }

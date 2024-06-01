@@ -6,7 +6,7 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = int;
 
-internal static partial class Graphemes
+static partial class Graphemes
 {
 	static bool Matches(this Property lookup, Property properties)
 	{

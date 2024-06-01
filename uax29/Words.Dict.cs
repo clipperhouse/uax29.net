@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = int;
 
-internal static partial class Words
+static partial class Words
 {
 	const Property Double_Quote = 1;
 	const Property Single_Quote = 2;

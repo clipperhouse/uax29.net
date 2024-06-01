@@ -16,36 +16,52 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 public class Benchmark
 {
 	private static byte[] sample = [];
+	private static string sampleStr = "";
 
 	[GlobalSetup]
 	public void Setup()
 	{
 		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
+		sampleStr = Encoding.UTF8.GetString(sample);
 	}
 
 	[Benchmark]
-	public void Words()
+	public void WordsExtension()
 	{
-		var words = sample.TokenizeWords();
+		var words = sampleStr.TokenizeWords();
 		foreach (var word in words)
 		{
 		}
 	}
 
-	// [Benchmark]
+	[Benchmark]
+	public void WordsTokenizer()
+	{
+		var tokens = new Tokenizer(sample);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
+	[Benchmark]
 	public double Throughput()
 	{
-		const int runs = 1000;
+		const int runs = 10;
 		var stopwatch = Stopwatch.StartNew();
 		double bytes = 0;
 
 		for (var i = 0; i < runs; i++)
 		{
-			var words = sample.TokenizeWords();
-			foreach (var word in words)
+			var tokens = new Tokenizer(sample);
+			while (tokens.MoveNext())
 			{
 
 			}
+			// var words = sample.TokenizeWords();
+			// foreach (var word in words)
+			// {
+
+			// }
 			bytes += sample.Length;
 		}
 

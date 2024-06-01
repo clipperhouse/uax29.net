@@ -123,7 +123,7 @@ namespace uax29;
 
 using Property = int;
 
-internal static partial class {typ}s
+static partial class {typ}s
 {{
 ");
 

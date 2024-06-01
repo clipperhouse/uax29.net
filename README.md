@@ -11,13 +11,26 @@ using uax29;
 using System.Text;
 
 var example = "Here is some example text. 你好，世界.";
-var words = example.TokenizeWords();
 
+// The simple version
+var words = example.TokenizeWords();
 foreach (var word in words)
 {
-	var s = Encoding.UTF8.GetString(word);	// We currently return raw UTF-8 bytes
+	// We return raw UTF-8 bytes
+	var s = Encoding.UTF8.GetString(word);
 	Console.WriteLine(s);
 }
+
+// The higher-performance version
+var bytes = Encoding.UTF8.GetBytes(example);
+var tokens = new Tokenizer(bytes);
+while (tokens.MoveNext())
+{
+	// We return raw UTF-8 bytes
+	var s = Encoding.UTF8.GetString(tokens.Current);
+	Console.WriteLine(s);
+}
+
 /*
 Here
  
