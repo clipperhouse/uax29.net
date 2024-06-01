@@ -6,23 +6,21 @@ public static class Extensions
 {
 	static IEnumerable<byte[]> Tokenize(SplitFunc split, byte[] data)
 	{
-		int pos = 0;
 		int start = 0;
 		int end = 0;
 
-		while (pos < data.Length)
+		while (end < data.Length)
 		{
-			var b = data.AsSpan()[pos..];
-			var advance = split(b, true);
+			var b = data.AsSpan()[end..];
+			var advance = split(b);
 			// Interpret as EOF
 			if (advance == 0)
 			{
 				break;
 			}
 
-			start = pos;
-			end = pos + advance;
-			pos += advance;
+			start = end;
+			end = start + advance;
 
 			yield return data[start..end];
 		}

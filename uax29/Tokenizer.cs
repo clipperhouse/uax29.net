@@ -12,7 +12,6 @@ public ref struct Tokenizer
 	readonly Span<byte> data;
 	readonly SplitFunc split;
 
-	int pos = 0;
 	int start = 0;
 	int end = 0;
 
@@ -30,18 +29,17 @@ public ref struct Tokenizer
 
 	public bool MoveNext()
 	{
-		while (pos < data.Length)
+		while (end < data.Length)
 		{
-			var advance = split(data[pos..]);
+			var advance = split(data[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
 				break;
 			}
 
-			start = pos;
-			end = pos + advance;
-			pos += advance;
+			start = end;
+			end = start + advance;
 
 			return true;
 		}
