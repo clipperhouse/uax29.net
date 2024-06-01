@@ -21,8 +21,8 @@ static partial class Graphemes
 	const Property ZWJ = 4096;
 	const Property Extended_Pictographic = 8192;
 
-	static readonly Dict dict = new Dict(GetDict());
-	static Dictionary<int, Property> GetDict() => new Dictionary<int, Property>()
+	static readonly Dict dict = new(GetDict());
+	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0600, Prepend},
 		{0x0601, Prepend},
@@ -21564,5 +21564,5 @@ static partial class Graphemes
 		{0x1FFFB, Extended_Pictographic},
 		{0x1FFFC, Extended_Pictographic},
 		{0x1FFFD, Extended_Pictographic},
-	}; // end dict
-};  // end class
+	};	// end dict
+};	// end class
