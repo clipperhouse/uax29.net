@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>uax29.net</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>clipperhouse</Authors>
+    <Description>This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode version 15.0.0.</Description>
+    <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://example.com</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon> -->
+    <RepositoryUrl>https://github.com/clipperhouse/uax29.net</RepositoryUrl>
+  </PropertyGroup>
 </Project>
