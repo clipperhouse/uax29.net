@@ -5,7 +5,7 @@ using System.Collections.Frozen;
 using System.Text;
 
 /// A bitmap of Unicode categories
-using Property = int;
+using Property = uint;
 
 internal class Dict
 {

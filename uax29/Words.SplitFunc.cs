@@ -4,7 +4,7 @@ using System.Text;
 using System.Buffers;
 
 /// A bitmap of Unicode categories
-using Property = int;
+using Property = uint;
 
 static partial class Words
 {

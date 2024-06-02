@@ -4,7 +4,7 @@ using System.Buffers;
 using System.Text;
 
 /// A bitmap of Unicode categories
-using Property = int;
+using Property = uint;
 static partial class Sentences
 {
 	static bool Matches(this Property lookup, Property properties)

@@ -2,7 +2,7 @@
 
 namespace uax29;
 
-using Property = int;
+using Property = uint;
 
 static partial class Sentences
 {

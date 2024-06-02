@@ -121,7 +121,7 @@ internal class Program
 			dict.Write(@$"
 namespace uax29;
 
-using Property = int;
+using Property = uint;
 
 static partial class {typ}s
 {{
