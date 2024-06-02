@@ -56,7 +56,14 @@ static partial class Sentences
 
 			var last = current;
 
-			current = dict.Lookup(data[pos..], out w, out _);   // TODO do something with the status
+			OperationStatus status;
+			current = dict.Lookup(data[pos..], out w, out status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				pos += w;
+				break;
+			}
 
 			if (w == 0)
 			{
@@ -147,7 +154,13 @@ static partial class Sentences
 				// Zero or more of not-the-above properties
 				while (p < data.Length)
 				{
-					var lookup = dict.Lookup(data[p..], out int w2, out OperationStatus status);
+					var lookup = dict.Lookup(data[p..], out int w2, out status);
+					if (status != OperationStatus.Done)
+					{
+						// Garbage in, garbage out
+						break;
+					}
+
 					if (w2 == 0)
 					{
 						if (atEOF)
@@ -386,7 +399,13 @@ static partial class Sentences
 			var _ = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);  // TODO handle status
 
 			i -= w;
-			var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int _, out var status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				break;
+			}
+
 			// I think it's OK to elide width here; will fall through to break
 
 			if (lookup.Matches(Ignore))
@@ -420,7 +439,12 @@ static partial class Sentences
 		var i = 0;
 		while (i < data.Length)
 		{
-			var lookup = dict.Lookup(data[i..], out int w, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int w, out var status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				break;
+			}
 
 			if (w == 0)
 			{

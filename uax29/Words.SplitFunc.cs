@@ -50,7 +50,14 @@ static partial class Words
 
 			var last = current;
 
-			current = dict.Lookup(data[pos..], out w, out _);   // TODO do something with the status
+			OperationStatus status;
+			current = dict.Lookup(data[pos..], out w, out status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				pos += w;
+				break;
+			}
 
 			if (w == 0)
 			{
@@ -125,7 +132,13 @@ static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = dict.Lookup(data[pos..], out int w2, out _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out status);
+						if (status != OperationStatus.Done)
+						{
+							// Garbage in, garbage out
+							break;
+						}
+
 						if (!lookup.Matches(AHLetter))
 						{
 							break;
@@ -234,7 +247,12 @@ static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = dict.Lookup(data[pos..], out int w2, out OperationStatus _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out status);
+						if (status != OperationStatus.Done)
+						{
+							// Garbage in, garbage out
+							break;
+						}
 
 						if (!lookup.Matches(Numeric | AHLetter))
 						{
@@ -299,7 +317,12 @@ static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
-						var lookup = dict.Lookup(data[pos..], out int w2, out OperationStatus _);
+						var lookup = dict.Lookup(data[pos..], out int w2, out status);
+						if (status != OperationStatus.Done)
+						{
+							// Garbage in, garbage out
+							break;
+						}
 
 						if (!lookup.Matches(Katakana))
 						{
@@ -369,7 +392,13 @@ static partial class Words
 
 				while (i > 0)
 				{
-					Rune.DecodeLastFromUtf8(data[..i], out Rune r, out int w2);
+					status = Rune.DecodeLastFromUtf8(data[..i], out Rune r, out int w2);
+					if (status != OperationStatus.Done)
+					{
+						// Garbage in, garbage out
+						break;
+					}
+
 					if (w2 == 0)
 					{
 						break;
@@ -377,7 +406,12 @@ static partial class Words
 
 					i -= w2;
 
-					var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
+					var lookup = dict.Lookup(data[i..], out int _, out status);
+					if (status != OperationStatus.Done)
+					{
+						// Garbage in, garbage out
+						break;
+					}
 
 					if (lookup.Matches(Ignore))
 					{
@@ -425,7 +459,13 @@ static partial class Words
 			var _ = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);  // TODO handle status
 
 			i -= w;
-			var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int _, out var status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				break;
+			}
+
 			// I think it's OK to elide width here; will fall through to break
 
 			if (lookup.Matches(Ignore))
@@ -459,7 +499,12 @@ static partial class Words
 		var i = 0;
 		while (i < data.Length)
 		{
-			var lookup = dict.Lookup(data[i..], out int w, out OperationStatus _);
+			var lookup = dict.Lookup(data[i..], out int w, out var status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				break;
+			}
 
 			if (w == 0)
 			{

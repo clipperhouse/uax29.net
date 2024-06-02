@@ -49,6 +49,10 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
+### Invalid UTF-8
+
+The tokenizer expects valid UTF-8 bytes as input. That said, we make an effort to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case. Garbage in, garbage out.
+
 ### Prior art
 
 [clipperhouse/uax29](https://github.com/clipperhouse/uax29)

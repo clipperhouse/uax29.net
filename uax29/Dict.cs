@@ -17,10 +17,6 @@ internal class Dict
 	public Property Lookup(Span<byte> data, out int width, out OperationStatus status)
 	{
 		status = Rune.DecodeFromUtf8(data, out Rune r, out width);
-		if (status != OperationStatus.Done)
-		{
-			return 0;
-		}
 		if (lookups.TryGetValue(r.Value, out Property property))
 		{
 			return property;

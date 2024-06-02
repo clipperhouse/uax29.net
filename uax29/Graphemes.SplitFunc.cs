@@ -45,19 +45,26 @@ static partial class Graphemes
 				break;
 			}
 
-			var last = current;
-			var lastw = w;
-
 			/*
 				We've switched the evaluation order of GB1↓ and GB2↑. It's ok:
 				because we've checked for len(data) at the top of this function,
 				sot and eot are mutually exclusive, order doesn't matter.
 			*/
 
-			// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
-			// to the right of the ×, from which we look back or forward
+			var last = current;
+			var lastWidth = w;
 
-			current = dict.Lookup(data[pos..], out w, out _);   // TODO do something with the status
+			// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
+			// to the right of the × or ÷, from which we look back or forward
+
+			OperationStatus status;
+			current = dict.Lookup(data[pos..], out w, out status);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				pos += w;
+				break;
+			}
 
 			if (w == 0)
 			{
@@ -142,7 +149,7 @@ static partial class Graphemes
 			}
 
 			// https://unicode.org/reports/tr29/#GB11
-			if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ) && Previous(Extended_Pictographic, data[..(pos - lastw)]))
+			if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ) && Previous(Extended_Pictographic, data[..(pos - lastWidth)]))
 			{
 				pos += w;
 				continue;
@@ -166,8 +173,12 @@ static partial class Graphemes
 					i -= w2;
 
 
-					var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
-
+					var lookup = dict.Lookup(data[i..], out int _, out status);
+					if (status != OperationStatus.Done)
+					{
+						// Garbage in, garbage out
+						break;
+					}
 
 					if (!lookup.Matches(Regional_Indicator))
 					{
@@ -204,7 +215,12 @@ static partial class Graphemes
 		var i = data.Length;
 		while (i > 0)
 		{
-			var _ = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);  // TODO handle status
+			var status = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);
+			if (status != OperationStatus.Done)
+			{
+				// Garbage in, garbage out
+				break;
+			}
 
 			i -= w;
 			var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
