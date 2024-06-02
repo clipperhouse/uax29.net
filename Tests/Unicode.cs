@@ -124,4 +124,25 @@ public class Unicode
 		// return matches;
 
 	}
+
+	[Test]
+	public void MatchAgain()
+	{
+		const uint current = 2;
+		const uint last = 4;
+
+		const uint currentProp = 2;
+		const uint lastProp = 4;
+		var concat = Concat(current, last);
+		var concatProp = Concat(currentProp, lastProp);
+		var ored = concat | concatProp;
+
+		var upper = ored >> 32;
+		var lower = ored & 0x00000000FFFFFFFF;
+
+		var upperLowerSum = upper + lower;
+		var propSum = currentProp + lastProp;
+
+		// var matches = (upper + lower) >= (currentProp + lastProp);
+	}
 }

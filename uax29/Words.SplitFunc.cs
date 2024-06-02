@@ -13,19 +13,22 @@ static partial class Words
 		return (lookup & properties) != 0;
 	}
 
-	static ulong Concat(this uint upper, uint lower)
+	static ulong Concat(this uint current, uint last)
 	{
-		ulong concatenated = ((ulong)upper << 32) | ((ulong)lower & 0xFFFFFFFF);
+		ulong concatenated = ((ulong)current << 32) | ((ulong)last & 0xFFFFFFFF);
 		return concatenated;
 	}
 
-	static bool Matches(this ulong currentLast, ulong properties)
+	static bool Matches(this uint current, uint currentProp, uint last, uint lastProp)
 	{
-		var current = currentLast >> 32;
-		var last = currentLast & 0x00000000FFFFFFFF;
-		var propCurrent = properties >> 32;
-		var propLast = properties & 0x0000000000000000FFFFFFFFFFFFFFFF;
-		var matches = ((current & propCurrent) + (last & propLast)) > 1;
+		var concat = Concat(current, last);
+		var concatProp = Concat(currentProp, lastProp);
+		var ored = concat & concatProp;
+
+		var upper = ored >> 32;
+		var lower = ored & 0x00000000FFFFFFFF;
+
+		var matches = (upper + lower) >= (currentProp + lastProp);
 		return matches;
 	}
 
@@ -93,12 +96,9 @@ static partial class Words
 				break;
 			}
 
-			var concat = current.Concat(last);
-			var lfcr = LF.Concat(CR);
-
 			// https://unicode.org/reports/tr29/#WB3
 			//			if (current.Matches(LF) && last.Matches(CR))
-			if (concat.Matches(lfcr))
+			if (Matches(current, LF, last, CR))
 			{
 				pos += w;
 				continue;
@@ -112,7 +112,8 @@ static partial class Words
 			}
 
 			// https://unicode.org/reports/tr29/#WB3c
-			if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ))
+			// if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ))
+			if (Matches(current, Extended_Pictographic, last, ZWJ))
 			{
 				pos += w;
 				continue;
@@ -137,7 +138,8 @@ static partial class Words
 			// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 			// https://unicode.org/reports/tr29/#WB5
-			if (current.Matches(AHLetter) && last.Matches(AHLetter | Ignore))
+			// if (current.Matches(AHLetter) && last.Matches(AHLetter | Ignore))
+			if (Matches(current, AHLetter, last, AHLetter | Ignore))
 			{
 				// Optimization: maybe a run without ignored characters
 				if (last.Matches(AHLetter))
@@ -175,7 +177,7 @@ static partial class Words
 
 			// Optimization: determine if WB6 can possibly apply
 			var maybeWB6 = current.Matches(MidLetter | MidNumLetQ) && last.Matches(AHLetter | Ignore);
-
+			// var maybeWB6 = Matches(current, MidLetter | MidNumLetQ, last, AHLetter | Ignore);
 			// https://unicode.org/reports/tr29/#WB6
 			if (maybeWB6)
 			{
