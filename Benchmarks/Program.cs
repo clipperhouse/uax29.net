@@ -5,12 +5,12 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using uax29;
 
-var summary = BenchmarkRunner.Run<Benchmark>();
+//var summary = BenchmarkRunner.Run<Benchmark>();
 
-// var benchmark = new Benchmark();
-// benchmark.Setup();
-// var throughput = benchmark.Throughput();
-// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+var benchmark = new Benchmark();
+benchmark.Setup();
+var throughput = benchmark.Throughput();
+Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark
@@ -26,15 +26,6 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void WordsExtension()
-	{
-		var words = sampleStr.TokenizeWords();
-		foreach (var word in words)
-		{
-		}
-	}
-
-	[Benchmark]
 	public void WordsTokenizer()
 	{
 		var tokens = new Tokenizer(sample);
@@ -46,7 +37,19 @@ public class Benchmark
 	[Benchmark]
 	public double Throughput()
 	{
-		const int runs = 10;
+		const int runs = 1000;
+
+		// warmup
+		for (var i = 0; i < runs; i++)
+		{
+			var tokens = new Tokenizer(sample);
+			while (tokens.MoveNext())
+			{
+
+			}
+		}
+		Thread.Sleep(100);
+
 		var stopwatch = Stopwatch.StartNew();
 		double bytes = 0;
 
@@ -57,11 +60,6 @@ public class Benchmark
 			{
 
 			}
-			// var words = sample.TokenizeWords();
-			// foreach (var word in words)
-			// {
-
-			// }
 			bytes += sample.Length;
 		}
 

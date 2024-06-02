@@ -10,14 +10,18 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 using uax29;
 using System.Text;
 
-var example = "Here is some example text. 你好，世界.";
-var words = example.TokenizeWords();
+// The API is bytes in and bytes out
 
-foreach (var word in words)
+var example = "Here is some example text. 你好，世界.";
+var bytes = Encoding.UTF8.GetBytes(example);
+
+var tokens = new Tokenizer(bytes);
+while (tokens.MoveNext())
 {
-	var s = Encoding.UTF8.GetString(word);	// We currently return raw UTF-8 bytes
+	var s = Encoding.UTF8.GetString(tokens.Current);
 	Console.WriteLine(s);
 }
+
 /*
 Here
  
