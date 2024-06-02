@@ -13,6 +13,22 @@ static partial class Words
 		return (lookup & properties) != 0;
 	}
 
+	static ulong Concat(this uint upper, uint lower)
+	{
+		ulong concatenated = ((ulong)upper << 32) | ((ulong)lower & 0xFFFFFFFF);
+		return concatenated;
+	}
+
+	static bool Matches(this ulong currentLast, ulong properties)
+	{
+		var current = currentLast >> 32;
+		var last = currentLast & 0x00000000FFFFFFFF;
+		var propCurrent = properties >> 32;
+		var propLast = properties & 0x0000000000000000FFFFFFFFFFFFFFFF;
+		var matches = ((current & propCurrent) + (last & propLast)) > 1;
+		return matches;
+	}
+
 	const Property AHLetter = ALetter | Hebrew_Letter;
 
 	const Property MidNumLetQ = MidNumLet | Single_Quote;
@@ -77,8 +93,12 @@ static partial class Words
 				break;
 			}
 
+			var concat = current.Concat(last);
+			var lfcr = LF.Concat(CR);
+
 			// https://unicode.org/reports/tr29/#WB3
-			if (current.Matches(LF) && last.Matches(CR))
+			//			if (current.Matches(LF) && last.Matches(CR))
+			if (concat.Matches(lfcr))
 			{
 				pos += w;
 				continue;

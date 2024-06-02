@@ -52,4 +52,76 @@ public class Unicode
 		var tokens = new Tokenizer(test.input, TokenType.Graphemes);
 		TestTokenizer(tokens, test);
 	}
+
+	static ulong Concat(uint upper, uint lower)
+	{
+		ulong concatenated = ((ulong)upper << 32) | ((ulong)lower & 0xFFFFFFFF);
+		return concatenated;
+	}
+
+
+	static bool Matches(ulong currentLast, ulong properties)
+	{
+		var current = currentLast >> 32;
+		var last = currentLast & 0x00000000FFFFFFFF;
+		var propCurrent = properties >> 32;
+		var propLast = properties & 0x0000000000000000FFFFFFFFFFFFFFFF;
+		var matches = ((current & propCurrent) + (last & propLast)) > 1;
+		return matches;
+	}
+
+	static string BitString(ulong val)
+	{
+		return Convert.ToString((long)val, 2).PadLeft(64, '0');
+	}
+
+	[Test]
+	public void Concatenate()
+	{
+		uint upper = 0b_1100110011001100_1100110011001100;
+		uint lower = 0b_0011001100110011_0011001100110011;
+
+		ulong concatenated = Concat(upper, lower);
+
+		var got = BitString(concatenated);
+
+		var expected = "11001100110011001100110011001100" + "00110011001100110011001100110011";
+		Assert.That(got == expected);
+	}
+
+	[Test]
+	public void LongMatch()
+	{
+		const uint current = 2;
+		const uint last = 4;
+		var currentLast = Concat(current, last);
+
+		var current2 = currentLast >> 32;
+		var last2 = currentLast & 0x0000_0000_FFFF_FFFF;
+
+		Assert.That(current == current2);
+		Assert.That((current & current2) == current);
+		Assert.That(last == last2);
+		Assert.That((last & last2) == last);
+
+		const uint currentProp = 2;
+		const uint lastProp = 4;
+
+		var bothProps = Concat(currentProp, lastProp);
+		var currentProp2 = bothProps >> 32;
+		var lastProp2 = bothProps & 0x0000_0000_FFFF_FFFF;
+
+		Assert.That(currentProp == currentProp2);
+		Assert.That((currentProp & currentProp2) == currentProp);
+		Assert.That(lastProp == lastProp2);
+		Assert.That((lastProp & lastProp2) == lastProp);
+
+		Assert.That((current & currentProp) == currentProp);
+		Assert.That((last & lastProp) == lastProp);
+
+
+		// var matches = ((current & propCurrent) + (last & propLast)) > 1;
+		// return matches;
+
+	}
 }

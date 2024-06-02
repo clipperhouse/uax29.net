@@ -3,7 +3,6 @@
 namespace uax29;
 
 using Property = uint;
-
 static partial class Graphemes
 {
 	const Property Prepend = 1;
@@ -21564,5 +21563,5 @@ static partial class Graphemes
 		{0x1FFFB, Extended_Pictographic},
 		{0x1FFFC, Extended_Pictographic},
 		{0x1FFFD, Extended_Pictographic},
-	};	// end dict
-};	// end class
+	};  // end dict
+};  // end class

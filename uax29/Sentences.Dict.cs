@@ -3,7 +3,6 @@
 namespace uax29;
 
 using Property = uint;
-
 static partial class Sentences
 {
 	const Property CR = 1;
@@ -140198,5 +140197,5 @@ static partial class Sentences
 		{0xFF0D, SContinue},
 		{0xFF1A, SContinue},
 		{0xFF64, SContinue},
-	};	// end dict
-};	// end class
+	};  // end dict
+};  // end class
