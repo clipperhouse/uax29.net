@@ -43,21 +43,31 @@ text
 */
 ```
 
+The constructor above has an optional second parameter to specify whether you wish to split words, graphemes, or sentences.
+
 ### Conformance
 
 We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
+### Performance
+
+When tokenizing words, I get around 100MB/s on my Macbook Air M2. For typical text, that's probably around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
+
 ### Invalid UTF-8
 
-The tokenizer expects valid UTF-8 bytes as input. That said, we make an effort to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case. Garbage in, garbage out.
+The tokenizer expects valid UTF-8 bytes as input. That said, we [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L43-L68) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case. Garbage in, garbage out.
 
 ### Prior art
 
 [clipperhouse/uax29](https://github.com/clipperhouse/uax29)
 
 I previously implemented this for Go. This .Net version is something of a port of that.
+
+[StringInfo.GetTextElementEnumerator](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.stringinfo.gettextelementenumerator?view=net-8.0)
+
+The standard library has a similar enumerator for graphemes.
 
 ### Other language implementations
 
