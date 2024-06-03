@@ -62,7 +62,8 @@ public class Unicode
 			{
 				results.AddRange(tokens.Current);
 			}
-			Assert.That(results, Has.Count.EqualTo(invalidUtf8Bytes.Length));
+
+			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
 		}
 	}
 
