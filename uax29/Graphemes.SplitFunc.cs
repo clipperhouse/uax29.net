@@ -1,4 +1,4 @@
-﻿namespace uax29;
+namespace uax29;
 
 using System.Buffers;
 using System.Text;
@@ -8,7 +8,7 @@ using Property = uint;
 
 static partial class Graphemes
 {
-	static bool Matches(this Property lookup, Property properties)
+	static bool Is(this Property lookup, Property properties)
 	{
 		return (lookup & properties) != 0;
 	}
@@ -93,7 +93,7 @@ static partial class Graphemes
 			}
 
 			// https://unicode.org/reports/tr29/#GB3
-			if (current.Matches(LF) && last.Matches(CR))
+			if (current.Is(LF) && last.Is(CR))
 			{
 				pos += w;
 				continue;
@@ -101,55 +101,55 @@ static partial class Graphemes
 
 			// https://unicode.org/reports/tr29/#GB4
 			// https://unicode.org/reports/tr29/#GB5
-			if ((current | last).Matches(Control | CR | LF))
+			if ((current | last).Is(Control | CR | LF))
 			{
 				break;
 			}
 
 			// https://unicode.org/reports/tr29/#GB6
-			if (current.Matches(L | V | LV | LVT) && last.Matches(L))
+			if (current.Is(L | V | LV | LVT) && last.Is(L))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB7
-			if (current.Matches(V | T) && last.Matches(LV | V))
+			if (current.Is(V | T) && last.Is(LV | V))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB8
-			if (current.Matches(T) && last.Matches(LVT | T))
+			if (current.Is(T) && last.Is(LVT | T))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB9
-			if (current.Matches(Extend | ZWJ))
+			if (current.Is(Extend | ZWJ))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB9a
-			if (current.Matches(SpacingMark))
+			if (current.Is(SpacingMark))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB9b
-			if (last.Matches(Prepend))
+			if (last.Is(Prepend))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#GB11
-			if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ) && Previous(Extended_Pictographic, data[..(pos - lastWidth)]))
+			if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous(Extended_Pictographic, data[..(pos - lastWidth)]))
 			{
 				pos += w;
 				continue;
@@ -158,7 +158,7 @@ static partial class Graphemes
 
 			// https://unicode.org/reports/tr29/#GB12 and
 			// https://unicode.org/reports/tr29/#GB13
-			if ((current & last).Matches(Regional_Indicator))
+			if ((current & last).Is(Regional_Indicator))
 			{
 				var i = pos;
 				var count = 0;
@@ -180,7 +180,7 @@ static partial class Graphemes
 						break;
 					}
 
-					if (!lookup.Matches(Regional_Indicator))
+					if (!lookup.Is(Regional_Indicator))
 					{
 						// It's GB13
 						break;
@@ -226,12 +226,12 @@ static partial class Graphemes
 			var lookup = dict.Lookup(data[i..], out int _, out OperationStatus _);
 			// I think it's OK to elide width here; will fall through to break
 
-			if (lookup.Matches(Ignore))
+			if (lookup.Is(Ignore))
 			{
 				continue;
 			}
 
-			if (lookup.Matches(property))
+			if (lookup.Is(property))
 			{
 				return true;
 			}

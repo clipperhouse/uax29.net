@@ -8,7 +8,7 @@ using Property = uint;
 
 static partial class Words
 {
-	static bool Matches(this Property lookup, Property properties)
+	static bool Is(this Property lookup, Property properties)
 	{
 		return (lookup & properties) != 0;
 	}
@@ -85,7 +85,7 @@ static partial class Words
 			}
 
 			// https://unicode.org/reports/tr29/#WB3
-			if (current.Matches(LF) && last.Matches(CR))
+			if (current.Is(LF) && last.Is(CR))
 			{
 				pos += w;
 				continue;
@@ -93,27 +93,27 @@ static partial class Words
 
 			// https://unicode.org/reports/tr29/#WB3a
 			// https://unicode.org/reports/tr29/#WB3b
-			if ((last | current).Matches(Newline | CR | LF))
+			if ((last | current).Is(Newline | CR | LF))
 			{
 				break;
 			}
 
 			// https://unicode.org/reports/tr29/#WB3c
-			if (current.Matches(Extended_Pictographic) && last.Matches(ZWJ))
+			if (current.Is(Extended_Pictographic) && last.Is(ZWJ))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#WB3d
-			if ((current & last).Matches(WSegSpace))
+			if ((current & last).Is(WSegSpace))
 			{
 				pos += w;
 				continue;
 			}
 
 			// https://unicode.org/reports/tr29/#WB4
-			if (current.Matches(Extend | Format | ZWJ))
+			if (current.Is(Extend | Format | ZWJ))
 			{
 				pos += w;
 				continue;
@@ -124,10 +124,10 @@ static partial class Words
 			// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 			// https://unicode.org/reports/tr29/#WB5
-			if (current.Matches(AHLetter) && last.Matches(AHLetter | Ignore))
+			if (current.Is(AHLetter) && last.Is(AHLetter | Ignore))
 			{
 				// Optimization: maybe a run without ignored characters
-				if (last.Matches(AHLetter))
+				if (last.Is(AHLetter))
 				{
 					pos += w;
 					while (pos < data.Length)
@@ -139,7 +139,7 @@ static partial class Words
 							break;
 						}
 
-						if (!lookup.Matches(AHLetter))
+						if (!lookup.Is(AHLetter))
 						{
 							break;
 						}
@@ -167,7 +167,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB6 can possibly apply
-			var maybeWB6 = current.Matches(MidLetter | MidNumLetQ) && last.Matches(AHLetter | Ignore);
+			var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB6
 			if (maybeWB6)
@@ -180,7 +180,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB7 can possibly apply
-			var maybeWB7 = current.Matches(AHLetter) && last.Matches(MidLetter | MidNumLetQ | Ignore);
+			var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB7
 			if (maybeWB7)
@@ -194,7 +194,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB7a can possibly apply
-			var maybeWB7a = current.Matches(Single_Quote) && last.Matches(Hebrew_Letter | Ignore);
+			var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB7a
 			if (maybeWB7a)
@@ -207,7 +207,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB7b can possibly apply
-			var maybeWB7b = current.Matches(Double_Quote) && last.Matches(Hebrew_Letter | Ignore);
+			var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB7b
 			if (maybeWB7b)
@@ -220,7 +220,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB7c can possibly apply
-			var maybeWB7c = current.Matches(Hebrew_Letter) && last.Matches(Double_Quote | Ignore);
+			var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB7c
 			if (maybeWB7c)
@@ -236,13 +236,13 @@ static partial class Words
 			// https://unicode.org/reports/tr29/#WB8
 			// https://unicode.org/reports/tr29/#WB9
 			// https://unicode.org/reports/tr29/#WB10
-			if (current.Matches(Numeric | AHLetter) && last.Matches(Numeric | AHLetter | Ignore))
+			if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | Ignore))
 			{
 				// Note: this logic de facto expresses WB5 as well, but harmless since WB5
 				// was already tested above
 
 				// Optimization: maybe a run without ignored characters
-				if (last.Matches(Numeric | AHLetter))
+				if (last.Is(Numeric | AHLetter))
 				{
 					pos += w;
 					while (pos < data.Length)
@@ -254,7 +254,7 @@ static partial class Words
 							break;
 						}
 
-						if (!lookup.Matches(Numeric | AHLetter))
+						if (!lookup.Is(Numeric | AHLetter))
 						{
 							break;
 						}
@@ -282,7 +282,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB11 can possibly apply
-			var maybeWB11 = current.Matches(Numeric) && last.Matches(MidNum | MidNumLetQ | Ignore);
+			var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB11
 			if (maybeWB11)
@@ -296,7 +296,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB12 can possibly apply
-			var maybeWB12 = current.Matches(MidNum | MidNumLetQ) && last.Matches(Numeric | Ignore);
+			var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB12
 			if (maybeWB12)
@@ -309,10 +309,10 @@ static partial class Words
 			}
 
 			// https://unicode.org/reports/tr29/#WB13
-			if (current.Matches(Katakana) && last.Matches(Katakana | Ignore))
+			if (current.Is(Katakana) && last.Is(Katakana | Ignore))
 			{
 				// Optimization: maybe a run without ignored characters
-				if (last.Matches(Katakana))
+				if (last.Is(Katakana))
 				{
 					pos += w;
 					while (pos < data.Length)
@@ -324,7 +324,7 @@ static partial class Words
 							break;
 						}
 
-						if (!lookup.Matches(Katakana))
+						if (!lookup.Is(Katakana))
 						{
 							break;
 						}
@@ -352,7 +352,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB13a can possibly apply
-			var maybeWB13a = current.Matches(ExtendNumLet) && last.Matches(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
+			var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB13a
 			if (maybeWB13a)
@@ -365,7 +365,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB13b can possibly apply
-			var maybeWB13b = current.Matches(AHLetter | Numeric | Katakana) && last.Matches(ExtendNumLet | Ignore);
+			var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB13b
 			if (maybeWB13b)
@@ -378,7 +378,7 @@ static partial class Words
 			}
 
 			// Optimization: determine if WB15 or WB16 can possibly apply
-			var maybeWB1516 = current.Matches(Regional_Indicator) && last.Matches(Regional_Indicator | Ignore);
+			var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | Ignore);
 
 			// https://unicode.org/reports/tr29/#WB15 and
 			// https://unicode.org/reports/tr29/#WB16
@@ -413,12 +413,12 @@ static partial class Words
 						break;
 					}
 
-					if (lookup.Matches(Ignore))
+					if (lookup.Is(Ignore))
 					{
 						continue;
 					}
 
-					if (!lookup.Matches(Regional_Indicator))
+					if (!lookup.Is(Regional_Indicator))
 					{
 						// It's WB16
 						break;
@@ -468,12 +468,12 @@ static partial class Words
 
 			// I think it's OK to elide width here; will fall through to break
 
-			if (lookup.Matches(Ignore))
+			if (lookup.Is(Ignore))
 			{
 				continue;
 			}
 
-			if (lookup.Matches(property))
+			if (lookup.Is(property))
 			{
 				return i;
 			}
@@ -492,8 +492,6 @@ static partial class Words
 		return PreviousIndex(property, data) != -1;
 	}
 
-	// subsequent looks ahead in the buffer until it hits a rune in properties,
-	// ignoring runes with the _Ignore property per WB4
 	static bool Subsequent(Property property, Span<byte> data)
 	{
 		var i = 0;
@@ -511,13 +509,13 @@ static partial class Words
 				break;
 			}
 
-			if (lookup.Matches(Ignore))
+			if (lookup.Is(Ignore))
 			{
 				i += w;
 				continue;
 			}
 
-			if (lookup.Matches(property))
+			if (lookup.Is(property))
 			{
 				return true;
 			}
