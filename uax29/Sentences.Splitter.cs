@@ -1,5 +1,4 @@
-﻿
-namespace uax29;
+﻿namespace uax29;
 
 using System.Buffers;
 using System.Text;

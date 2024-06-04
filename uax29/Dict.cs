@@ -1,8 +1,6 @@
 ﻿namespace uax29;
 
-using System.Buffers;
 using System.Collections.Frozen;
-using System.Text;
 
 /// A bitmap of Unicode categories
 using Property = uint;

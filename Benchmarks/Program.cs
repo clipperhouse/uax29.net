@@ -1,6 +1,4 @@
-using System.Buffers;
 using System.Diagnostics;
-using System.Globalization;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;

@@ -1,7 +1,6 @@
-using System.Buffers;
-using System.ComponentModel;
-using System.Text;
 namespace uax29;
+
+using System.ComponentModel;
 
 public enum TokenType
 {
