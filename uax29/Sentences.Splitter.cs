@@ -13,7 +13,7 @@ internal static partial class Sentences
     internal class Splitter : SplitterBase
     {
         internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
-            base(dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Sentences.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         const Property SATerm = STerm | ATerm;

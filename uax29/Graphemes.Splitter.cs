@@ -14,7 +14,7 @@ internal static partial class Graphemes
     internal class Splitter : SplitterBase
     {
         internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
-            base(dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Graphemes.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         new const Property Ignore = Extend;
@@ -181,7 +181,7 @@ internal static partial class Graphemes
 
                         i -= w2;
 
-                        var lookup = dict.Lookup(rune2.Value);
+                        var lookup = Dict.Lookup(rune2.Value);
 
                         if (!lookup.Iss(Regional_Indicator))
                         {

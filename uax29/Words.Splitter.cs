@@ -13,7 +13,7 @@ internal static partial class Words
     internal class Splitter : SplitterBase
     {
         internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
-            base(dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;

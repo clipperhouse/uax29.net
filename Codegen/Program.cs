@@ -133,7 +133,7 @@ static partial class {typ}s
 			}
 
 			dict.Write(@"
-	static readonly Dict dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 ");

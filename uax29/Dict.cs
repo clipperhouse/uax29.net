@@ -14,12 +14,10 @@ internal class Dict
 	}
 
 	/// <summary>
-	/// Lookup decodes the first rune/codepoint in the UTF-8 bytes, and determines its Unicode categories.
+	/// Looks up the Unicode categories for a given rune (codepoint).
 	/// </summary>
-	/// <param name="data">UTF-8 bytes</param>
-	/// <param name="width">The number of bytes of the decoded rune/codepoint.</param>
-	/// <param name="status">Whether the rune decoding was successful.</param>
-	/// <returns>Property of the rune, or 0 if not found</returns>
+	/// <param name="rune">The rune to look up.</param>
+	/// <returns>The categories (Property) of the rune if found, otherwise 0.</returns>
 	public Property Lookup(int rune)
 	{
 		if (lookups.TryGetValue(rune, out Property property))

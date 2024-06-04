@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = uint;
 
-internal static partial class Sentences
+static partial class Sentences
 {
 	const Property CR = 1;
 	const Property LF = 2;
@@ -21,7 +21,7 @@ internal static partial class Sentences
 	const Property Close = 4096;
 	const Property SContinue = 8192;
 
-	internal static readonly Dict dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x000D, CR},
