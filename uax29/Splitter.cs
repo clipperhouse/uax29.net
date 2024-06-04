@@ -6,16 +6,16 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = uint;
 
-internal delegate OperationStatus Decoder(ReadOnlySpan<byte> input, out Rune result, out int consumed);
+internal delegate OperationStatus Decoder<TSpan>(ReadOnlySpan<TSpan> input, out Rune result, out int consumed);
 
-internal abstract class SplitterBase
+internal abstract class SplitterBase<TSpan>
 {
     readonly internal Dict Dict;
     readonly internal Property Ignore;
-    readonly internal Decoder DecodeFirstRune;
-    readonly internal Decoder DecodeLastRune;
+    readonly internal Decoder<TSpan> DecodeFirstRune;
+    readonly internal Decoder<TSpan> DecodeLastRune;
 
-    public SplitterBase(Dict dict, Property ignore, Decoder decodeFirstRune, Decoder decodeLastRune)
+    public SplitterBase(Dict dict, Property ignore, Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune)
     {
         this.Dict = dict;
         this.Ignore = ignore;
@@ -32,7 +32,7 @@ internal abstract class SplitterBase
     /// (Always true in the current implementation, we may implement streaming in the future.)
     /// </param>
     /// <returns></returns>
-    public abstract int Split(ReadOnlySpan<byte> input, bool atEOF);
+    public abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF);
 
     /// <summary>
     /// Seek backward until it hits a rune which matches property.
@@ -40,7 +40,7 @@ internal abstract class SplitterBase
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
     /// <returns>The index if found, or -1 if not</returns>
-    internal int PreviousIndex(Property property, ReadOnlySpan<byte> input)
+    internal int PreviousIndex(Property property, ReadOnlySpan<TSpan> input)
     {
         // Start at the end of the buffer and move backwards
         var i = input.Length;
@@ -83,7 +83,7 @@ internal abstract class SplitterBase
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Previous(Property property, ReadOnlySpan<byte> input)
+    internal bool Previous(Property property, ReadOnlySpan<TSpan> input)
     {
         return PreviousIndex(property, input) != -1;
     }
@@ -94,7 +94,7 @@ internal abstract class SplitterBase
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Subsequent(Property property, ReadOnlySpan<byte> data)
+    internal bool Subsequent(Property property, ReadOnlySpan<TSpan> data)
     {
         var i = 0;
         while (i < data.Length)

@@ -8,11 +8,11 @@ using Property = uint;
 
 internal static partial class Words
 {
-    internal static readonly Split Split = new Splitter(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+    internal static readonly Split Split = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
 
-    internal class Splitter : SplitterBase
+    internal class Splitter<TSpan> : SplitterBase<TSpan>
     {
-        internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
+        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
             base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
@@ -20,7 +20,7 @@ internal static partial class Words
         const Property MidNumLetQ = MidNumLet | Single_Quote;
         new const Property Ignore = Extend | Format | ZWJ;
 
-        public override int Split(ReadOnlySpan<byte> input, bool atEOF = true)
+        public override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
             if (input.Length == 0)
             {
