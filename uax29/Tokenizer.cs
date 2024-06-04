@@ -73,4 +73,13 @@ public ref struct Tokenizer
 			return input[start..end];
 		}
 	}
+
+	/// <summary>
+	/// Resets the tokenizer to the first rune.
+	/// </summary>
+	public void Reset()
+	{
+		this.start = 0;
+		this.end = 0;
+	}
 }
