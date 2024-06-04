@@ -17,7 +17,7 @@ static partial class Sentences
 	const Property ParaSep = Sep | CR | LF;
 	const Property Ignore = Extend | Format;
 
-	internal static readonly SplitFunc SplitFunc = static (Span<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = static (ReadOnlySpan<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
@@ -392,7 +392,7 @@ static partial class Sentences
 	// previousIndex works backward until it hits a rune in properties,
 	// ignoring runes with the _Ignore property (per WB4), and returns
 	// the index in data. It returns -1 if such a rune is not found.
-	static int PreviousIndex(Property property, Span<byte> data)
+	static int PreviousIndex(Property property, ReadOnlySpan<byte> data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;
@@ -429,14 +429,14 @@ static partial class Sentences
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Previous(Property property, Span<byte> data)
+	static bool Previous(Property property, ReadOnlySpan<byte> data)
 	{
 		return PreviousIndex(property, data) != -1;
 	}
 
 	// subsequent looks ahead in the buffer until it hits a rune in properties,
 	// ignoring runes with the _Ignore property per WB4
-	static bool Subsequent(Property property, Span<byte> data)
+	static bool Subsequent(Property property, ReadOnlySpan<byte> data)
 	{
 		var i = 0;
 		while (i < data.Length)

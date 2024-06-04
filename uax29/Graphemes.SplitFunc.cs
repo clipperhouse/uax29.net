@@ -15,7 +15,7 @@ static partial class Graphemes
 
 	const Property Ignore = Extend;
 
-	internal static readonly SplitFunc SplitFunc = (Span<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = (ReadOnlySpan<byte> data, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
@@ -209,7 +209,7 @@ static partial class Graphemes
 
 	// previous works backward in the buffer until it hits a rune in properties,
 	// ignoring runes with the Ignore property.
-	static bool Previous(Property property, Span<byte> data)
+	static bool Previous(Property property, ReadOnlySpan<byte> data)
 	{
 		// Start at the end of the buffer and move backwards
 		var i = data.Length;

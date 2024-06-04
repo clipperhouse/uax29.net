@@ -9,4 +9,4 @@
 /// (This is always true in the current implementation. Future implementations may support streams.)
 /// </param>
 /// <returns>The number of bytes to advance, i.e. the length of the first token in the input UTF-8 data.</returns>
-delegate int SplitFunc(Span<byte> data, bool atEOF = true);
+delegate int SplitFunc(ReadOnlySpan<byte> data, bool atEOF = true);

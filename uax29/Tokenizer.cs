@@ -13,7 +13,7 @@ public enum TokenType
 /// </summary>
 public ref struct Tokenizer
 {
-	readonly Span<byte> data;
+	readonly ReadOnlySpan<byte> data;
 	readonly SplitFunc split;
 
 	int start = 0;
@@ -24,7 +24,7 @@ public ref struct Tokenizer
 	/// </summary>
 	/// <param name="data">A UTF-8 byte string</param>
 	/// <param name="typ">Choose to split words, graphemes or sentences. Default is words.</param>
-	public Tokenizer(Span<byte> data, TokenType typ = TokenType.Words)
+	public Tokenizer(ReadOnlySpan<byte> data, TokenType typ = TokenType.Words)
 	{
 		this.data = data;
 		this.split = typ switch
@@ -62,7 +62,7 @@ public ref struct Tokenizer
 	/// <summary>
 	/// The current token (word, grapheme or sentence) as UTF-8 bytes. Use Encoding.UTF8 to get a string.
 	/// </summary>
-	public readonly Span<byte> Current
+	public readonly ReadOnlySpan<byte> Current
 	{
 		get
 		{
