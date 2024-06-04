@@ -14,7 +14,7 @@ public class Unicode
 	{
 	}
 
-	static void TestTokenizer(Tokenizer tokens, UnicodeTest test)
+	static void TestTokenizer(Tokenizer<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		while (tokens.MoveNext())
@@ -34,7 +34,7 @@ public class Unicode
 	[Test, TestCaseSource(nameof(WordsTests))]
 	public void WordsTokenizer(UnicodeTest test)
 	{
-		var tokens = new Tokenizer(test.input);
+		var tokens = Tokenizer.Create(test.input);
 		TestTokenizer(tokens, test);
 	}
 
@@ -56,7 +56,7 @@ public class Unicode
 		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
 		{
 			var results = new List<byte>();
-			var tokens = new Tokenizer(invalidUtf8Bytes, tokenType);
+			var tokens = Tokenizer.Create(invalidUtf8Bytes, tokenType);
 			while (tokens.MoveNext())
 			{
 				results.AddRange(tokens.Current);
@@ -70,7 +70,7 @@ public class Unicode
 	[Test, TestCaseSource(nameof(SentencesTests))]
 	public void SentencesTokenizer(UnicodeTest test)
 	{
-		var tokens = new Tokenizer(test.input, TokenType.Sentences);
+		var tokens = Tokenizer.Create(test.input, TokenType.Sentences);
 		TestTokenizer(tokens, test);
 	}
 
@@ -78,7 +78,7 @@ public class Unicode
 	[Test, TestCaseSource(nameof(GraphemesTests))]
 	public void GraphemesTokenizer(UnicodeTest test)
 	{
-		var tokens = new Tokenizer(test.input, TokenType.Graphemes);
+		var tokens = Tokenizer.Create(test.input, TokenType.Graphemes);
 		TestTokenizer(tokens, test);
 	}
 }

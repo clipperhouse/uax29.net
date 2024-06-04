@@ -19,13 +19,13 @@ public class TestTokenizer
         var example = "Hello, how are you?";
         var bytes = Encoding.UTF8.GetBytes(example);
 
-        var tokens = new Tokenizer(bytes);
+        var tokens = Tokenizer.Create(example);
 
         var first = new List<string>();
         while (tokens.MoveNext())
         {
-            var s = Encoding.UTF8.GetString(tokens.Current);
-            first.Add(s);
+            // do something with tokens.Current
+            first.Add(tokens.Current.ToString());
         }
 
         Assert.That(first.Count > 1);   // just make sure it did the thing
@@ -35,8 +35,8 @@ public class TestTokenizer
         var second = new List<string>();
         while (tokens.MoveNext())
         {
-            var s = Encoding.UTF8.GetString(tokens.Current);
-            second.Add(s);
+            // do something with tokens.Current
+            second.Add(tokens.Current.ToString());
         }
 
         Assert.That(first.SequenceEqual(second));
