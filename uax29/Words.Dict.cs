@@ -26,7 +26,7 @@ internal static partial class Words
 	const Property WSegSpace = 131072;
 	const Property Extended_Pictographic = 262144;
 
-	internal static readonly Dict Dict = new(GetDict());
+	private static readonly Dict dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0022, Double_Quote},

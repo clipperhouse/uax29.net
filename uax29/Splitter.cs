@@ -23,10 +23,19 @@ internal abstract class SplitterBase
         this.DecodeLastRune = decodeLastRune;
     }
 
+    /// <summary>
+    /// Reads input until a token break
+    /// </summary>
+    /// <param name="input">Data to split</param>
+    /// <param name="atEOF">
+    /// Indicates whether the current input is all that is coming.
+    /// (Always true in the current implementation, we may implement streaming in the future.)
+    /// </param>
+    /// <returns></returns>
     public abstract int Split(ReadOnlySpan<byte> input, bool atEOF);
 
     /// <summary>
-    /// Seeks backward until it hits a rune which matches property.
+    /// Seek backward until it hits a rune which matches property.
     /// </summary>
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
@@ -69,7 +78,7 @@ internal abstract class SplitterBase
     }
 
     /// <summary>
-    /// Seeks backward until it hits a rune which matches property.
+    /// Seek backward until it hits a rune which matches property.
     /// </summary>
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
@@ -79,6 +88,12 @@ internal abstract class SplitterBase
         return PreviousIndex(property, input) != -1;
     }
 
+    /// <summary>
+    /// Seek forward until it hits a rune which matches property.
+    /// </summary>
+    /// <param name="property">Property to attempt to find</param>
+    /// <param name="input">Data in which to seek</param>
+    /// <returns>True if found, otherwise false</returns>
     internal bool Subsequent(Property property, ReadOnlySpan<byte> data)
     {
         var i = 0;

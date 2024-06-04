@@ -9,19 +9,21 @@ using Property = uint;
 
 internal static partial class Words
 {
+    internal static readonly Split Split = new Splitter(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+
     internal class Splitter : SplitterBase
     {
-        public Splitter(Dict dict, uint ignore, Decoder decodeFirstRune, Decoder decodeLastRune) :
-            base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
+        internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
+            base(dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
         new const Property Ignore = Extend | Format | ZWJ;
 
-        public override int Split(ReadOnlySpan<byte> data, bool atEOF)
+        public override int Split(ReadOnlySpan<byte> input, bool atEOF = true)
         {
-            if (data.Length == 0)
+            if (input.Length == 0)
             {
                 return 0;
             }
@@ -34,7 +36,7 @@ internal static partial class Words
             while (true)
             {
                 var sot = pos == 0;             // "start of text"
-                var eot = pos == data.Length;   // "end of text"
+                var eot = pos == input.Length;   // "end of text"
 
                 if (eot)
                 {
@@ -50,7 +52,7 @@ internal static partial class Words
 
                 var last = current;
 
-                var status = DecodeFirstRune(data[pos..], out Rune rune, out w);
+                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -62,7 +64,7 @@ internal static partial class Words
                     if (atEOF)
                     {
                         // Just return the bytes, we can't do anything with them
-                        pos = data.Length;
+                        pos = input.Length;
                         break;
                     }
                     // Rune extends past current data, request more
@@ -77,7 +79,6 @@ internal static partial class Words
                     pos += w;
                     continue;
                 }
-
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -131,9 +132,9 @@ internal static partial class Words
                     if (last.Iss(AHLetter))
                     {
                         pos += w;
-                        while (pos < data.Length)
+                        while (pos < input.Length)
                         {
-                            status = DecodeFirstRune(data[pos..], out Rune rune2, out int w2);
+                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
                             if (status != OperationStatus.Done)
                             {
                                 // Garbage in, garbage out
@@ -160,7 +161,7 @@ internal static partial class Words
                     }
 
                     // Otherwise, do proper look back per WB4
-                    if (Previous(AHLetter, data[..pos]))
+                    if (Previous(AHLetter, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -173,7 +174,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB6
                 if (maybeWB6)
                 {
-                    if (Subsequent(AHLetter, data[(pos + w)..]) && Previous(AHLetter, data[..pos]))
+                    if (Subsequent(AHLetter, input[(pos + w)..]) && Previous(AHLetter, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -186,8 +187,8 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB7
                 if (maybeWB7)
                 {
-                    var i = PreviousIndex(MidLetter | MidNumLetQ, data[..pos]);
-                    if (i > 0 && Previous(AHLetter, data[..i]))
+                    var i = PreviousIndex(MidLetter | MidNumLetQ, input[..pos]);
+                    if (i > 0 && Previous(AHLetter, input[..i]))
                     {
                         pos += w;
                         continue;
@@ -200,7 +201,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB7a
                 if (maybeWB7a)
                 {
-                    if (Previous(Hebrew_Letter, data[..pos]))
+                    if (Previous(Hebrew_Letter, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -213,7 +214,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB7b
                 if (maybeWB7b)
                 {
-                    if (Subsequent(Hebrew_Letter, data[(pos + w)..]) && Previous(Hebrew_Letter, data[..pos]))
+                    if (Subsequent(Hebrew_Letter, input[(pos + w)..]) && Previous(Hebrew_Letter, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -226,8 +227,8 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB7c
                 if (maybeWB7c)
                 {
-                    var i = PreviousIndex(Double_Quote, data[..pos]);
-                    if (i > 0 && Previous(Hebrew_Letter, data[..i]))
+                    var i = PreviousIndex(Double_Quote, input[..pos]);
+                    if (i > 0 && Previous(Hebrew_Letter, input[..i]))
                     {
                         pos += w;
                         continue;
@@ -246,9 +247,9 @@ internal static partial class Words
                     if (last.Iss(Numeric | AHLetter))
                     {
                         pos += w;
-                        while (pos < data.Length)
+                        while (pos < input.Length)
                         {
-                            status = DecodeFirstRune(data[pos..], out Rune rune2, out int w2);
+                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
                             if (status != OperationStatus.Done)
                             {
                                 // Garbage in, garbage out
@@ -280,7 +281,7 @@ internal static partial class Words
                     }
 
                     // Otherwise, do proper lookback per WB4
-                    if (Previous(Numeric | AHLetter, data[..pos]))
+                    if (Previous(Numeric | AHLetter, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -293,8 +294,8 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB11
                 if (maybeWB11)
                 {
-                    var i = PreviousIndex(MidNum | MidNumLetQ, data[..pos]);
-                    if (i > 0 && Previous(Numeric, data[..i]))
+                    var i = PreviousIndex(MidNum | MidNumLetQ, input[..pos]);
+                    if (i > 0 && Previous(Numeric, input[..i]))
                     {
                         pos += w;
                         continue;
@@ -307,7 +308,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB12
                 if (maybeWB12)
                 {
-                    if (Subsequent(Numeric, data[(pos + w)..]) && Previous(Numeric, data[..pos]))
+                    if (Subsequent(Numeric, input[(pos + w)..]) && Previous(Numeric, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -321,9 +322,9 @@ internal static partial class Words
                     if (last.Iss(Katakana))
                     {
                         pos += w;
-                        while (pos < data.Length)
+                        while (pos < input.Length)
                         {
-                            status = DecodeFirstRune(data[pos..], out Rune rune2, out int w2);
+                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
                             if (status != OperationStatus.Done)
                             {
                                 // Garbage in, garbage out
@@ -350,7 +351,7 @@ internal static partial class Words
                     }
 
                     // Otherwise, do proper lookback per WB4
-                    if (Previous(Katakana, data[..pos]))
+                    if (Previous(Katakana, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -363,7 +364,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB13a
                 if (maybeWB13a)
                 {
-                    if (Previous(AHLetter | Numeric | Katakana | ExtendNumLet, data[..pos]))
+                    if (Previous(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -376,7 +377,7 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB13b
                 if (maybeWB13b)
                 {
-                    if (Previous(ExtendNumLet, data[..pos]))
+                    if (Previous(ExtendNumLet, input[..pos]))
                     {
                         pos += w;
                         continue;
@@ -398,8 +399,7 @@ internal static partial class Words
 
                     while (i > 0)
                     {
-
-                        status = DecodeFirstRune(data[pos..], out Rune rune2, out int w2);
+                        status = DecodeLastRune(input[..i], out Rune rune2, out int w2);
                         if (status != OperationStatus.Done)
                         {
                             // Garbage in, garbage out

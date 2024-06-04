@@ -8,6 +8,8 @@ public enum TokenType
 	Words, Graphemes, Sentences
 }
 
+public delegate int Split(ReadOnlySpan<byte> input, bool atEOF = true);
+
 /// <summary>
 /// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// It accepts UTF-8 bytes, an returns an iterator.
@@ -15,10 +17,7 @@ public enum TokenType
 public ref struct Tokenizer
 {
 	readonly ReadOnlySpan<byte> input;
-	readonly SplitFunc split;
-	readonly Decoder FirstRune;
-	readonly Decoder LastRune;
-	readonly Dict dict;
+	readonly Split Split;
 
 	int start = 0;
 	int end = 0;
@@ -31,22 +30,7 @@ public ref struct Tokenizer
 	public Tokenizer(ReadOnlySpan<byte> input, TokenType typ = TokenType.Words)
 	{
 		this.input = input;
-		this.split = typ switch
-		{
-			TokenType.Words => Words.SplitFunc,
-			TokenType.Graphemes => Graphemes.SplitFunc,
-			TokenType.Sentences => Sentences.SplitFunc,
-			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
-		};
-		this.dict = typ switch
-		{
-			TokenType.Words => Words.Dict,
-			TokenType.Graphemes => Graphemes.dict,
-			TokenType.Sentences => Sentences.dict,
-			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
-		};
-		this.FirstRune = Rune.DecodeFromUtf8;
-		this.LastRune = Rune.DecodeLastFromUtf8;
+		this.Split = Words.Split;
 	}
 
 	/// <summary>
@@ -57,7 +41,7 @@ public ref struct Tokenizer
 	{
 		while (end < input.Length)
 		{
-			var advance = split(input[end..]);
+			var advance = this.Split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
