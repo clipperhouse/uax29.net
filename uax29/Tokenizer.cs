@@ -57,7 +57,7 @@ public static class Tokenizer
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
-/// Use MoveNext to iterate, and Current to retrive the current token (i.e. word, grapheme or sentence).
+/// Use <see cref="Tokenizer{T}.MoveNext"/> to iterate, and <see cref="Tokenizer{T}.Current"/> to retrive the current token (i.e. the word, grapheme or sentence).
 /// </summary>
 public ref struct Tokenizer<T> where T : struct
 {
@@ -69,9 +69,9 @@ public ref struct Tokenizer<T> where T : struct
 	int end = 0;
 
 	/// <summary>
-	/// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
-	/// <param name="input">A UTF-8 byte string</param>
+	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
 	internal Tokenizer(ReadOnlySpan<T> input, TokenType tokenType = TokenType.Words)
 	{
@@ -107,7 +107,7 @@ public ref struct Tokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// Move to the next token. Returns false when no more tokens (typically EOF). Use Current to retrieve the token.
+	/// Move to the next token. Use <see cref="Current"/> to retrieve the token.
 	/// </summary>
 	/// <returns>Whether there are any more tokens. False typically means EOF.</returns>
 	public bool MoveNext()
@@ -130,7 +130,9 @@ public ref struct Tokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// The current token (word, grapheme or sentence) as UTF-8 bytes. Use Encoding.UTF8 to get a string.
+	/// The current token (word, grapheme or sentence).
+	/// If the input was a string, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+	/// If the input was UTF-8 bytes, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
 	/// </summary>
 	public readonly ReadOnlySpan<T> Current
 	{
@@ -141,7 +143,7 @@ public ref struct Tokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// Resets the tokenizer to the first rune.
+	/// Resets the tokenizer back to the first token.
 	/// </summary>
 	public void Reset()
 	{
