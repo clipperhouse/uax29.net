@@ -9,7 +9,7 @@ using Property = uint;
 internal static partial class Words
 {
     internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
-    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeFromUtf16).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
 
     internal class Splitter<TSpan> : SplitterBase<TSpan>
     {
