@@ -1,5 +1,6 @@
+using System.Buffers;
 using System.ComponentModel;
-
+using System.Text;
 namespace uax29;
 
 public enum TokenType
@@ -13,8 +14,11 @@ public enum TokenType
 /// </summary>
 public ref struct Tokenizer
 {
-	readonly ReadOnlySpan<byte> data;
+	readonly ReadOnlySpan<byte> input;
 	readonly SplitFunc split;
+	readonly Decoder FirstRune;
+	readonly Decoder LastRune;
+	readonly Dict dict;
 
 	int start = 0;
 	int end = 0;
@@ -22,11 +26,11 @@ public ref struct Tokenizer
 	/// <summary>
 	/// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
-	/// <param name="data">A UTF-8 byte string</param>
+	/// <param name="input">A UTF-8 byte string</param>
 	/// <param name="typ">Choose to split words, graphemes or sentences. Default is words.</param>
-	public Tokenizer(ReadOnlySpan<byte> data, TokenType typ = TokenType.Words)
+	public Tokenizer(ReadOnlySpan<byte> input, TokenType typ = TokenType.Words)
 	{
-		this.data = data;
+		this.input = input;
 		this.split = typ switch
 		{
 			TokenType.Words => Words.SplitFunc,
@@ -34,6 +38,15 @@ public ref struct Tokenizer
 			TokenType.Sentences => Sentences.SplitFunc,
 			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
 		};
+		this.dict = typ switch
+		{
+			TokenType.Words => Words.Dict,
+			TokenType.Graphemes => Graphemes.dict,
+			TokenType.Sentences => Sentences.dict,
+			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
+		};
+		this.FirstRune = Rune.DecodeFromUtf8;
+		this.LastRune = Rune.DecodeLastFromUtf8;
 	}
 
 	/// <summary>
@@ -42,9 +55,9 @@ public ref struct Tokenizer
 	/// <returns>Whether there are any more tokens. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
-		while (end < data.Length)
+		while (end < input.Length)
 		{
-			var advance = split(data[end..]);
+			var advance = split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
@@ -66,7 +79,7 @@ public ref struct Tokenizer
 	{
 		get
 		{
-			return data[start..end];
+			return input[start..end];
 		}
 	}
 }

@@ -21,11 +21,10 @@ internal class Dict
 	/// <param name="data">UTF-8 bytes</param>
 	/// <param name="width">The number of bytes of the decoded rune/codepoint.</param>
 	/// <param name="status">Whether the rune decoding was successful.</param>
-	/// <returns></returns>
-	public Property Lookup(ReadOnlySpan<byte> data, out int width, out OperationStatus status)
+	/// <returns>Property of the rune, or 0 if not found</returns>
+	public Property Lookup(int rune)
 	{
-		status = Rune.DecodeFromUtf8(data, out Rune r, out width);
-		if (lookups.TryGetValue(r.Value, out Property property))
+		if (lookups.TryGetValue(rune, out Property property))
 		{
 			return property;
 		}

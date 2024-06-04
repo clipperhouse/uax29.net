@@ -19,7 +19,7 @@ static partial class Words
 
 	const Property Ignore = Extend | Format | ZWJ;
 
-	internal static readonly SplitFunc SplitFunc = (ReadOnlySpan<byte> data, bool atEOF) =>
+	internal static readonly SplitFunc SplitFunc = (ReadOnlySpan<byte> data, Decoder firstRune, Dict dict, bool atEOF) =>
 	{
 		if (data.Length == 0)
 		{
@@ -50,15 +50,13 @@ static partial class Words
 
 			var last = current;
 
-			OperationStatus status;
-			current = dict.Lookup(data[pos..], out w, out status);
+			var status = firstRune(data[pos..], out Rune rune, out w);
 			if (status != OperationStatus.Done)
 			{
 				// Garbage in, garbage out
 				pos += w;
 				break;
 			}
-
 			if (w == 0)
 			{
 				if (atEOF)
@@ -71,12 +69,15 @@ static partial class Words
 				return 0;
 			}
 
+			current = dict.Lookup(rune.Value);
+
 			// https://unicode.org/reports/tr29/#WB1
 			if (sot)
 			{
 				pos += w;
 				continue;
 			}
+
 
 			// Optimization: no rule can possibly apply
 			if ((current | last) == 0)
@@ -132,6 +133,8 @@ static partial class Words
 					pos += w;
 					while (pos < data.Length)
 					{
+						var status = firstRune(data[pos..], out Rune rune, out w);
+
 						var lookup = dict.Lookup(data[pos..], out int w2, out status);
 						if (status != OperationStatus.Done)
 						{
@@ -459,7 +462,7 @@ static partial class Words
 			var _ = Rune.DecodeLastFromUtf8(data[..i], out Rune _, out int w);  // TODO handle status
 
 			i -= w;
-			var lookup = dict.Lookup(data[i..], out int _, out var status);
+			var lookup = Dict.Lookup(data[i..], out int _, out var status);
 			if (status != OperationStatus.Done)
 			{
 				// Garbage in, garbage out
@@ -497,7 +500,7 @@ static partial class Words
 		var i = 0;
 		while (i < data.Length)
 		{
-			var lookup = dict.Lookup(data[i..], out int w, out var status);
+			var lookup = Dict.Lookup(data[i..], out int w, out var status);
 			if (status != OperationStatus.Done)
 			{
 				// Garbage in, garbage out
