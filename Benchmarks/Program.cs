@@ -1,22 +1,23 @@
-using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using uax29;
 
-//var summary = BenchmarkRunner.Run<Benchmark>();
+var summary = BenchmarkRunner.Run<Benchmark>();
 
-var benchmark = new Benchmark();
-benchmark.Setup();
-var throughput = benchmark.Throughput();
-Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+// var benchmark = new Benchmark();
+// benchmark.Setup();
+// var throughput = benchmark.Throughput();
+// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark
 {
 	private static byte[] sample = [];
-	private static string sampleStr = "";
+	static string sampleStr = "";
+
+	private static TokenType tokenType = TokenType.Words;
 
 	[GlobalSetup]
 	public void Setup()
@@ -26,15 +27,32 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void WordsTokenizer()
+	public void Tokenizer()
 	{
-		var tokens = new Tokenizer(sample);
+		var tokens = new Tokenizer(sample, tokenType);
 		while (tokens.MoveNext())
 		{
 		}
 	}
 
-	[Benchmark]
+	//	[Benchmark]
+	public void StringInfo()
+	{
+		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
+		while (enumerator.MoveNext())
+		{
+		}
+	}
+
+	//	[Benchmark]
+	public void Graphemes()
+	{
+		var tokens = new Tokenizer(sample, TokenType.Graphemes);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
 	public double Throughput()
 	{
 		const int runs = 1000;
@@ -42,7 +60,7 @@ public class Benchmark
 		// warmup
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = new Tokenizer(sample);
+			var tokens = new Tokenizer(sample, tokenType);
 			while (tokens.MoveNext())
 			{
 
@@ -55,7 +73,7 @@ public class Benchmark
 
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = new Tokenizer(sample);
+			var tokens = new Tokenizer(sample, tokenType);
 			while (tokens.MoveNext())
 			{
 

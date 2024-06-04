@@ -1,11 +1,13 @@
-using System.ComponentModel;
-
 namespace uax29;
+
+using System.ComponentModel;
 
 public enum TokenType
 {
 	Words, Graphemes, Sentences
 }
+
+public delegate int Split(ReadOnlySpan<byte> input, bool atEOF = true);
 
 /// <summary>
 /// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -13,8 +15,9 @@ public enum TokenType
 /// </summary>
 public ref struct Tokenizer
 {
-	readonly Span<byte> data;
-	readonly SplitFunc split;
+	readonly ReadOnlySpan<byte> input;
+	readonly Split Split;
+	readonly TokenType TokenType;
 
 	int start = 0;
 	int end = 0;
@@ -22,17 +25,18 @@ public ref struct Tokenizer
 	/// <summary>
 	/// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
-	/// <param name="data">A UTF-8 byte string</param>
-	/// <param name="typ">Choose to split words, graphemes or sentences. Default is words.</param>
-	public Tokenizer(Span<byte> data, TokenType typ = TokenType.Words)
+	/// <param name="input">A UTF-8 byte string</param>
+	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
+	public Tokenizer(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
 	{
-		this.data = data;
-		this.split = typ switch
+		this.input = input;
+		this.TokenType = tokenType;
+		this.Split = tokenType switch
 		{
-			TokenType.Words => Words.SplitFunc,
-			TokenType.Graphemes => Graphemes.SplitFunc,
-			TokenType.Sentences => Sentences.SplitFunc,
-			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
+			TokenType.Words => Words.Split,
+			TokenType.Graphemes => Graphemes.Split,
+			TokenType.Sentences => Sentences.Split,
+			_ => throw new InvalidEnumArgumentException(nameof(tokenType), (int)tokenType, typeof(TokenType))
 		};
 	}
 
@@ -42,9 +46,9 @@ public ref struct Tokenizer
 	/// <returns>Whether there are any more tokens. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
-		while (end < data.Length)
+		while (end < input.Length)
 		{
-			var advance = split(data[end..]);
+			var advance = this.Split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
@@ -62,11 +66,11 @@ public ref struct Tokenizer
 	/// <summary>
 	/// The current token (word, grapheme or sentence) as UTF-8 bytes. Use Encoding.UTF8 to get a string.
 	/// </summary>
-	public readonly Span<byte> Current
+	public readonly ReadOnlySpan<byte> Current
 	{
 		get
 		{
-			return data[start..end];
+			return input[start..end];
 		}
 	}
 }
