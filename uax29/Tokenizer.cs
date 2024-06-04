@@ -30,7 +30,13 @@ public ref struct Tokenizer
 	public Tokenizer(ReadOnlySpan<byte> input, TokenType typ = TokenType.Words)
 	{
 		this.input = input;
-		this.Split = Words.Split;
+		this.Split = typ switch
+		{
+			TokenType.Words => Words.Split,
+			//			TokenType.Graphemes => Graphemes.SplitFunc,
+			TokenType.Sentences => Sentences.Split,
+			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
+		};
 	}
 
 	/// <summary>

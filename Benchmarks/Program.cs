@@ -6,12 +6,12 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using uax29;
 
-// var summary = BenchmarkRunner.Run<Benchmark>();
+var summary = BenchmarkRunner.Run<Benchmark>();
 
-var benchmark = new Benchmark();
-benchmark.Setup();
-var throughput = benchmark.Throughput();
-Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+// var benchmark = new Benchmark();
+// benchmark.Setup();
+// var throughput = benchmark.Throughput();
+// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark
@@ -28,7 +28,7 @@ public class Benchmark
 		sampleStr = Encoding.UTF8.GetString(sample);
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public void Tokenizer()
 	{
 		var tokens = new Tokenizer(sample, tokenType);
@@ -37,7 +37,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	//	[Benchmark]
 	public void StringInfo()
 	{
 		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
@@ -46,7 +46,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	//	[Benchmark]
 	public void Graphemes()
 	{
 		var tokens = new Tokenizer(sample, TokenType.Graphemes);
