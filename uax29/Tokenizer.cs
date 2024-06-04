@@ -18,6 +18,7 @@ public ref struct Tokenizer
 {
 	readonly ReadOnlySpan<byte> input;
 	readonly Split Split;
+	readonly TokenType TokenType;
 
 	int start = 0;
 	int end = 0;
@@ -26,16 +27,17 @@ public ref struct Tokenizer
 	/// Tokenizer splits strings (bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A UTF-8 byte string</param>
-	/// <param name="typ">Choose to split words, graphemes or sentences. Default is words.</param>
-	public Tokenizer(ReadOnlySpan<byte> input, TokenType typ = TokenType.Words)
+	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
+	public Tokenizer(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
 	{
 		this.input = input;
-		this.Split = typ switch
+		this.TokenType = tokenType;
+		this.Split = tokenType switch
 		{
 			TokenType.Words => Words.Split,
 			TokenType.Graphemes => Graphemes.Split,
 			TokenType.Sentences => Sentences.Split,
-			_ => throw new InvalidEnumArgumentException(nameof(typ), (int)typ, typeof(TokenType))
+			_ => throw new InvalidEnumArgumentException(nameof(tokenType), (int)tokenType, typeof(TokenType))
 		};
 	}
 
