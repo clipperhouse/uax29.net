@@ -60,7 +60,7 @@ public static class Tokenizer
 /// </summary>
 public ref struct Tokenizer<TSpan> where TSpan : struct
 {
-	readonly ReadOnlySpan<TSpan> input;
+	ReadOnlySpan<TSpan> input;
 	readonly Split<TSpan> Split;
 	public readonly TokenType TokenType;
 
@@ -154,5 +154,14 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		this.start = 0;
 		this.end = 0;
+	}
+
+	/// <summary>
+	/// (Re)sets the text to be tokenized, and resets the iterator back to the the start.
+	/// </summary>
+	public void SetText(ReadOnlySpan<TSpan> input)
+	{
+		Reset();
+		this.input = input;
 	}
 }

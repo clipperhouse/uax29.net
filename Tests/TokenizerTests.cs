@@ -28,7 +28,7 @@ public class TestTokenizer
             first.Add(tokens.Current.ToString());
         }
 
-        Assert.That(first.Count > 1);   // just make sure it did the thing
+        Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
         tokens.Reset();
 
@@ -42,5 +42,32 @@ public class TestTokenizer
         Assert.That(first.SequenceEqual(second));
     }
 
+    [Test]
+    public void SetText()
+    {
+        var example = "Hello, how are you?";
+
+        var tokens = Tokenizer.Create(example);
+
+        var first = new List<string>();
+        while (tokens.MoveNext())
+        {
+            // do something with tokens.Current
+            first.Add(tokens.Current.ToString());
+        }
+
+        Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
+
+        tokens.SetText(example);
+
+        var second = new List<string>();
+        while (tokens.MoveNext())
+        {
+            // do something with tokens.Current
+            second.Add(tokens.Current.ToString());
+        }
+
+        Assert.That(first.SequenceEqual(second));
+    }
 }
 
