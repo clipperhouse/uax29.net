@@ -94,12 +94,12 @@ internal abstract class SplitterBase<TSpan>
     /// <param name="property">Property to attempt to find</param>
     /// <param name="input">Data in which to seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Subsequent(Property property, ReadOnlySpan<TSpan> data)
+    internal bool Subsequent(Property property, ReadOnlySpan<TSpan> input)
     {
         var i = 0;
-        while (i < data.Length)
+        while (i < input.Length)
         {
-            var status = DecodeFirstRune(data[i..], out Rune rune, out int w);
+            var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
             if (status != OperationStatus.Done)
             {
                 // Garbage in, garbage out
@@ -133,6 +133,12 @@ internal abstract class SplitterBase<TSpan>
 
 internal static class Extensions
 {
+    /// <summary>
+    /// Determines whether two properties (bitstrings) match, i.e. intersect, i.e. share at least one bit.
+    /// </summary>
+    /// <param name="lookup">One property to test against...</param>
+    /// <param name="properties">...the other</param>
+    /// <returns>True if the two properties share a bit, i.e. Unicode category.</returns>
     internal static bool Is(this Property lookup, Property properties)
     {
         return (lookup & properties) != 0;
