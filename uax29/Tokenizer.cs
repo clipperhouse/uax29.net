@@ -76,11 +76,17 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		this.input = input;
 		this.TokenType = tokenType;
+		this.Split = ChooseSplit(tokenType);
+	}
 
+	static Split<TSpan> ChooseSplit(TokenType tokenType)
+	{
+		// I will type inference would make this unnecessary, but couldn't find a way.
+		// Just encapsualting it to clean up the constructor.
 		Type type = typeof(TSpan);
 		if (type == typeof(byte))
 		{
-			this.Split = tokenType switch
+			return tokenType switch
 			{
 				TokenType.Words => Words.SplitUtf8Bytes as Split<TSpan>,
 				TokenType.Graphemes => Graphemes.SplitUtf8Bytes as Split<TSpan>,
@@ -91,7 +97,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 		}
 		else if (type == typeof(char))
 		{
-			this.Split = tokenType switch
+			return tokenType switch
 			{
 				TokenType.Words => Words.SplitChars as Split<TSpan>,
 				TokenType.Graphemes => Graphemes.SplitChars as Split<TSpan>,
