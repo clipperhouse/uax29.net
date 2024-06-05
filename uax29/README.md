@@ -67,11 +67,13 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 ### Performance
 
-When tokenizing words, I get around 100MB/s on my Macbook Air M2. For typical text, that's probably around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
+When tokenizing words, I get around 100MB/s on my Macbook Air M2. For typical text, that's around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
 
-### Invalid UTF-8
+The tokenizer is implemented as a `ref struct`, so you should see zero allocations.
 
-The tokenizer expects valid UTF-8 bytes as input. That said, we [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L43-L68) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case. Garbage in, garbage out.
+### Invalid inputs
+
+The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L42-L67) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
 
 ### Prior art
 
@@ -81,7 +83,7 @@ I previously implemented this for Go. This .Net version is something of a port o
 
 [StringInfo.GetTextElementEnumerator](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.stringinfo.gettextelementenumerator?view=net-8.0)
 
-The standard library has a similar enumerator for graphemes.
+The .Net Core standard library has a similar enumerator for graphemes.
 
 ### Other language implementations
 

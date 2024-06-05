@@ -109,5 +109,18 @@ public class Unicode
 
 			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
 		}
+
+		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
+		{
+			var results = new List<char>();
+			var invalidString = Encoding.UTF8.GetString(invalidUtf8Bytes);
+			var tokens = Tokenizer.Create(invalidString, tokenType);
+			while (tokens.MoveNext())
+			{
+				results.AddRange(tokens.Current);
+			}
+
+			Assert.That(results.SequenceEqual(invalidString));
+		}
 	}
 }
