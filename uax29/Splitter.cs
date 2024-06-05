@@ -60,12 +60,12 @@ internal abstract class SplitterBase<TSpan>
             i -= w;
             var lookup = Dict.Lookup(rune.Value);
 
-            if (lookup.Iss(Ignore))
+            if (lookup.Is(Ignore))
             {
                 continue;
             }
 
-            if (lookup.Iss(property))
+            if (lookup.Is(property))
             {
                 return i;
             }
@@ -112,13 +112,13 @@ internal abstract class SplitterBase<TSpan>
 
             var lookup = Dict.Lookup(rune.Value);
 
-            if (lookup.Iss(Ignore))
+            if (lookup.Is(Ignore))
             {
                 i += w;
                 continue;
             }
 
-            if (lookup.Iss(property))
+            if (lookup.Is(property))
             {
                 return true;
             }
@@ -133,7 +133,7 @@ internal abstract class SplitterBase<TSpan>
 
 internal static class Extensions
 {
-    internal static bool Iss(this Property lookup, Property properties)
+    internal static bool Is(this Property lookup, Property properties)
     {
         return (lookup & properties) != 0;
     }

@@ -87,7 +87,7 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB3
-                if (current.Iss(LF) && last.Iss(CR))
+                if (current.Is(LF) && last.Is(CR))
                 {
                     pos += w;
                     continue;
@@ -95,27 +95,27 @@ internal static partial class Words
 
                 // https://unicode.org/reports/tr29/#WB3a
                 // https://unicode.org/reports/tr29/#WB3b
-                if ((last | current).Iss(Newline | CR | LF))
+                if ((last | current).Is(Newline | CR | LF))
                 {
                     break;
                 }
 
                 // https://unicode.org/reports/tr29/#WB3c
-                if (current.Iss(Extended_Pictographic) && last.Iss(ZWJ))
+                if (current.Is(Extended_Pictographic) && last.Is(ZWJ))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB3d
-                if ((current & last).Iss(WSegSpace))
+                if ((current & last).Is(WSegSpace))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB4
-                if (current.Iss(Extend | Format | ZWJ))
+                if (current.Is(Extend | Format | ZWJ))
                 {
                     pos += w;
                     continue;
@@ -126,10 +126,10 @@ internal static partial class Words
                 // The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
                 // https://unicode.org/reports/tr29/#WB5
-                if (current.Iss(AHLetter) && last.Iss(AHLetter | Ignore))
+                if (current.Is(AHLetter) && last.Is(AHLetter | Ignore))
                 {
                     // Optimization: maybe a run without ignored characters
-                    if (last.Iss(AHLetter))
+                    if (last.Is(AHLetter))
                     {
                         pos += w;
                         while (pos < input.Length)
@@ -146,7 +146,7 @@ internal static partial class Words
                             }
 
                             var lookup = Dict.Lookup(rune2.Value);
-                            if (!lookup.Iss(AHLetter))
+                            if (!lookup.Is(AHLetter))
                             {
                                 break;
                             }
@@ -169,7 +169,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB6 can possibly apply
-                var maybeWB6 = current.Iss(MidLetter | MidNumLetQ) && last.Iss(AHLetter | Ignore);
+                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB6
                 if (maybeWB6)
@@ -182,7 +182,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB7 can possibly apply
-                var maybeWB7 = current.Iss(AHLetter) && last.Iss(MidLetter | MidNumLetQ | Ignore);
+                var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB7
                 if (maybeWB7)
@@ -196,7 +196,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB7a can possibly apply
-                var maybeWB7a = current.Iss(Single_Quote) && last.Iss(Hebrew_Letter | Ignore);
+                var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB7a
                 if (maybeWB7a)
@@ -209,7 +209,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB7b can possibly apply
-                var maybeWB7b = current.Iss(Double_Quote) && last.Iss(Hebrew_Letter | Ignore);
+                var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB7b
                 if (maybeWB7b)
@@ -222,7 +222,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB7c can possibly apply
-                var maybeWB7c = current.Iss(Hebrew_Letter) && last.Iss(Double_Quote | Ignore);
+                var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB7c
                 if (maybeWB7c)
@@ -238,13 +238,13 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB8
                 // https://unicode.org/reports/tr29/#WB9
                 // https://unicode.org/reports/tr29/#WB10
-                if (current.Iss(Numeric | AHLetter) && last.Iss(Numeric | AHLetter | Ignore))
+                if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | Ignore))
                 {
                     // Note: this logic de facto expresses WB5 as well, but harmless since WB5
                     // was already tested above
 
                     // Optimization: maybe a run without ignored characters
-                    if (last.Iss(Numeric | AHLetter))
+                    if (last.Is(Numeric | AHLetter))
                     {
                         pos += w;
                         while (pos < input.Length)
@@ -262,7 +262,7 @@ internal static partial class Words
 
                             var lookup = Dict.Lookup(rune2.Value);
 
-                            if (!lookup.Iss(Numeric | AHLetter))
+                            if (!lookup.Is(Numeric | AHLetter))
                             {
                                 break;
                             }
@@ -289,7 +289,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB11 can possibly apply
-                var maybeWB11 = current.Iss(Numeric) && last.Iss(MidNum | MidNumLetQ | Ignore);
+                var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB11
                 if (maybeWB11)
@@ -303,7 +303,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB12 can possibly apply
-                var maybeWB12 = current.Iss(MidNum | MidNumLetQ) && last.Iss(Numeric | Ignore);
+                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB12
                 if (maybeWB12)
@@ -316,10 +316,10 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB13
-                if (current.Iss(Katakana) && last.Iss(Katakana | Ignore))
+                if (current.Is(Katakana) && last.Is(Katakana | Ignore))
                 {
                     // Optimization: maybe a run without ignored characters
-                    if (last.Iss(Katakana))
+                    if (last.Is(Katakana))
                     {
                         pos += w;
                         while (pos < input.Length)
@@ -336,7 +336,7 @@ internal static partial class Words
                             }
 
                             var lookup = Dict.Lookup(rune2.Value);
-                            if (!lookup.Iss(Katakana))
+                            if (!lookup.Is(Katakana))
                             {
                                 break;
                             }
@@ -359,7 +359,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB13a can possibly apply
-                var maybeWB13a = current.Iss(ExtendNumLet) && last.Iss(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
+                var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB13a
                 if (maybeWB13a)
@@ -372,7 +372,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB13b can possibly apply
-                var maybeWB13b = current.Iss(AHLetter | Numeric | Katakana) && last.Iss(ExtendNumLet | Ignore);
+                var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB13b
                 if (maybeWB13b)
@@ -385,7 +385,7 @@ internal static partial class Words
                 }
 
                 // Optimization: determine if WB15 or WB16 can possibly apply
-                var maybeWB1516 = current.Iss(Regional_Indicator) && last.Iss(Regional_Indicator | Ignore);
+                var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB15 and
                 // https://unicode.org/reports/tr29/#WB16
@@ -419,12 +419,12 @@ internal static partial class Words
                             break;
                         }
 
-                        if (lookup.Iss(Ignore))
+                        if (lookup.Is(Ignore))
                         {
                             continue;
                         }
 
-                        if (!lookup.Iss(Regional_Indicator))
+                        if (!lookup.Is(Regional_Indicator))
                         {
                             // It's WB16
                             break;
