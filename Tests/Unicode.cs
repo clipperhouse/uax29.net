@@ -111,8 +111,8 @@ public class Unicode
 		}
 
 		char[] invalidChars = [
+			'\uDC00', // Low surrogate without a high surrogate
 			'\uD800', // High surrogate without a low surrogate
-            '\uDC00', // Low surrogate without a high surrogate
             '\uFFFF', // Invalid Unicode character
             '\uD800', '\uD800', // Two high surrogates
             '\uDC00', '\uDC00', // Two low surrogates
