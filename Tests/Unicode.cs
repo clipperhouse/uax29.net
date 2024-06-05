@@ -84,7 +84,7 @@ public class Unicode
 	}
 
 	[Test]
-	public void InvalidUTF8()
+	public void Invalid()
 	{
 		byte[] invalidUtf8Bytes =
 		[
@@ -110,17 +110,24 @@ public class Unicode
 			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
 		}
 
+		char[] invalidChars = [
+			'\uD800', // High surrogate without a low surrogate
+            '\uDC00', // Low surrogate without a high surrogate
+            '\uFFFF', // Invalid Unicode character
+            '\uD800', '\uD800', // Two high surrogates
+            '\uDC00', '\uDC00', // Two low surrogates
+		];
+
 		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
 		{
 			var results = new List<char>();
-			var invalidString = Encoding.UTF8.GetString(invalidUtf8Bytes);
-			var tokens = Tokenizer.Create(invalidString, tokenType);
+			var tokens = Tokenizer.Create(invalidChars, tokenType);
 			while (tokens.MoveNext())
 			{
 				results.AddRange(tokens.Current);
 			}
 
-			Assert.That(results.SequenceEqual(invalidString));
+			Assert.That(results.SequenceEqual(invalidChars));
 		}
 	}
 }
