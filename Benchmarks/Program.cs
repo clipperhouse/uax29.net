@@ -14,10 +14,10 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 [MemoryDiagnoser]
 public class Benchmark
 {
-	private static byte[] sample = [];
+	static byte[] sample = [];
 	static string sampleStr = "";
 
-	private static TokenType tokenType = TokenType.Words;
+	private static readonly TokenType tokenType = TokenType.Words;
 
 	[GlobalSetup]
 	public void Setup()
@@ -27,16 +27,25 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void Tokenizer()
+	public void TokenizeBytes()
 	{
-		var tokens = new Tokenizer(sample, tokenType);
+		var tokens = Tokenizer.Create(sample, tokenType);
 		while (tokens.MoveNext())
 		{
 		}
 	}
 
-	//	[Benchmark]
-	public void StringInfo()
+	[Benchmark]
+	public void TokenizeString()
+	{
+		var tokens = Tokenizer.Create(sampleStr, tokenType);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
+	[Benchmark]
+	public void StringInfoGraphemes()
 	{
 		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
 		while (enumerator.MoveNext())
@@ -44,10 +53,10 @@ public class Benchmark
 		}
 	}
 
-	//	[Benchmark]
-	public void Graphemes()
+	[Benchmark]
+	public void TokenizerGraphemes()
 	{
-		var tokens = new Tokenizer(sample, TokenType.Graphemes);
+		var tokens = Tokenizer.Create(sample, TokenType.Graphemes);
 		while (tokens.MoveNext())
 		{
 		}
@@ -60,7 +69,7 @@ public class Benchmark
 		// warmup
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = new Tokenizer(sample, tokenType);
+			var tokens = Tokenizer.Create(sample, tokenType);
 			while (tokens.MoveNext())
 			{
 
@@ -73,7 +82,7 @@ public class Benchmark
 
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = new Tokenizer(sample, tokenType);
+			var tokens = Tokenizer.Create(sample, tokenType);
 			while (tokens.MoveNext())
 			{
 

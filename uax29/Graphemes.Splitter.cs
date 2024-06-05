@@ -9,17 +9,18 @@ using Property = uint;
 
 internal static partial class Graphemes
 {
-    internal static readonly Split Split = new Splitter(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
 
-    internal class Splitter : SplitterBase
+    internal class Splitter<TSpan> : SplitterBase<TSpan>
     {
-        internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
+        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
             base(Graphemes.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         new const Property Ignore = Extend;
 
-        public override int Split(ReadOnlySpan<byte> input, bool atEOF = true)
+        public override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
             if (input.Length == 0)
             {
@@ -96,7 +97,7 @@ internal static partial class Graphemes
                 }
 
                 // https://unicode.org/reports/tr29/#GB3
-                if (current.Iss(LF) && last.Iss(CR))
+                if (current.Is(LF) && last.Is(CR))
                 {
                     pos += w;
                     continue;
@@ -104,55 +105,55 @@ internal static partial class Graphemes
 
                 // https://unicode.org/reports/tr29/#GB4
                 // https://unicode.org/reports/tr29/#GB5
-                if ((current | last).Iss(Control | CR | LF))
+                if ((current | last).Is(Control | CR | LF))
                 {
                     break;
                 }
 
                 // https://unicode.org/reports/tr29/#GB6
-                if (current.Iss(L | V | LV | LVT) && last.Iss(L))
+                if (current.Is(L | V | LV | LVT) && last.Is(L))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB7
-                if (current.Iss(V | T) && last.Iss(LV | V))
+                if (current.Is(V | T) && last.Is(LV | V))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB8
-                if (current.Iss(T) && last.Iss(LVT | T))
+                if (current.Is(T) && last.Is(LVT | T))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB9
-                if (current.Iss(Extend | ZWJ))
+                if (current.Is(Extend | ZWJ))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB9a
-                if (current.Iss(SpacingMark))
+                if (current.Is(SpacingMark))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB9b
-                if (last.Iss(Prepend))
+                if (last.Is(Prepend))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#GB11
-                if (current.Iss(Extended_Pictographic) && last.Iss(ZWJ) && Previous(Extended_Pictographic, input[..(pos - lastWidth)]))
+                if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous(Extended_Pictographic, input[..(pos - lastWidth)]))
                 {
                     pos += w;
                     continue;
@@ -161,7 +162,7 @@ internal static partial class Graphemes
 
                 // https://unicode.org/reports/tr29/#GB12 and
                 // https://unicode.org/reports/tr29/#GB13
-                if ((current & last).Iss(Regional_Indicator))
+                if ((current & last).Is(Regional_Indicator))
                 {
                     var i = pos;
                     var count = 0;
@@ -183,7 +184,7 @@ internal static partial class Graphemes
 
                         var lookup = Dict.Lookup(rune2.Value);
 
-                        if (!lookup.Iss(Regional_Indicator))
+                        if (!lookup.Is(Regional_Indicator))
                         {
                             // It's GB13
                             break;

@@ -8,11 +8,12 @@ using Property = uint;
 
 internal static partial class Sentences
 {
-    internal static readonly Split Split = new Splitter(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
 
-    internal class Splitter : SplitterBase
+    internal class Splitter<TSpan> : SplitterBase<TSpan>
     {
-        internal Splitter(Decoder decodeFirstRune, Decoder decodeLastRune) :
+        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
             base(Sentences.Dict, Ignore, decodeFirstRune, decodeLastRune)
         { }
 
@@ -20,7 +21,7 @@ internal static partial class Sentences
         const Property ParaSep = Sep | CR | LF;
         new const Property Ignore = Extend | Format;
 
-        public override int Split(ReadOnlySpan<byte> input, bool atEOF = true)
+        public override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
             if (input.Length == 0)
             {
@@ -62,6 +63,7 @@ internal static partial class Sentences
                 var last = current;
 
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -97,20 +99,20 @@ internal static partial class Sentences
                 }
 
                 // https://unicode.org/reports/tr29/#SB3
-                if (current.Iss(LF) && last.Iss(CR))
+                if (current.Is(LF) && last.Is(CR))
                 {
                     pos += w;
                     continue;
                 }
 
                 // https://unicode.org/reports/tr29/#SB4
-                if (last.Iss(ParaSep))
+                if (last.Is(ParaSep))
                 {
                     break;
                 }
 
                 // https://unicode.org/reports/tr29/#SB5
-                if (current.Iss(Extend | Format))
+                if (current.Is(Extend | Format))
                 {
                     pos += w;
                     continue;
@@ -121,7 +123,7 @@ internal static partial class Sentences
                 // The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
                 // Optimization: determine if SB6 can possibly apply
-                var maybeSB6 = (current.Iss(Numeric) && last.Iss(ATerm | Ignore));
+                var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | Ignore));
 
                 // https://unicode.org/reports/tr29/#SB6
                 if (maybeSB6)
@@ -134,7 +136,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB7 can possibly apply
-                var maybeSB7 = current.Iss(Upper) && last.Iss(ATerm | Ignore);
+                var maybeSB7 = current.Is(Upper) && last.Is(ATerm | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB7
                 if (maybeSB7)
@@ -148,7 +150,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB8 can possibly apply
-                var maybeSB8 = last.Iss(ATerm | Close | Sp | Ignore);
+                var maybeSB8 = last.Is(ATerm | Close | Sp | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB8
                 if (maybeSB8)
@@ -179,7 +181,7 @@ internal static partial class Sentences
 
                         var lookup = Dict.Lookup(rune2.Value);
 
-                        if (lookup.Iss(OLetter | Upper | Lower | ParaSep | SATerm))
+                        if (lookup.Is(OLetter | Upper | Lower | ParaSep | SATerm))
                         {
                             break;
                         }
@@ -226,7 +228,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB8a can possibly apply
-                var maybeSB8a = current.Iss(SContinue | SATerm) && last.Iss(SATerm | Close | Sp | Ignore);
+                var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB8a
                 if (maybeSB8a)
@@ -267,7 +269,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB9 can possibly apply
-                var maybeSB9 = current.Iss(Close | Sp | ParaSep) && last.Iss(SATerm | Close | Ignore);
+                var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB9
                 if (maybeSB9)
@@ -296,7 +298,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB10 can possibly apply
-                var maybeSB10 = current.Iss(Sp | ParaSep) && last.Iss(SATerm | Close | Sp | Ignore);
+                var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB10
                 if (maybeSB10)
@@ -337,7 +339,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB11 can possibly apply
-                var maybeSB11 = last.Iss(SATerm | Close | Sp | ParaSep | Ignore);
+                var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB11
                 if (maybeSB11)

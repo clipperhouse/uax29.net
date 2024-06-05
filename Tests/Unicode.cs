@@ -14,32 +14,77 @@ public class Unicode
 	{
 	}
 
-	static void TestTokenizer(Tokenizer tokens, UnicodeTest test)
+	static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		while (tokens.MoveNext())
 		{
 			var got = tokens.Current;
 			var expected = test.expected[i];
-			Assert.That(expected.AsSpan().SequenceEqual(got), $@"{test.comment}
-				input {test.input}
-				expected {expected}
-				got {got.ToArray()}
-				");
+			Assert.That(expected.AsSpan().SequenceEqual(got), $"{test.comment}");
+			i++;
+		}
+	}
+	static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
+	{
+		var i = 0;
+		while (tokens.MoveNext())
+		{
+			var got = tokens.Current;
+			var expected = test.expected[i];
+			var s = Encoding.UTF8.GetString(expected).AsSpan();
+			Assert.That(s.SequenceEqual(got), $"{test.comment}");
 			i++;
 		}
 	}
 
 	static readonly UnicodeTest[] WordsTests = UnicodeTests.Words;
 	[Test, TestCaseSource(nameof(WordsTests))]
-	public void WordsTokenizer(UnicodeTest test)
+	public void WordsBytes(UnicodeTest test)
 	{
-		var tokens = new Tokenizer(test.input);
-		TestTokenizer(tokens, test);
+		var tokens = Tokenizer.Create(test.input);
+		TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(WordsTests))]
+	public void WordsString(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.Create(s);
+		TestTokenizerChars(tokens, test);
+	}
+
+	static readonly UnicodeTest[] SentencesTests = UnicodeTests.Sentences;
+	[Test, TestCaseSource(nameof(SentencesTests))]
+	public void SentencesBytes(UnicodeTest test)
+	{
+		var tokens = Tokenizer.Create(test.input, TokenType.Sentences);
+		TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(SentencesTests))]
+	public void SentencesString(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.Create(s, TokenType.Sentences);
+		TestTokenizerChars(tokens, test);
+	}
+
+	static readonly UnicodeTest[] GraphemesTests = UnicodeTests.Graphemes;
+	[Test, TestCaseSource(nameof(GraphemesTests))]
+	public void GraphemesBytes(UnicodeTest test)
+	{
+		var tokens = Tokenizer.Create(test.input, TokenType.Graphemes);
+		TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(GraphemesTests))]
+	public void GraphemesString(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.Create(s, TokenType.Graphemes);
+		TestTokenizerChars(tokens, test);
 	}
 
 	[Test]
-	public void InvalidUTF8()
+	public void Invalid()
 	{
 		byte[] invalidUtf8Bytes =
 		[
@@ -56,7 +101,7 @@ public class Unicode
 		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
 		{
 			var results = new List<byte>();
-			var tokens = new Tokenizer(invalidUtf8Bytes, tokenType);
+			var tokens = Tokenizer.Create(invalidUtf8Bytes, tokenType);
 			while (tokens.MoveNext())
 			{
 				results.AddRange(tokens.Current);
@@ -64,21 +109,25 @@ public class Unicode
 
 			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
 		}
-	}
 
-	static readonly UnicodeTest[] SentencesTests = UnicodeTests.Sentences;
-	[Test, TestCaseSource(nameof(SentencesTests))]
-	public void SentencesTokenizer(UnicodeTest test)
-	{
-		var tokens = new Tokenizer(test.input, TokenType.Sentences);
-		TestTokenizer(tokens, test);
-	}
+		char[] invalidChars = [
+			'\uDC00', // Low surrogate without a high surrogate
+			'\uD800', // High surrogate without a low surrogate
+            '\uFFFF', // Invalid Unicode character
+            '\uD800', '\uD800', // Two high surrogates
+            '\uDC00', '\uDC00', // Two low surrogates
+		];
 
-	static readonly UnicodeTest[] GraphemesTests = UnicodeTests.Graphemes;
-	[Test, TestCaseSource(nameof(GraphemesTests))]
-	public void GraphemesTokenizer(UnicodeTest test)
-	{
-		var tokens = new Tokenizer(test.input, TokenType.Graphemes);
-		TestTokenizer(tokens, test);
+		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
+		{
+			var results = new List<char>();
+			var tokens = Tokenizer.Create(invalidChars, tokenType);
+			while (tokens.MoveNext())
+			{
+				results.AddRange(tokens.Current);
+			}
+
+			Assert.That(results.SequenceEqual(invalidChars));
+		}
 	}
 }
