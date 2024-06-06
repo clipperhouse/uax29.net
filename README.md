@@ -6,6 +6,10 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 ### Example
 
+```
+dotnet add package uax29.net
+```
+
 ```csharp
 using uax29;
 using System.Text;
@@ -67,7 +71,7 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 ### Performance
 
-When tokenizing words, I get around 100MB/s on my Macbook Air M2. For typical text, that's around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
+When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, that's around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations.
 
