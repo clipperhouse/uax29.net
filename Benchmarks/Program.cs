@@ -60,11 +60,16 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeSetStream()
 	{
+		// This is to test to observe allocations.
+
+		// The creation will allocate a buffer of 1024 bytes
 		var tokens = Tokenizer.Create(sampleStream, tokenType);
 
 		var runs = 10;
+		// keep in mind the 10 runs when interpreting the benchmark
 		for (var i = 0; i < runs; i++)
 		{
+			// subsequent runs should allocate less by using SetStream
 			sampleStream.Seek(0, SeekOrigin.Begin);
 			tokens.SetStream(sampleStream);
 			while (tokens.MoveNext())

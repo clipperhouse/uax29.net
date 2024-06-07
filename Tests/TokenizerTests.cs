@@ -174,7 +174,6 @@ public class TestTokenizer
 		Assert.That(first.SequenceEqual(second));
 	}
 
-
 	[Test]
 	public void SetStreamReader()
 	{
