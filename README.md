@@ -63,6 +63,8 @@ text
 
 The constructor above has an optional second parameter to specify whether you wish to split words, graphemes, or sentences.
 
+You can also pass a `Stream` of UTF-8 bytes, or a `TextReader`/`StreamReader` of `char`.
+
 ### Conformance
 
 We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
@@ -71,9 +73,11 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 ### Performance
 
-When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, that's around 25MM tokens/s, assuming tokens average 4 bytes. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
+When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, that's around 25MM tokens/s. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
 
-The tokenizer is implemented as a `ref struct`, so you should see zero allocations.
+The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
+
+For `Stream` or `TextReader`/`StreamReader`, a default `byte[1024]` buffer needs to be allocated behind the scenes. You can specify the size when calling `Create`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
 
 ### Invalid inputs
 
@@ -83,7 +87,7 @@ The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We
 
 [clipperhouse/uax29](https://github.com/clipperhouse/uax29)
 
-I previously implemented this for Go. This .Net version is something of a port of that.
+I previously implemented this for Go.
 
 [StringInfo.GetTextElementEnumerator](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.stringinfo.gettextelementenumerator?view=net-8.0)
 
