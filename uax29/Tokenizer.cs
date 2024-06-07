@@ -40,25 +40,6 @@ public static class Tokenizer
 	}
 
 	/// <summary>
-	/// Create a tokenizer for a stream of UTF-8 encoded bytes, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="stream">The stream of UTF-8 bytes to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <param name="maxTokenBytes">
-	/// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
-	/// Defaults to 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
-	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
-	/// </param>
-	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="StreamingTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="StreamingTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
-	/// </returns>
-	public static StreamingTokenizer Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
-	{
-		return new StreamingTokenizer(stream, tokenType, maxTokenBytes);
-	}
-
-	/// <summary>
 	/// Create a tokenizer for a <see cref="ReadOnlySpan"/> of <see cref="char"/>, to split words, graphemes or sentences.
 	/// </summary>
 	/// <param name="input">The string to tokenize.</param>

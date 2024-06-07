@@ -88,7 +88,7 @@ public class TestTokenizer
 			var staticTokens = Tokenizer.Create(bytes);
 
 			using var stream = new MemoryStream(bytes);
-			var streamedTokens = Tokenizer.Create(stream);
+			var streamedTokens = StreamTokenizer.Create(stream);
 
 			while (streamedTokens.MoveNext())
 			{
@@ -112,7 +112,7 @@ public class TestTokenizer
 		var bytes = Encoding.UTF8.GetBytes(input);
 		using var stream = new MemoryStream(bytes);
 
-		var tokens = Tokenizer.Create(stream);
+		var tokens = StreamTokenizer.Create(stream);
 
 		var first = new List<string>();
 		while (tokens.MoveNext())
