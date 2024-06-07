@@ -49,7 +49,7 @@ public class Benchmark
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
-		var tokens = StreamTokenizer.Create(stream, tokenType);
+		var tokens = Tokenizer.Create(stream, tokenType);
 		while (tokens.MoveNext())
 		{
 		}
