@@ -89,7 +89,7 @@ public static class Tokenizer
 	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
 	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
 	/// </returns>
-	public static StreamTokenizer<char> Create(StreamReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
+	public static StreamTokenizer<char> Create(TextReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
 	{
 		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
 		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);

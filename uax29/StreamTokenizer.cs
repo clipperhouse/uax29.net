@@ -26,8 +26,6 @@ public ref struct StreamTokenizer<T> where T : struct
 		this.buffer = buffer;
 	}
 
-	readonly ReadOnlySpan<T> empty = [];
-
 	public bool MoveNext()
 	{
 		buffer.Consume(tok.Current.Length); // the previous token
@@ -47,7 +45,7 @@ public static class StreamExtensions
 		stok.buffer.SetRead(stream.Read);
 	}
 
-	public static void SetStream(this StreamTokenizer<char> stok, StreamReader stream)
+	public static void SetStream(this StreamTokenizer<char> stok, TextReader stream)
 	{
 		stok.tok.SetText([]);
 		stok.buffer.SetRead(stream.Read);
