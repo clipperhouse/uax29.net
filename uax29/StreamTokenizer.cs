@@ -6,9 +6,9 @@
 /// </summary>
 public ref struct StreamTokenizer<T> where T : struct
 {
-	Tokenizer<T> tok;
+	internal Tokenizer<T> tok;
 
-	Buffer<T> buffer;
+	internal Buffer<T> buffer;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -20,16 +20,10 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// Defaults is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
-	internal StreamTokenizer(Stream stream, Tokenizer<T> tok, int maxTokenBytes = 1024)
+	internal StreamTokenizer(Buffer<T> buffer, Tokenizer<T> tok, int maxTokenBytes = 1024)
 	{
 		this.tok = tok;
-		buffer = new Buffer<byte>(stream.Read, maxTokenBytes) as Buffer<T> ?? throw new NotImplementedException();
-	}
-
-	internal StreamTokenizer(StreamReader stream, Tokenizer<T> tok, int maxTokenBytes = 1024)
-	{
-		this.tok = tok;
-		buffer = new Buffer<char>(stream.Read, maxTokenBytes) as Buffer<T> ?? throw new NotImplementedException();
+		this.buffer = buffer;
 	}
 
 	readonly ReadOnlySpan<T> empty = [];
@@ -43,17 +37,20 @@ public ref struct StreamTokenizer<T> where T : struct
 	}
 
 	public readonly ReadOnlySpan<T> Current => tok.Current;
+}
 
-	public void SetStream(Stream stream)
+public static class StreamExtensions
+{
+	public static void SetStream(this StreamTokenizer<byte> stok, Stream stream)
 	{
-		this.tok.SetText(empty);
-		buffer = new Buffer<byte>(stream.Read, buffer.storage.Length) as Buffer<T> ?? throw new NotImplementedException();
+		stok.tok.SetText([]);
+		stok.buffer.SetRead(stream.Read);
 	}
 
-	public void SetStream(StreamReader stream)
+	public static void SetStream(this StreamTokenizer<char> stok, StreamReader stream)
 	{
-		this.tok.SetText(empty);
-		buffer = new Buffer<char>(stream.Read, buffer.storage.Length) as Buffer<T> ?? throw new NotImplementedException();
+		stok.tok.SetText([]);
+		stok.buffer.SetRead(stream.Read);
 	}
 }
 
@@ -61,7 +58,7 @@ internal delegate int Read<T>(T[] buffer, int offset, int count) where T : struc
 
 internal class Buffer<T> where T : struct
 {
-	readonly internal T[] storage;
+	readonly T[] storage;
 	Read<T> Read;
 	int end = 0;
 
@@ -69,6 +66,12 @@ internal class Buffer<T> where T : struct
 	{
 		this.Read = read;
 		storage = new T[size];
+	}
+
+	internal Buffer(Read<T> read, T[] storage)
+	{
+		this.Read = read;
+		this.storage = storage;
 	}
 
 	internal ReadOnlySpan<T> Contents

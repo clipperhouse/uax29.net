@@ -71,7 +71,8 @@ public static class Tokenizer
 	public static StreamTokenizer<byte> Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
 	{
 		var tok = Create(ReadOnlySpan<byte>.Empty, tokenType);
-		return new StreamTokenizer<byte>(stream, tok, maxTokenBytes);
+		var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+		return new StreamTokenizer<byte>(buffer, tok, maxTokenBytes);
 	}
 
 	/// <summary>
@@ -91,7 +92,8 @@ public static class Tokenizer
 	public static StreamTokenizer<char> Create(StreamReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
 	{
 		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
-		return new StreamTokenizer<char>(stream, tok, maxTokenBytes);
+		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+		return new StreamTokenizer<char>(buffer, tok, maxTokenBytes);
 	}
 }
 

@@ -16,6 +16,7 @@ public class Benchmark
 {
 	static byte[] sample = [];
 	static string sampleStr = "";
+	Stream sampleStream = Stream.Null;
 
 	private static readonly TokenType tokenType = TokenType.Words;
 
@@ -24,6 +25,7 @@ public class Benchmark
 	{
 		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
+		sampleStream = new MemoryStream(sample);
 	}
 
 	[Benchmark]
@@ -50,6 +52,16 @@ public class Benchmark
 	{
 		var stream = new MemoryStream(sample);
 		var tokens = Tokenizer.Create(stream, tokenType);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
+	[Benchmark]
+	public void TokenizeSetStream()
+	{
+		sampleStream.Seek(0, SeekOrigin.Begin);
+		var tokens = Tokenizer.Create(sampleStream, tokenType);
 		while (tokens.MoveNext())
 		{
 		}
