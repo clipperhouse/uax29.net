@@ -60,10 +60,16 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeSetStream()
 	{
-		sampleStream.Seek(0, SeekOrigin.Begin);
 		var tokens = Tokenizer.Create(sampleStream, tokenType);
-		while (tokens.MoveNext())
+
+		var runs = 10;
+		for (var i = 0; i < runs; i++)
 		{
+			sampleStream.Seek(0, SeekOrigin.Begin);
+			tokens.SetStream(sampleStream);
+			while (tokens.MoveNext())
+			{
+			}
 		}
 	}
 

@@ -39,13 +39,13 @@ public ref struct StreamTokenizer<T> where T : struct
 
 public static class StreamExtensions
 {
-	public static void SetStream(this StreamTokenizer<byte> stok, Stream stream)
+	public static void SetStream(ref this StreamTokenizer<byte> stok, Stream stream)
 	{
 		stok.tok.SetText([]);
 		stok.buffer.SetRead(stream.Read);
 	}
 
-	public static void SetStream(this StreamTokenizer<char> stok, TextReader stream)
+	public static void SetStream(ref this StreamTokenizer<char> stok, TextReader stream)
 	{
 		stok.tok.SetText([]);
 		stok.buffer.SetRead(stream.Read);
@@ -54,7 +54,7 @@ public static class StreamExtensions
 
 internal delegate int Read<T>(T[] buffer, int offset, int count) where T : struct;
 
-internal class Buffer<T> where T : struct
+internal ref struct Buffer<T> where T : struct
 {
 	readonly T[] storage;
 	Read<T> Read;
