@@ -1,7 +1,5 @@
 ﻿namespace uax29;
 
-internal delegate int Read(byte[] buffer, int offset, int count);
-
 public static class StreamTokenizer
 {
 
@@ -16,24 +14,25 @@ public static class StreamTokenizer
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="StreamTokenizerImpl{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="StreamTokenizerImpl{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
+	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
+	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
 	/// </returns>
-	public static StreamTokenizerImpl Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
+	public static StreamTokenizer<byte> Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
 	{
-		return new StreamTokenizerImpl(stream, tokenType, maxTokenBytes);
+		var tok = Tokenizer.Create(ReadOnlySpan<byte>.Empty, tokenType);
+		return new StreamTokenizer<byte>(stream, tok, maxTokenBytes);
 	}
 }
 
 /// <summary>
 /// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
-/// Use <see cref="StreamTokenizerImpl{TSpan}.MoveNext"/> to iterate, and <see cref="StreamTokenizerImpl{TSpan}.Current"/> to retrive the current token (i.e. the word, grapheme or sentence).
+/// Use <see cref="StreamTokenizer{TSpan}.MoveNext"/> to iterate, and <see cref="StreamTokenizer{TSpan}.Current"/> to retrive the current token (i.e. the word, grapheme or sentence).
 /// </summary>
-public ref struct StreamTokenizerImpl
+public ref struct StreamTokenizer<T> where T : struct
 {
-	Tokenizer<byte> tok;
+	Tokenizer<T> tok;
 
-	Buffer buffer;
+	Buffer<T> buffer;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -45,11 +44,13 @@ public ref struct StreamTokenizerImpl
 	/// Defaults is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
-	internal StreamTokenizerImpl(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
+	internal StreamTokenizer(Stream stream, Tokenizer<T> tok, int maxTokenBytes = 1024)
 	{
-		tok = new Tokenizer<byte>(null, tokenType);
-		buffer = new Buffer(stream.Read, maxTokenBytes);
+		this.tok = tok;
+		buffer = new Buffer<byte>(stream.Read, maxTokenBytes) as Buffer<T> ?? throw new NotImplementedException();
 	}
+
+	readonly ReadOnlySpan<T> empty = [];
 
 	public bool MoveNext()
 	{
@@ -59,28 +60,30 @@ public ref struct StreamTokenizerImpl
 		return tok.MoveNext();
 	}
 
-	public readonly ReadOnlySpan<byte> Current => tok.Current;
+	public readonly ReadOnlySpan<T> Current => tok.Current;
 
 	public void SetStream(Stream stream)
 	{
-		this.tok.SetText(null);
-		this.buffer.SetRead(stream.Read);
+		this.tok.SetText(empty);
+		buffer = new Buffer<byte>(stream.Read, buffer.storage.Length) as Buffer<T> ?? throw new NotImplementedException();
 	}
 }
 
-internal ref struct Buffer
-{
-	readonly byte[] storage;
-	int end = 0;
-	Read Read;
+internal delegate int Read<T>(T[] buffer, int offset, int count) where T : struct;
 
-	internal Buffer(Read read, int size)
+internal class Buffer<T> where T : struct
+{
+	readonly internal T[] storage;
+	Read<T> Read;
+	int end = 0;
+
+	internal Buffer(Read<T> read, int size)
 	{
 		this.Read = read;
-		storage = new byte[size];
+		storage = new T[size];
 	}
 
-	internal ReadOnlySpan<byte> Contents
+	internal ReadOnlySpan<T> Contents
 	{
 		get
 		{
@@ -98,7 +101,7 @@ internal ref struct Buffer
 		Array.Copy(storage, consumed, storage, 0, end);
 	}
 
-	internal void SetRead(Read read)
+	internal void SetRead(Read<T> read)
 	{
 		this.Read = read;
 		end = 0;

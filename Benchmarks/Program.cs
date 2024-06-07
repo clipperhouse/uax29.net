@@ -44,6 +44,17 @@ public class Benchmark
 		}
 	}
 
+
+	[Benchmark]
+	public void TokenizeStream()
+	{
+		var stream = new MemoryStream(sample);
+		var tokens = StreamTokenizer.Create(stream, tokenType);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
 	[Benchmark]
 	public void StringInfoGraphemes()
 	{
