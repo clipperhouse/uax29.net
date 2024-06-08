@@ -191,6 +191,11 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 		}
 	}
 
+	public readonly Tokenizer<TSpan> GetEnumerator()
+	{
+		return this;
+	}
+
 	/// <summary>
 	/// Resets the tokenizer back to the first token.
 	/// </summary>

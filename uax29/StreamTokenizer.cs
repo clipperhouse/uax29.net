@@ -35,6 +35,11 @@ public ref struct StreamTokenizer<T> where T : struct
 	}
 
 	public readonly ReadOnlySpan<T> Current => tok.Current;
+
+	public readonly StreamTokenizer<T> GetEnumerator()
+	{
+		return this;
+	}
 }
 
 public static class StreamExtensions

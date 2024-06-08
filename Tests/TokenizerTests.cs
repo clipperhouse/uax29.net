@@ -165,9 +165,9 @@ public class TestTokenizer
 		tokens.SetStream(stream2);
 
 		var second = new List<string>();
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
-			var s = Encoding.UTF8.GetString(tokens.Current);
+			var s = Encoding.UTF8.GetString(token);
 			second.Add(s);
 		}
 
@@ -199,12 +199,69 @@ public class TestTokenizer
 		tokens.SetStream(reader2);
 
 		var second = new List<string>();
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
-			var s = tokens.Current.ToString();
+			var s = token.ToString();
 			second.Add(s);
 		}
 
+		Assert.That(first.SequenceEqual(second));
+	}
+
+	[Test]
+	public void EnumeratorTest()
+	{
+		var input = "Hello, how are you?";
+
+		var tokens = Tokenizer.Create(input);
+
+		var first = new List<string>();
+		while (tokens.MoveNext())
+		{
+			var s = tokens.Current.ToString();
+			first.Add(s);
+		}
+
+		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
+
+		var tokens2 = Tokenizer.Create(input);
+
+		var second = new List<string>();
+		foreach (var token in tokens2)
+		{
+			var s = token.ToString();
+			second.Add(s);
+		}
+		Assert.That(first.SequenceEqual(second));
+	}
+
+	[Test]
+	public void EnumeratorStreamTest()
+	{
+		var input = "Hello, how are you?";
+		var bytes = Encoding.UTF8.GetBytes(input);
+		using var stream = new MemoryStream(bytes);
+
+		var tokens = Tokenizer.Create(stream);
+
+		var first = new List<string>();
+		while (tokens.MoveNext())
+		{
+			var s = tokens.Current.ToString();
+			first.Add(s);
+		}
+
+		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
+
+		using var stream2 = new MemoryStream(bytes);
+		var tokens2 = Tokenizer.Create(stream2);
+
+		var second = new List<string>();
+		foreach (var token in tokens2)
+		{
+			var s = token.ToString();
+			second.Add(s);
+		}
 		Assert.That(first.SequenceEqual(second));
 	}
 }
