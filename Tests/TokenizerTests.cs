@@ -4,7 +4,6 @@ using uax29;
 using NUnit.Framework.Internal;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualBasic;
 
 [TestFixture]
 public class TestTokenizer

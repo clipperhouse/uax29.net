@@ -2,3 +2,4 @@ BenchmarkDotNet.Artifacts
 .DS_Store
 bin
 obj
+.vscode/tasks.json
