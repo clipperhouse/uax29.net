@@ -52,6 +52,49 @@ public static class Tokenizer
 	{
 		return new Tokenizer<char>(input, tokenType);
 	}
+
+	/// <summary>
+	/// Create a tokenizer for a stream of UTF-8 encoded bytes, to split words, graphemes or sentences.
+	/// </summary>
+	/// <param name="stream">The stream of UTF-8 bytes to tokenize.</param>
+	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
+	/// <param name="maxTokenBytes">
+	/// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
+	/// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
+	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
+	/// </param>
+	/// <returns>
+	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
+	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
+	/// </returns>
+	/// 
+	public static StreamTokenizer<byte> Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
+	{
+		var tok = Create(ReadOnlySpan<byte>.Empty, tokenType);
+		var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+		return new StreamTokenizer<byte>(buffer, tok, maxTokenBytes);
+	}
+
+	/// <summary>
+	/// Create a tokenizer for a stream reader of char, to split words, graphemes or sentences.
+	/// </summary>
+	/// <param name="stream">The stream reader of char to tokenize.</param>
+	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
+	/// <param name="maxTokenBytes">
+	/// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
+	/// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
+	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
+	/// </param>
+	/// <returns>
+	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
+	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+	/// </returns>
+	public static StreamTokenizer<char> Create(TextReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
+	{
+		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
+		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+		return new StreamTokenizer<char>(buffer, tok, maxTokenBytes);
+	}
 }
 
 /// <summary>
@@ -61,6 +104,7 @@ public static class Tokenizer
 public ref struct Tokenizer<TSpan> where TSpan : struct
 {
 	ReadOnlySpan<TSpan> input;
+
 	readonly Split<TSpan> Split;
 	public readonly TokenType TokenType;
 

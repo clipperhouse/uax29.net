@@ -16,6 +16,7 @@ public class Benchmark
 {
 	static byte[] sample = [];
 	static string sampleStr = "";
+	Stream sampleStream = Stream.Null;
 
 	private static readonly TokenType tokenType = TokenType.Words;
 
@@ -24,6 +25,7 @@ public class Benchmark
 	{
 		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
+		sampleStream = new MemoryStream(sample);
 	}
 
 	[Benchmark]
@@ -41,6 +43,38 @@ public class Benchmark
 		var tokens = Tokenizer.Create(sampleStr, tokenType);
 		while (tokens.MoveNext())
 		{
+		}
+	}
+
+
+	[Benchmark]
+	public void TokenizeStream()
+	{
+		var stream = new MemoryStream(sample);
+		var tokens = Tokenizer.Create(stream, tokenType);
+		while (tokens.MoveNext())
+		{
+		}
+	}
+
+	[Benchmark]
+	public void TokenizeSetStream()
+	{
+		// This is to test to observe allocations.
+
+		// The creation will allocate a buffer of 1024 bytes
+		var tokens = Tokenizer.Create(sampleStream, tokenType);
+
+		var runs = 10;
+		// keep in mind the 10 runs when interpreting the benchmark
+		for (var i = 0; i < runs; i++)
+		{
+			// subsequent runs should allocate less by using SetStream
+			sampleStream.Seek(0, SeekOrigin.Begin);
+			tokens.SetStream(sampleStream);
+			while (tokens.MoveNext())
+			{
+			}
 		}
 	}
 
