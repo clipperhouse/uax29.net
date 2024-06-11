@@ -21,7 +21,8 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<char> Create(string input, TokenType tokenType = TokenType.Words)
 	{
-		return new Tokenizer<char>(input.AsSpan(), tokenType);
+		var split = charSplits[tokenType];
+		return new Tokenizer<char>(input.AsSpan(), split);
 	}
 
 	/// <summary>
@@ -34,7 +35,8 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<byte> Create(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
 	{
-		return new Tokenizer<byte>(input, tokenType);
+		var split = byteSplits[tokenType];
+		return new Tokenizer<byte>(input, split);
 	}
 
 	/// <summary>
@@ -47,7 +49,8 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<char> Create(ReadOnlySpan<char> input, TokenType tokenType = TokenType.Words)
 	{
-		return new Tokenizer<char>(input, tokenType);
+		var split = charSplits[tokenType];
+		return new Tokenizer<char>(input, split);
 	}
 
 	/// <summary>
@@ -90,6 +93,20 @@ public static class Tokenizer
 		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
 		return new StreamTokenizer<char>(buffer, tok, maxTokenBytes);
 	}
+
+	static readonly Dictionary<TokenType, Split<byte>> byteSplits = new()
+	{
+		{TokenType.Words, Words.SplitUtf8Bytes},
+		{TokenType.Graphemes , Graphemes.SplitUtf8Bytes},
+		{TokenType.Sentences , Sentences.SplitUtf8Bytes},
+	};
+
+	static readonly Dictionary<TokenType, Split<char>> charSplits = new()
+	{
+		{TokenType.Words, Words.SplitChars},
+		{TokenType.Graphemes , Graphemes.SplitChars},
+		{TokenType.Sentences , Sentences.SplitChars},
+	};
 }
 
 /// <summary>
@@ -99,8 +116,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 {
 	ReadOnlySpan<TSpan> input;
 
-	readonly Split<TSpan> Split;
-	public readonly TokenType TokenType;
+	readonly Split<TSpan> split;
 
 	int start = 0;
 	int end = 0;
@@ -110,43 +126,10 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal Tokenizer(ReadOnlySpan<TSpan> input, TokenType tokenType = TokenType.Words)
+	internal Tokenizer(ReadOnlySpan<TSpan> input, Split<TSpan> split)
 	{
 		this.input = input;
-		this.TokenType = tokenType;
-		this.Split = ChooseSplit(tokenType);
-	}
-
-	static Split<TSpan> ChooseSplit(TokenType tokenType)
-	{
-		// I will type inference would make this unnecessary, but couldn't find a way.
-		// Just encapsualting it to clean up the constructor.
-		Type type = typeof(TSpan);
-		if (type == typeof(byte))
-		{
-			return tokenType switch
-			{
-				TokenType.Words => Words.SplitUtf8Bytes as Split<TSpan>,
-				TokenType.Graphemes => Graphemes.SplitUtf8Bytes as Split<TSpan>,
-				TokenType.Sentences => Sentences.SplitUtf8Bytes as Split<TSpan>,
-				// I wish T were inferrable simply by choice of the above generic delegates!
-				_ => throw new InvalidEnumArgumentException(nameof(tokenType), (int)tokenType, typeof(TokenType))
-			} ?? throw new NotImplementedException();
-		}
-		else if (type == typeof(char))
-		{
-			return tokenType switch
-			{
-				TokenType.Words => Words.SplitChars as Split<TSpan>,
-				TokenType.Graphemes => Graphemes.SplitChars as Split<TSpan>,
-				TokenType.Sentences => Sentences.SplitChars as Split<TSpan>,
-				_ => throw new InvalidEnumArgumentException(nameof(tokenType), (int)tokenType, typeof(TokenType))
-			} ?? throw new NotImplementedException();
-		}
-		else
-		{
-			throw new NotImplementedException();
-		}
+		this.split = split;
 	}
 
 	/// <summary>
@@ -157,7 +140,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		while (end < input.Length)
 		{
-			var advance = this.Split(input[end..]);
+			var advance = this.split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
