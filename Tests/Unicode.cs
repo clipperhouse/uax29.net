@@ -17,9 +17,9 @@ public class Unicode
 	static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
-			var got = tokens.Current;
+			var got = token;
 			var expected = test.expected[i];
 			Assert.That(expected.AsSpan().SequenceEqual(got), $"{test.comment}");
 			i++;
@@ -28,9 +28,9 @@ public class Unicode
 	static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
-			var got = tokens.Current;
+			var got = token;
 			var expected = test.expected[i];
 			var s = Encoding.UTF8.GetString(expected).AsSpan();
 			Assert.That(s.SequenceEqual(got), $"{test.comment}");
@@ -102,9 +102,9 @@ public class Unicode
 		{
 			var results = new List<byte>();
 			var tokens = Tokenizer.Create(invalidUtf8Bytes, tokenType);
-			while (tokens.MoveNext())
+			foreach (var token in tokens)
 			{
-				results.AddRange(tokens.Current);
+				results.AddRange(token);
 			}
 
 			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
@@ -122,9 +122,9 @@ public class Unicode
 		{
 			var results = new List<char>();
 			var tokens = Tokenizer.Create(invalidChars, tokenType);
-			while (tokens.MoveNext())
+			foreach (var token in tokens)
 			{
-				results.AddRange(tokens.Current);
+				results.AddRange(token);
 			}
 
 			Assert.That(results.SequenceEqual(invalidChars));

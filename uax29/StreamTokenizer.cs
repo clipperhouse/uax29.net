@@ -2,7 +2,6 @@
 
 /// <summary>
 /// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
-/// Use <see cref="StreamTokenizer{TSpan}.MoveNext"/> to iterate, and <see cref="StreamTokenizer{TSpan}.Current"/> to retrive the current token (i.e. the word, grapheme or sentence).
 /// </summary>
 public ref struct StreamTokenizer<T> where T : struct
 {
@@ -35,6 +34,11 @@ public ref struct StreamTokenizer<T> where T : struct
 	}
 
 	public readonly ReadOnlySpan<T> Current => tok.Current;
+
+	public readonly StreamTokenizer<T> GetEnumerator()
+	{
+		return this;
+	}
 }
 
 public static class StreamExtensions

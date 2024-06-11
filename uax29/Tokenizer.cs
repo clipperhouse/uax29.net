@@ -17,8 +17,7 @@ public static class Tokenizer
 	/// <param name="input">The string to tokenize.</param>
 	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="Tokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="Tokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+	/// An enumerator of tokens. Use foreach (var token in tokens).
 	/// </returns>
 	public static Tokenizer<char> Create(string input, TokenType tokenType = TokenType.Words)
 	{
@@ -31,8 +30,7 @@ public static class Tokenizer
 	/// <param name="input">The UTF-8 bytes to tokenize.</param>
 	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="Tokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="Tokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
+	/// An enumerator of tokens. Use foreach (var token in tokens).
 	/// </returns>
 	public static Tokenizer<byte> Create(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
 	{
@@ -45,8 +43,7 @@ public static class Tokenizer
 	/// <param name="input">The string to tokenize.</param>
 	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="Tokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="Tokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+	/// An enumerator of tokens. Use foreach (var token in tokens).
 	/// </returns>
 	public static Tokenizer<char> Create(ReadOnlySpan<char> input, TokenType tokenType = TokenType.Words)
 	{
@@ -64,8 +61,7 @@ public static class Tokenizer
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
+	/// An enumerator of tokens. Use foreach (var token in tokens).
 	/// </returns>
 	/// 
 	public static StreamTokenizer<byte> Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
@@ -86,8 +82,7 @@ public static class Tokenizer
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
 	/// <returns>
-	/// A tokenizer to iterate over, using <see cref="StreamTokenizer{TSpan}.MoveNext"/>, and retrieving each individual token with <see cref="Tokenizer{TSpan}.Current"/>.
-	/// <see cref="StreamTokenizer{TSpan}.Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+	/// An enumerator of tokens. Use foreach (var token in tokens).
 	/// </returns>
 	public static StreamTokenizer<char> Create(TextReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
 	{
@@ -99,7 +94,6 @@ public static class Tokenizer
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
-/// Use <see cref="Tokenizer{TSpan}.MoveNext"/> to iterate, and <see cref="Tokenizer{TSpan}.Current"/> to retrive the current token (i.e. the word, grapheme or sentence).
 /// </summary>
 public ref struct Tokenizer<TSpan> where TSpan : struct
 {
@@ -189,6 +183,11 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 		{
 			return input[start..end];
 		}
+	}
+
+	public readonly Tokenizer<TSpan> GetEnumerator()
+	{
+		return this;
 	}
 
 	/// <summary>
