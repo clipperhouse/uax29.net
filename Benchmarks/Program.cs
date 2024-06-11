@@ -32,7 +32,7 @@ public class Benchmark
 	public void TokenizeBytes()
 	{
 		var tokens = Tokenizer.Create(sample, tokenType);
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
 		}
 	}
@@ -41,7 +41,7 @@ public class Benchmark
 	public void TokenizeString()
 	{
 		var tokens = Tokenizer.Create(sampleStr, tokenType);
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
 		}
 	}
@@ -52,7 +52,7 @@ public class Benchmark
 	{
 		var stream = new MemoryStream(sample);
 		var tokens = Tokenizer.Create(stream, tokenType);
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
 		}
 	}
@@ -72,7 +72,7 @@ public class Benchmark
 			// subsequent runs should allocate less by using SetStream
 			sampleStream.Seek(0, SeekOrigin.Begin);
 			tokens.SetStream(sampleStream);
-			while (tokens.MoveNext())
+			foreach (var token in tokens)
 			{
 			}
 		}
@@ -91,7 +91,7 @@ public class Benchmark
 	public void TokenizerGraphemes()
 	{
 		var tokens = Tokenizer.Create(sample, TokenType.Graphemes);
-		while (tokens.MoveNext())
+		foreach (var token in tokens)
 		{
 		}
 	}
@@ -104,7 +104,7 @@ public class Benchmark
 		for (var i = 0; i < runs; i++)
 		{
 			var tokens = Tokenizer.Create(sample, tokenType);
-			while (tokens.MoveNext())
+			foreach (var token in tokens)
 			{
 
 			}
@@ -117,7 +117,7 @@ public class Benchmark
 		for (var i = 0; i < runs; i++)
 		{
 			var tokens = Tokenizer.Create(sample, tokenType);
-			while (tokens.MoveNext())
+			foreach (var token in tokens)
 			{
 
 			}
