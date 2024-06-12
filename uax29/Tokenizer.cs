@@ -71,7 +71,7 @@ public static class Tokenizer
 	{
 		var tok = Create(ReadOnlySpan<byte>.Empty, tokenType);
 		var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<byte>(buffer, tok, maxTokenBytes);
+		return new StreamTokenizer<byte>(buffer, tok);
 	}
 
 	/// <summary>
@@ -91,7 +91,7 @@ public static class Tokenizer
 	{
 		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
 		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<char>(buffer, tok, maxTokenBytes);
+		return new StreamTokenizer<char>(buffer, tok);
 	}
 
 	static readonly Dictionary<TokenType, Split<byte>> byteSplits = new()
