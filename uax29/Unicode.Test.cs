@@ -5,8 +5,15 @@ using NUnit.Framework.Internal;
 using System.Linq;
 using System.Text;
 
+public class UnicodeTest(byte[] input, byte[][] expected, string comment)
+{
+	public readonly byte[] input = input;
+	public readonly byte[][] expected = expected;
+	public readonly string comment = comment;
+}
+
 [TestFixture]
-public class Unicode
+public class TestUnicode
 {
 
 	[SetUp]
@@ -84,7 +91,7 @@ public class Unicode
 	}
 
 	[Test]
-	public void Invalid()
+	public void InvalidUTF8()
 	{
 		byte[] invalidUtf8Bytes =
 		[

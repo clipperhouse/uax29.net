@@ -1,12 +1,11 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 using uax29;
 
 namespace Tests;
 
 
 [TestFixture]
-public class Examples
+public class TestExample
 {
 
 	[SetUp]
