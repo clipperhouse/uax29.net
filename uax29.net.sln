@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{9BE27752-3654-484C-82A6-71A8629B9E06}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{AB02171B-4ADB-4728-8679-D1CA40EDA798}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uax29", "uax29\uax29.csproj", "{901775A9-006B-4627-9B57-92EC4C921738}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9BE27752-3654-484C-82A6-71A8629B9E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9BE27752-3654-484C-82A6-71A8629B9E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9BE27752-3654-484C-82A6-71A8629B9E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9BE27752-3654-484C-82A6-71A8629B9E06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB02171B-4ADB-4728-8679-D1CA40EDA798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB02171B-4ADB-4728-8679-D1CA40EDA798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB02171B-4ADB-4728-8679-D1CA40EDA798}.Release|Any CPU.ActiveCfg = Release|Any CPU

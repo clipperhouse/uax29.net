@@ -1,7 +1,6 @@
 ﻿namespace Tests;
 
 using uax29;
-using NUnit.Framework.Internal;
 using System.Linq;
 using System.Text;
 
@@ -70,7 +69,7 @@ public class TestTokenizer
 	/// Ensure that streamed text and static text return identical results.
 	/// </summary>
 	[Test]
-	public void StreamTest()
+	public void Stream()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
 		var examples = new List<string>()
@@ -106,7 +105,7 @@ public class TestTokenizer
 	/// Ensure that streamed text and static text return identical results.
 	/// </summary>
 	[Test]
-	public void StreamReaderTest()
+	public void StreamReader()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
 		var examples = new List<string>()
@@ -204,7 +203,7 @@ public class TestTokenizer
 	}
 
 	[Test]
-	public void EnumeratorTest()
+	public void Enumerator()
 	{
 		var input = "Hello, how are you?";
 
@@ -228,7 +227,7 @@ public class TestTokenizer
 	}
 
 	[Test]
-	public void EnumeratorStreamTest()
+	public void StreamEnumerator()
 	{
 		var input = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(input);

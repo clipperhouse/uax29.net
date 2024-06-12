@@ -71,7 +71,7 @@ public static class Tokenizer
 	{
 		var tok = Create(ReadOnlySpan<byte>.Empty, tokenType);
 		var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<byte>(buffer, tok, maxTokenBytes);
+		return new StreamTokenizer<byte>(buffer, tok);
 	}
 
 	/// <summary>
@@ -91,21 +91,21 @@ public static class Tokenizer
 	{
 		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
 		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<char>(buffer, tok, maxTokenBytes);
+		return new StreamTokenizer<char>(buffer, tok);
 	}
 
 	static readonly Dictionary<TokenType, Split<byte>> byteSplits = new()
 	{
 		{TokenType.Words, Words.SplitUtf8Bytes},
-		{TokenType.Graphemes , Graphemes.SplitUtf8Bytes},
-		{TokenType.Sentences , Sentences.SplitUtf8Bytes},
+		{TokenType.Graphemes, Graphemes.SplitUtf8Bytes},
+		{TokenType.Sentences, Sentences.SplitUtf8Bytes},
 	};
 
 	static readonly Dictionary<TokenType, Split<char>> charSplits = new()
 	{
 		{TokenType.Words, Words.SplitChars},
-		{TokenType.Graphemes , Graphemes.SplitChars},
-		{TokenType.Sentences , Sentences.SplitChars},
+		{TokenType.Graphemes, Graphemes.SplitChars},
+		{TokenType.Sentences, Sentences.SplitChars},
 	};
 }
 
@@ -138,13 +138,13 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// <returns>Whether there are any more tokens. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
-		while (end < input.Length)
+		if (end < input.Length)
 		{
 			var advance = this.split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
-				break;
+				return false;
 			}
 
 			start = end;
