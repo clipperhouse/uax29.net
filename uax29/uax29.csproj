@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- Test items only included in Debug build -->
+  <!-- Exclude test packages from the Release build -->
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -18,13 +18,20 @@
 
   <!-- Remove test files from Release build -->
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <None Remove="**\*.Test.cs" />
+    <None Remove="*.Test.cs" />
+    <Compile Remove="*.Test.cs" />
   </ItemGroup>
 
-  <!-- Only applies in Debug configuration -->
+  <!-- Only test in Debug configuration -->
   <PropertyGroup Condition="'$(Configuration)' != 'Release'">
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+
+  <!--
+    To demonstrate that the above is working, observe the differences between:
+    dotnet test -c Release
+    dotnet test -c Debug
+  -->
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>

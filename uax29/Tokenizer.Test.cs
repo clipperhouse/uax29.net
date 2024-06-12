@@ -1,10 +1,8 @@
 ﻿namespace Tests;
 
 using uax29;
-using NUnit.Framework.Internal;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
 
 [TestFixture]
 public class TestTokenizer
