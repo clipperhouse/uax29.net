@@ -65,6 +65,13 @@ The constructor above has an optional second parameter to specify whether you wi
 
 You can also pass a `Stream` of UTF-8 bytes, or a `TextReader`/`StreamReader` of `char`.
 
+### Data types
+
+`Tokenizer.Create` can take UTF-8 bytes, or UTF-16 string/char.
+
+For UTF-8 bytes, you pass `byte[]` or `Stream`. For strings/chars, pass `string`, `char[]` or `TextReader`/`StreamReader`.
+
+
 ### Conformance
 
 We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
@@ -77,7 +84,7 @@ When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, 
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
 
-For `Stream` or `TextReader`/`StreamReader`, a default `byte[1024]` buffer needs to be allocated behind the scenes. You can specify the size when calling `Create`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
+For `Stream` or `TextReader`/`StreamReader`, a default `byte[]` or `char[]` buffer needs to be allocated behind the scenes. You can specify the size when calling `Create`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
 
 ### Invalid inputs
 
