@@ -7,11 +7,12 @@ internal ref struct Buffer<T> where T : struct
     /// <summary>
     /// Allows the active span of the array to move with reduced copying.
     /// </summary>
-    const int factor = 2;
-    readonly T[] storage;
     Read<T> Read;
-    int start = 0;
-    int end = 0;
+
+    internal const int factor = 2;
+    internal readonly T[] storage;
+    internal int start = 0;
+    internal int end = 0;
 
     internal Buffer(Read<T> read, int maxTokenSize)
     {
