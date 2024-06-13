@@ -43,7 +43,7 @@ internal ref struct Buffer<T> where T : struct
         start += consumed;
 
         // Optimization: move the array less often
-        if (start > storage.Length / factor)
+        if (start >= storage.Length / factor)
         {
             // Move the remaining unconsumed data to the start of the buffer
             Array.Copy(storage, start, storage, 0, end - start);
