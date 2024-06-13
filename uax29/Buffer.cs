@@ -4,43 +4,59 @@ internal delegate int Read<T>(T[] buffer, int offset, int count) where T : struc
 
 internal ref struct Buffer<T> where T : struct
 {
-    readonly T[] storage;
+    /// <summary>
+    /// Allows the active span of the array to move with reduced copying.
+    /// </summary>
     Read<T> Read;
-    int end = 0;
 
-    internal Buffer(Read<T> read, int size)
+    internal const int factor = 2;
+    internal readonly T[] storage;
+    internal int start = 0;
+    internal int end = 0;
+
+    internal Buffer(Read<T> read, int maxTokenSize)
     {
         this.Read = read;
-        storage = new T[size];
-    }
-
-    internal Buffer(Read<T> read, T[] storage)
-    {
-        this.Read = read;
-        this.storage = storage;
+        storage = new T[maxTokenSize * factor];
     }
 
     internal ReadOnlySpan<T> Contents
     {
         get
         {
-            var read = Read(storage, end, storage.Length - end);
-            end += read;
-
-            return storage.AsSpan(0, end);
+            if (end < storage.Length)
+            {
+                var read = Read(storage, end, storage.Length - end);
+                end += read;
+            }
+            return storage.AsSpan(start, end - start);
         }
     }
 
     internal void Consume(int consumed)
     {
-        // Move the remaining unconsumed data to the start of the buffer
-        end -= consumed;
-        Array.Copy(storage, consumed, storage, 0, end);
+        var remaining = end - start;
+        if (consumed > remaining)
+        {
+            consumed = remaining;
+        }
+
+        start += consumed;
+
+        // Optimization: move the array less often
+        if (start >= storage.Length / factor)
+        {
+            // Move the remaining unconsumed data to the start of the buffer
+            Array.Copy(storage, start, storage, 0, end - start);
+            end -= start;
+            start = 0;
+        }
     }
 
     internal void SetRead(Read<T> read)
     {
         this.Read = read;
+        start = 0;
         end = 0;
     }
 }
