@@ -21,7 +21,7 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<char> Create(string input, TokenType tokenType = TokenType.Words)
 	{
-		var split = charSplits[tokenType];
+		var split = charSplits[(int)tokenType];
 		return new Tokenizer<char>(input.AsSpan(), split);
 	}
 
@@ -35,7 +35,7 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<byte> Create(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
 	{
-		var split = byteSplits[tokenType];
+		var split = byteSplits[(int)tokenType];
 		return new Tokenizer<byte>(input, split);
 	}
 
@@ -49,7 +49,7 @@ public static class Tokenizer
 	/// </returns>
 	public static Tokenizer<char> Create(ReadOnlySpan<char> input, TokenType tokenType = TokenType.Words)
 	{
-		var split = charSplits[tokenType];
+		var split = charSplits[(int)tokenType];
 		return new Tokenizer<char>(input, split);
 	}
 
@@ -94,19 +94,9 @@ public static class Tokenizer
 		return new StreamTokenizer<char>(buffer, tok);
 	}
 
-	static readonly Dictionary<TokenType, Split<byte>> byteSplits = new()
-	{
-		{TokenType.Words, Words.SplitUtf8Bytes},
-		{TokenType.Graphemes, Graphemes.SplitUtf8Bytes},
-		{TokenType.Sentences, Sentences.SplitUtf8Bytes},
-	};
+	static readonly Split<byte>[] byteSplits = [Words.SplitUtf8Bytes, Graphemes.SplitUtf8Bytes, Sentences.SplitUtf8Bytes];
+	static readonly Split<char>[] charSplits = [Words.SplitChars, Graphemes.SplitChars, Sentences.SplitChars];
 
-	static readonly Dictionary<TokenType, Split<char>> charSplits = new()
-	{
-		{TokenType.Words, Words.SplitChars},
-		{TokenType.Graphemes, Graphemes.SplitChars},
-		{TokenType.Sentences, Sentences.SplitChars},
-	};
 }
 
 /// <summary>

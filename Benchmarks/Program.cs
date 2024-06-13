@@ -6,10 +6,10 @@ using uax29;
 
 var summary = BenchmarkRunner.Run<Benchmark>();
 
-// var benchmark = new Benchmark();
-// benchmark.Setup();
-// var throughput = benchmark.Throughput();
-// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+//var benchmark = new Benchmark();
+//benchmark.Setup();
+//var throughput = benchmark.Throughput();
+//Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark
@@ -23,7 +23,7 @@ public class Benchmark
 	[GlobalSetup]
 	public void Setup()
 	{
-		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
+		sample = File.ReadAllBytes(@"C:\Users\kevin\source\repos\uax29.net\Benchmarks\sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
 		sampleStream = new MemoryStream(sample);
 	}
