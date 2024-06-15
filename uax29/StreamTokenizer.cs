@@ -1,13 +1,15 @@
-﻿namespace uax29;
+namespace uax29;
 
 /// <summary>
 /// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
-public ref struct StreamTokenizer<T> where T : struct
+public ref struct StreamTokenizer<TSpan, TSplit>
+	where TSpan : struct
+	where TSplit : struct, ISplit<TSpan>
 {
-	internal Tokenizer<T> tok;
+	internal Tokenizer<TSpan, TSplit> tok;
 
-	internal Buffer<T> buffer;
+	internal Buffer<TSpan> buffer;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -19,7 +21,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
 	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
 	/// </param>
-	internal StreamTokenizer(Buffer<T> buffer, Tokenizer<T> tok)
+	internal StreamTokenizer(Buffer<TSpan> buffer, Tokenizer<TSpan, TSplit> tok)
 	{
 		this.tok = tok;
 		this.buffer = buffer;
@@ -33,9 +35,9 @@ public ref struct StreamTokenizer<T> where T : struct
 		return tok.MoveNext();
 	}
 
-	public readonly ReadOnlySpan<T> Current => tok.Current;
+	public readonly ReadOnlySpan<TSpan> Current => tok.Current;
 
-	public readonly StreamTokenizer<T> GetEnumerator()
+	public readonly StreamTokenizer<TSpan, TSplit> GetEnumerator()
 	{
 		return this;
 	}
@@ -43,13 +45,15 @@ public ref struct StreamTokenizer<T> where T : struct
 
 public static class StreamExtensions
 {
-	public static void SetStream(ref this StreamTokenizer<byte> stok, Stream stream)
+	public static void SetStream<TSplit>(ref this StreamTokenizer<byte, TSplit> stok, Stream stream)
+		where TSplit : struct, ISplit<byte>
 	{
 		stok.tok.SetText([]);
 		stok.buffer.SetRead(stream.Read);
 	}
 
-	public static void SetStream(ref this StreamTokenizer<char> stok, TextReader stream)
+	public static void SetStream<TSplit>(ref this StreamTokenizer<char, TSplit> stok, TextReader stream)
+		where TSplit : struct, ISplit<char>
 	{
 		stok.tok.SetText([]);
 		stok.buffer.SetRead(stream.Read);

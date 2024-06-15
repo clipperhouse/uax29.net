@@ -10,7 +10,7 @@ internal static partial class Words
 {
 	private readonly struct WordsIgnore : IIgnore
 	{
-		static Property IIgnore.Ignore { get; } = Extend | Format | ZWJ;
+		public static Property Ignore { get; } = Extend | Format | ZWJ;
 	}
 
 	private readonly struct WordsDict : IDict
@@ -18,15 +18,10 @@ internal static partial class Words
 		static Dict IDict.Dict { get; } = Words.Dict;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, WordsDict, WordsIgnore>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, WordsDict, WordsIgnore>.Split;
-
-	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+	internal sealed class Splitter<TSpan, TDecoder>
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
-		where TDict : struct, IDict // force non-reference so gets de-virtualized
-		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
-		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+		private static SplitterBase.Context<TSpan, TDecoder, WordsDict, WordsIgnore> ctx { get; } = default;
 
 		internal Splitter() : base()
 		{ }
@@ -139,7 +134,7 @@ internal static partial class Words
 				// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 				// https://unicode.org/reports/tr29/#WB5
-				if (current.Is(AHLetter) && last.Is(AHLetter | TIgnore.Ignore))
+				if (current.Is(AHLetter) && last.Is(AHLetter | WordsIgnore.Ignore))
 				{
 					// Optimization: maybe a run without ignored characters
 					if (last.Is(AHLetter))
@@ -182,7 +177,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB6 can possibly apply
-				var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | TIgnore.Ignore);
+				var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB6
 				if (maybeWB6)
@@ -195,7 +190,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7 can possibly apply
-				var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | TIgnore.Ignore);
+				var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7
 				if (maybeWB7)
@@ -209,7 +204,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7a can possibly apply
-				var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | TIgnore.Ignore);
+				var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7a
 				if (maybeWB7a)
@@ -222,7 +217,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7b can possibly apply
-				var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | TIgnore.Ignore);
+				var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7b
 				if (maybeWB7b)
@@ -235,7 +230,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7c can possibly apply
-				var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | TIgnore.Ignore);
+				var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7c
 				if (maybeWB7c)
@@ -251,7 +246,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB8
 				// https://unicode.org/reports/tr29/#WB9
 				// https://unicode.org/reports/tr29/#WB10
-				if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | TIgnore.Ignore))
+				if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | WordsIgnore.Ignore))
 				{
 					// Note: this logic de facto expresses WB5 as well, but harmless since WB5
 					// was already tested above
@@ -302,7 +297,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB11 can possibly apply
-				var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | TIgnore.Ignore);
+				var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB11
 				if (maybeWB11)
@@ -316,7 +311,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB12 can possibly apply
-				var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | TIgnore.Ignore);
+				var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB12
 				if (maybeWB12)
@@ -329,7 +324,7 @@ internal static partial class Words
 				}
 
 				// https://unicode.org/reports/tr29/#WB13
-				if (current.Is(Katakana) && last.Is(Katakana | TIgnore.Ignore))
+				if (current.Is(Katakana) && last.Is(Katakana | WordsIgnore.Ignore))
 				{
 					// Optimization: maybe a run without ignored characters
 					if (last.Is(Katakana))
@@ -372,7 +367,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB13a can possibly apply
-				var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | TIgnore.Ignore);
+				var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB13a
 				if (maybeWB13a)
@@ -385,7 +380,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB13b can possibly apply
-				var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | TIgnore.Ignore);
+				var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB13b
 				if (maybeWB13b)
@@ -398,7 +393,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB15 or WB16 can possibly apply
-				var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | TIgnore.Ignore);
+				var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | WordsIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB15 and
 				// https://unicode.org/reports/tr29/#WB16
@@ -432,7 +427,7 @@ internal static partial class Words
 							break;
 						}
 
-						if (lookup.Is(TIgnore.Ignore))
+						if (lookup.Is(WordsIgnore.Ignore))
 						{
 							continue;
 						}

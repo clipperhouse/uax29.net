@@ -1,110 +1,135 @@
 namespace uax29;
 
-public enum TokenType
-{
-	Words, Graphemes, Sentences
-}
-
-public delegate int Split<TSpan>(ReadOnlySpan<TSpan> input, bool atEOF = true);
-
 public static class Tokenizer
 {
-	/// <summary>
-	/// Create a tokenizer for a string, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="input">The string to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <returns>
-	/// An enumerator of tokens. Use foreach (var token in tokens).
-	/// </returns>
-	public static Tokenizer<char> Create(string input, TokenType tokenType = TokenType.Words)
+	public static class Graphemes
 	{
-		var split = charSplits[(int)tokenType];
-		return new Tokenizer<char>(input.AsSpan(), split);
+		public static Tokenizer<char, GraphemeUtf16Splitter> Create(string input)
+		=> Create(input.AsSpan());
+
+		public static Tokenizer<char, GraphemeUtf16Splitter> Create(ReadOnlySpan<char> input)
+		=> new(input);
+
+		public static Tokenizer<byte, GraphemeUtf8Splitter> Create(ReadOnlySpan<byte> input)
+		=> new(input);
+
+		public static StreamTokenizer<byte, GraphemeUtf8Splitter> Create(Stream stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<byte>.Empty);
+			var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<byte, GraphemeUtf8Splitter>(buffer, tok);
+		}
+
+		public static StreamTokenizer<char, GraphemeUtf16Splitter> Create(TextReader stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<char>.Empty);
+			var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<char, GraphemeUtf16Splitter>(buffer, tok);
+		}
 	}
 
-	/// <summary>
-	/// Create a tokenizer for a <see cref="ReadOnlySpan"/> (or array) of UTF-8 encoded bytes, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="input">The UTF-8 bytes to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <returns>
-	/// An enumerator of tokens. Use foreach (var token in tokens).
-	/// </returns>
-	public static Tokenizer<byte> Create(ReadOnlySpan<byte> input, TokenType tokenType = TokenType.Words)
+	public static class Words
 	{
-		var split = byteSplits[(int)tokenType];
-		return new Tokenizer<byte>(input, split);
+		public static Tokenizer<char, WordUtf16Splitter> Create(string input)
+		=> Create(input.AsSpan());
+
+		public static Tokenizer<char, WordUtf16Splitter> Create(ReadOnlySpan<char> input)
+		=> new(input);
+
+		public static Tokenizer<byte, WordUtf8Splitter> Create(ReadOnlySpan<byte> input)
+		=> new(input);
+
+		public static StreamTokenizer<byte, WordUtf8Splitter> Create(Stream stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<byte>.Empty);
+			var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<byte, WordUtf8Splitter>(buffer, tok);
+		}
+
+		public static StreamTokenizer<char, WordUtf16Splitter> Create(TextReader stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<char>.Empty);
+			var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<char, WordUtf16Splitter>(buffer, tok);
+		}
 	}
 
-	/// <summary>
-	/// Create a tokenizer for a <see cref="ReadOnlySpan"/> of <see cref="char"/>, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="input">The string to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <returns>
-	/// An enumerator of tokens. Use foreach (var token in tokens).
-	/// </returns>
-	public static Tokenizer<char> Create(ReadOnlySpan<char> input, TokenType tokenType = TokenType.Words)
+	public static class Sentences
 	{
-		var split = charSplits[(int)tokenType];
-		return new Tokenizer<char>(input, split);
+		public static Tokenizer<char, SentenceUtf16Splitter> Create(string input)
+		=> Create(input.AsSpan());
+
+		public static Tokenizer<char, SentenceUtf16Splitter> Create(ReadOnlySpan<char> input)
+		=> new(input);
+
+		public static Tokenizer<byte, SentenceUtf8Splitter> Create(ReadOnlySpan<byte> input)
+		=> new(input);
+
+		public static StreamTokenizer<byte, SentenceUtf8Splitter> Create(Stream stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<byte>.Empty);
+			var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<byte, SentenceUtf8Splitter>(buffer, tok);
+		}
+
+		public static StreamTokenizer<char, SentenceUtf16Splitter> Create(TextReader stream, int maxTokenBytes = 1024)
+		{
+			var tok = Create(ReadOnlySpan<char>.Empty);
+			var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+			return new StreamTokenizer<char, SentenceUtf16Splitter>(buffer, tok);
+		}
 	}
+}
 
-	/// <summary>
-	/// Create a tokenizer for a stream of UTF-8 encoded bytes, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="stream">The stream of UTF-8 bytes to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <param name="maxTokenBytes">
-	/// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
-	/// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
-	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
-	/// </param>
-	/// <returns>
-	/// An enumerator of tokens. Use foreach (var token in tokens).
-	/// </returns>
-	/// 
-	public static StreamTokenizer<byte> Create(Stream stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
-	{
-		var tok = Create(ReadOnlySpan<byte>.Empty, tokenType);
-		var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<byte>(buffer, tok);
-	}
+public interface ISplit<TSpan>
+{
+	static abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF = true);
+}
 
-	/// <summary>
-	/// Create a tokenizer for a stream reader of char, to split words, graphemes or sentences.
-	/// </summary>
-	/// <param name="stream">The stream reader of char to tokenize.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	/// <param name="maxTokenBytes">
-	/// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
-	/// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
-	/// If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
-	/// </param>
-	/// <returns>
-	/// An enumerator of tokens. Use foreach (var token in tokens).
-	/// </returns>
-	public static StreamTokenizer<char> Create(TextReader stream, TokenType tokenType = TokenType.Words, int maxTokenBytes = 1024)
-	{
-		var tok = Create(ReadOnlySpan<char>.Empty, tokenType);
-		var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
-		return new StreamTokenizer<char>(buffer, tok);
-	}
+public readonly struct GraphemeUtf16Splitter : ISplit<char>
+{
+	static int ISplit<char>.Split(ReadOnlySpan<char> input, bool atEOF)
+	=> Graphemes.Splitter<char, Utf16Decoder>.Split(input, atEOF);
+}
 
-	static readonly Split<byte>[] byteSplits = [Words.SplitUtf8Bytes, Graphemes.SplitUtf8Bytes, Sentences.SplitUtf8Bytes];
-	static readonly Split<char>[] charSplits = [Words.SplitChars, Graphemes.SplitChars, Sentences.SplitChars];
+public readonly struct GraphemeUtf8Splitter : ISplit<byte>
+{
+	static int ISplit<byte>.Split(ReadOnlySpan<byte> input, bool atEOF)
+	=> Graphemes.Splitter<byte, Utf8Decoder>.Split(input, atEOF);
+}
 
+public readonly struct WordUtf16Splitter : ISplit<char>
+{
+	static int ISplit<char>.Split(ReadOnlySpan<char> input, bool atEOF)
+	=> Words.Splitter<char, Utf16Decoder>.Split(input, atEOF);
+}
+
+public readonly struct WordUtf8Splitter : ISplit<byte>
+{
+	static int ISplit<byte>.Split(ReadOnlySpan<byte> input, bool atEOF)
+	=> Words.Splitter<byte, Utf8Decoder>.Split(input, atEOF);
+}
+
+public readonly struct SentenceUtf16Splitter : ISplit<char>
+{
+	static int ISplit<char>.Split(ReadOnlySpan<char> input, bool atEOF)
+	=> Sentences.Splitter<char, Utf16Decoder>.Split(input, atEOF);
+}
+
+public readonly struct SentenceUtf8Splitter : ISplit<byte>
+{
+	static int ISplit<byte>.Split(ReadOnlySpan<byte> input, bool atEOF)
+	=> Sentences.Splitter<byte, Utf8Decoder>.Split(input, atEOF);
 }
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
-public ref struct Tokenizer<TSpan> where TSpan : struct
+public ref struct Tokenizer<TSpan, TSplit>
+	where TSpan : struct
+	where TSplit : struct, ISplit<TSpan>
 {
 	ReadOnlySpan<TSpan> input;
-
-	readonly Split<TSpan> split;
 
 	int start = 0;
 	int end = 0;
@@ -114,10 +139,9 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal Tokenizer(ReadOnlySpan<TSpan> input, Split<TSpan> split)
+	internal Tokenizer(ReadOnlySpan<TSpan> input)
 	{
 		this.input = input;
-		this.split = split;
 	}
 
 	/// <summary>
@@ -128,7 +152,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..]);
+			var advance = TSplit.Split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
@@ -156,7 +180,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 		}
 	}
 
-	public readonly Tokenizer<TSpan> GetEnumerator()
+	public readonly Tokenizer<TSpan, TSplit> GetEnumerator()
 	{
 		return this;
 	}

@@ -10,7 +10,7 @@ internal static partial class Sentences
 {
 	private readonly struct SentencesIgnore : IIgnore
 	{
-		static Property IIgnore.Ignore { get; } = Extend | Format;
+		public static Property Ignore { get; } = Extend | Format;
 	}
 
 	private readonly struct SentencesDict : IDict
@@ -18,15 +18,10 @@ internal static partial class Sentences
 		static Dict IDict.Dict { get; } = Sentences.Dict;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, SentencesDict, SentencesIgnore>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, SentencesDict, SentencesIgnore>.Split;
-
-	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+	internal sealed class Splitter<TSpan, TDecoder>
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
-		where TDict : struct, IDict // force non-reference so gets de-virtualized
-		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
-		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+		private static SplitterBase.Context<TSpan, TDecoder, SentencesDict, SentencesIgnore> ctx { get; } = default;
 
 		internal Splitter() : base()
 		{ }
@@ -136,7 +131,7 @@ internal static partial class Sentences
 				// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 				// Optimization: determine if SB6 can possibly apply
-				var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | TIgnore.Ignore));
+				var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | SentencesIgnore.Ignore));
 
 				// https://unicode.org/reports/tr29/#SB6
 				if (maybeSB6)
@@ -149,7 +144,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB7 can possibly apply
-				var maybeSB7 = current.Is(Upper) && last.Is(ATerm | TIgnore.Ignore);
+				var maybeSB7 = current.Is(Upper) && last.Is(ATerm | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB7
 				if (maybeSB7)
@@ -163,7 +158,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB8 can possibly apply
-				var maybeSB8 = last.Is(ATerm | Close | Sp | TIgnore.Ignore);
+				var maybeSB8 = last.Is(ATerm | Close | Sp | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB8
 				if (maybeSB8)
@@ -241,7 +236,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB8a can possibly apply
-				var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | TIgnore.Ignore);
+				var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB8a
 				if (maybeSB8a)
@@ -282,7 +277,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB9 can possibly apply
-				var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | TIgnore.Ignore);
+				var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB9
 				if (maybeSB9)
@@ -311,7 +306,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB10 can possibly apply
-				var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | TIgnore.Ignore);
+				var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB10
 				if (maybeSB10)
@@ -352,7 +347,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB11 can possibly apply
-				var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | TIgnore.Ignore);
+				var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | SentencesIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB11
 				if (maybeSB11)

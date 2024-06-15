@@ -19,15 +19,10 @@ internal static partial class Graphemes
 		static Dict IDict.Dict { get; } = Graphemes.Dict;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, GraphemesDict, GraphemesIgnore>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, GraphemesDict, GraphemesIgnore>.Split;
-
-	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+	internal sealed class Splitter<TSpan, TDecoder>
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
-		where TDict : struct, IDict // force non-reference so gets de-virtualized
-		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
-		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+		private static SplitterBase.Context<TSpan, TDecoder, GraphemesDict, GraphemesIgnore> ctx { get; } = default;
 
 		internal Splitter() : base()
 		{ }
