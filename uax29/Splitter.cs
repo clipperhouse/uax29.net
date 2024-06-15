@@ -9,12 +9,23 @@ using Property = uint;
 internal static class SplitterBase
 {
 	/// <summary>
+	/// Helper type to DRY up callsites w.r.t. generic arguments.
+	/// </summary>
+	internal readonly struct Context<TSpan, TDecoder, TDict, TIgnore>
+		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
+	{
+		// intentionally empty
+	}
+
+	/// <summary>
 	/// Seek backward until it hits a rune which matches property.
 	/// </summary>
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>The index if found, or -1 if not</returns>
-	internal static int PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
+	internal static int PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(this Context<TSpan, TDecoder, TDict, TIgnore> ctx, Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
 		where TDict: struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
@@ -60,12 +71,12 @@ internal static class SplitterBase
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>True if found, otherwise false</returns>
-	internal static bool Previous<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
+	internal static bool Previous<TSpan, TDecoder, TDict, TIgnore>(this Context<TSpan, TDecoder, TDict, TIgnore> ctx, Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
 		where TDict : struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
-		return PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(property, input) != -1;
+		return ctx.PreviousIndex(property, input) != -1;
 	}
 
 	/// <summary>
@@ -74,7 +85,7 @@ internal static class SplitterBase
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>True if found, otherwise false</returns>
-	internal static bool Subsequent<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
+	internal static bool Subsequent<TSpan, TDecoder, TDict, TIgnore>(this Context<TSpan, TDecoder, TDict, TIgnore> ctx, Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
 		where TDict : struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized

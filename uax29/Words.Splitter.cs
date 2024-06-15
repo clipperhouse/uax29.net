@@ -6,9 +6,6 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = uint;
 
-/// Make SplitterBase helpers available
-using static SplitterBase;
-
 internal static partial class Words
 {
 	private readonly struct WordsIgnore : IIgnore
@@ -29,6 +26,8 @@ internal static partial class Words
 		where TDict : struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
+		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+
 		internal Splitter() : base()
 		{ }
 
@@ -175,7 +174,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper look back per WB4
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..pos]))
+					if (ctx.Previous(AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -188,7 +187,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB6
 				if (maybeWB6)
 				{
-					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..pos]))
+					if (ctx.Subsequent(AHLetter, input[(pos + w)..]) && ctx.Previous(AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -201,8 +200,8 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB7
 				if (maybeWB7)
 				{
-					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(MidLetter | MidNumLetQ, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..i]))
+					var i = ctx.PreviousIndex(MidLetter | MidNumLetQ, input[..pos]);
+					if (i > 0 && ctx.Previous(AHLetter, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -215,7 +214,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB7a
 				if (maybeWB7a)
 				{
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..pos]))
+					if (ctx.Previous(Hebrew_Letter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -228,7 +227,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB7b
 				if (maybeWB7b)
 				{
-					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..pos]))
+					if (ctx.Subsequent(Hebrew_Letter, input[(pos + w)..]) && ctx.Previous(Hebrew_Letter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -241,8 +240,8 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB7c
 				if (maybeWB7c)
 				{
-					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Double_Quote, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..i]))
+					var i = ctx.PreviousIndex(Double_Quote, input[..pos]);
+					if (i > 0 && ctx.Previous(Hebrew_Letter, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -295,7 +294,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper lookback per WB4
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric | AHLetter, input[..pos]))
+					if (ctx.Previous(Numeric | AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -308,8 +307,8 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB11
 				if (maybeWB11)
 				{
-					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(MidNum | MidNumLetQ, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[..i]))
+					var i = ctx.PreviousIndex(MidNum | MidNumLetQ, input[..pos]);
+					if (i > 0 && ctx.Previous(Numeric, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -322,7 +321,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB12
 				if (maybeWB12)
 				{
-					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[..pos]))
+					if (ctx.Subsequent(Numeric, input[(pos + w)..]) && ctx.Previous(Numeric, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -365,7 +364,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper lookback per WB4
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Katakana, input[..pos]))
+					if (ctx.Previous(Katakana, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -378,7 +377,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB13a
 				if (maybeWB13a)
 				{
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
+					if (ctx.Previous(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -391,7 +390,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB13b
 				if (maybeWB13b)
 				{
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(ExtendNumLet, input[..pos]))
+					if (ctx.Previous(ExtendNumLet, input[..pos]))
 					{
 						pos += w;
 						continue;

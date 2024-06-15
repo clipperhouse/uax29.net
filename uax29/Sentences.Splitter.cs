@@ -6,9 +6,6 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = uint;
 
-/// Make SplitterBase helpers available
-using static SplitterBase;
-
 internal static partial class Sentences
 {
 	private readonly struct SentencesIgnore : IIgnore
@@ -29,6 +26,8 @@ internal static partial class Sentences
 		where TDict : struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
+		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+
 		internal Splitter() : base()
 		{ }
 
@@ -142,7 +141,7 @@ internal static partial class Sentences
 				// https://unicode.org/reports/tr29/#SB6
 				if (maybeSB6)
 				{
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..pos]))
+					if (ctx.Previous(ATerm, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -155,8 +154,8 @@ internal static partial class Sentences
 				// https://unicode.org/reports/tr29/#SB7
 				if (maybeSB7)
 				{
-					var pi = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..pos]);
-					if (pi >= 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Upper | Lower, input[..pi]))
+					var pi = ctx.PreviousIndex(ATerm, input[..pos]);
+					if (pi >= 0 && ctx.Previous(Upper | Lower, input[..pi]))
 					{
 						pos += w;
 						continue;
@@ -203,7 +202,7 @@ internal static partial class Sentences
 						p += w2;
 					}
 
-					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Lower, input[p..]))
+					if (ctx.Subsequent(Lower, input[p..]))
 					{
 						var p2 = pos;
 
@@ -211,7 +210,7 @@ internal static partial class Sentences
 						var sp = pos;
 						while (true)
 						{
-							sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
+							sp = ctx.PreviousIndex(Sp, input[..sp]);
 							if (sp < 0)
 							{
 								break;
@@ -223,7 +222,7 @@ internal static partial class Sentences
 						var close = p2;
 						while (true)
 						{
-							close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
+							close = ctx.PreviousIndex(Close, input[..close]);
 							if (close < 0)
 							{
 								break;
@@ -233,7 +232,7 @@ internal static partial class Sentences
 
 						// Having looked back past Sp's, Close's, and intervening Extend|Format,
 						// is there an ATerm?
-						if (Previous<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..p2]))
+						if (ctx.Previous(ATerm, input[..p2]))
 						{
 							pos += w;
 							continue;
@@ -253,7 +252,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
+						sp = ctx.PreviousIndex(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -265,7 +264,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
+						close = ctx.PreviousIndex(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -275,7 +274,7 @@ internal static partial class Sentences
 
 					// Having looked back past Sp, Close, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
+					if (ctx.Previous(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -294,7 +293,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
+						close = ctx.PreviousIndex(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -304,7 +303,7 @@ internal static partial class Sentences
 
 					// Having looked back past Close's and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
+					if (ctx.Previous(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -323,7 +322,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
+						sp = ctx.PreviousIndex(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -335,7 +334,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
+						close = ctx.PreviousIndex(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -345,7 +344,7 @@ internal static partial class Sentences
 
 					// Having looked back past Sp's, Close's, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
+					if (ctx.Previous(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -361,7 +360,7 @@ internal static partial class Sentences
 					var p = pos;
 
 					// Zero or one ParaSep
-					var ps = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(ParaSep, input[..p]);
+					var ps = ctx.PreviousIndex(ParaSep, input[..p]);
 					if (ps >= 0)
 					{
 						p = ps;
@@ -371,7 +370,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
+						sp = ctx.PreviousIndex(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -383,7 +382,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
+						close = ctx.PreviousIndex(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -393,7 +392,7 @@ internal static partial class Sentences
 
 					// Having looked back past ParaSep, Sp's, Close's, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
+					if (ctx.Previous(SATerm, input[..p]))
 					{
 						break;
 					}

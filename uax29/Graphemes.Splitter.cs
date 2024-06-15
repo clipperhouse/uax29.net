@@ -7,10 +7,6 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = uint;
 
-/// Make SplitterBase helpers available
-using static SplitterBase;
-using static uax29.Sentences;
-
 internal static partial class Graphemes
 {
 	private readonly struct GraphemesIgnore : IIgnore
@@ -31,6 +27,8 @@ internal static partial class Graphemes
 		where TDict : struct, IDict // force non-reference so gets de-virtualized
 		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
+		private static SplitterBase.Context<TSpan, TDecoder, TDict, TIgnore> ctx { get; } = default;
+
 		internal Splitter() : base()
 		{ }
 
@@ -167,7 +165,7 @@ internal static partial class Graphemes
 				}
 
 				// https://unicode.org/reports/tr29/#GB11
-				if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous<TSpan, TDecoder, TDict, TIgnore>(Extended_Pictographic, input[..(pos - lastWidth)]))
+				if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && ctx.Previous(Extended_Pictographic, input[..(pos - lastWidth)]))
 				{
 					pos += w;
 					continue;
