@@ -11,17 +11,23 @@ using static SplitterBase;
 
 internal static partial class Sentences
 {
-	private readonly struct SentencesIgnore : IDictAndIgnore
+	private readonly struct SentencesIgnore : IIgnore
 	{
-		static Dict IDictAndIgnore.Dict { get; } = Sentences.Dict;
-		static Property IDictAndIgnore.Ignore { get; } = Extend | Format;
+		static Property IIgnore.Ignore { get; } = Extend | Format;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder<SentencesIgnore>>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder<SentencesIgnore>>.Split;
+	private readonly struct SentencesDict : IDict
+	{
+		static Dict IDict.Dict { get; } = Sentences.Dict;
+	}
 
-	internal sealed class Splitter<TSpan, TDecoder>
-		where TDecoder : struct, IDecoder<TSpan>
+	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, SentencesDict, SentencesIgnore>.Split;
+	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, SentencesDict, SentencesIgnore>.Split;
+
+	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
 		internal Splitter() : base()
 		{ }
@@ -131,12 +137,12 @@ internal static partial class Sentences
 				// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 				// Optimization: determine if SB6 can possibly apply
-				var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | TDecoder.Ignore));
+				var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | TIgnore.Ignore));
 
 				// https://unicode.org/reports/tr29/#SB6
 				if (maybeSB6)
 				{
-					if (Previous<TSpan, TDecoder>(ATerm, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -144,13 +150,13 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB7 can possibly apply
-				var maybeSB7 = current.Is(Upper) && last.Is(ATerm | TDecoder.Ignore);
+				var maybeSB7 = current.Is(Upper) && last.Is(ATerm | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB7
 				if (maybeSB7)
 				{
-					var pi = PreviousIndex<TSpan, TDecoder>(ATerm, input[..pos]);
-					if (pi >= 0 && Previous<TSpan, TDecoder>(Upper | Lower, input[..pi]))
+					var pi = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..pos]);
+					if (pi >= 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Upper | Lower, input[..pi]))
 					{
 						pos += w;
 						continue;
@@ -158,7 +164,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB8 can possibly apply
-				var maybeSB8 = last.Is(ATerm | Close | Sp | TDecoder.Ignore);
+				var maybeSB8 = last.Is(ATerm | Close | Sp | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB8
 				if (maybeSB8)
@@ -197,7 +203,7 @@ internal static partial class Sentences
 						p += w2;
 					}
 
-					if (Subsequent<TSpan, TDecoder>(Lower, input[p..]))
+					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Lower, input[p..]))
 					{
 						var p2 = pos;
 
@@ -205,7 +211,7 @@ internal static partial class Sentences
 						var sp = pos;
 						while (true)
 						{
-							sp = PreviousIndex<TSpan, TDecoder>(Sp, input[..sp]);
+							sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
 							if (sp < 0)
 							{
 								break;
@@ -217,7 +223,7 @@ internal static partial class Sentences
 						var close = p2;
 						while (true)
 						{
-							close = PreviousIndex<TSpan, TDecoder>(Close, input[..close]);
+							close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
 							if (close < 0)
 							{
 								break;
@@ -227,7 +233,7 @@ internal static partial class Sentences
 
 						// Having looked back past Sp's, Close's, and intervening Extend|Format,
 						// is there an ATerm?
-						if (Previous<TSpan, TDecoder>(ATerm, input[..p2]))
+						if (Previous<TSpan, TDecoder, TDict, TIgnore>(ATerm, input[..p2]))
 						{
 							pos += w;
 							continue;
@@ -236,7 +242,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB8a can possibly apply
-				var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | TDecoder.Ignore);
+				var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB8a
 				if (maybeSB8a)
@@ -247,7 +253,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder>(Sp, input[..sp]);
+						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -259,7 +265,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder>(Close, input[..close]);
+						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -269,7 +275,7 @@ internal static partial class Sentences
 
 					// Having looked back past Sp, Close, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder>(SATerm, input[..p]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -277,7 +283,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB9 can possibly apply
-				var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | TDecoder.Ignore);
+				var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB9
 				if (maybeSB9)
@@ -288,7 +294,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder>(Close, input[..close]);
+						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -298,7 +304,7 @@ internal static partial class Sentences
 
 					// Having looked back past Close's and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder>(SATerm, input[..p]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -306,7 +312,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB10 can possibly apply
-				var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | TDecoder.Ignore);
+				var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB10
 				if (maybeSB10)
@@ -317,7 +323,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder>(Sp, input[..sp]);
+						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -329,7 +335,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder>(Close, input[..close]);
+						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -339,7 +345,7 @@ internal static partial class Sentences
 
 					// Having looked back past Sp's, Close's, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder>(SATerm, input[..p]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
 					{
 						pos += w;
 						continue;
@@ -347,7 +353,7 @@ internal static partial class Sentences
 				}
 
 				// Optimization: determine if SB11 can possibly apply
-				var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | TDecoder.Ignore);
+				var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#SB11
 				if (maybeSB11)
@@ -355,7 +361,7 @@ internal static partial class Sentences
 					var p = pos;
 
 					// Zero or one ParaSep
-					var ps = PreviousIndex<TSpan, TDecoder>(ParaSep, input[..p]);
+					var ps = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(ParaSep, input[..p]);
 					if (ps >= 0)
 					{
 						p = ps;
@@ -365,7 +371,7 @@ internal static partial class Sentences
 					var sp = p;
 					while (true)
 					{
-						sp = PreviousIndex<TSpan, TDecoder>(Sp, input[..sp]);
+						sp = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Sp, input[..sp]);
 						if (sp < 0)
 						{
 							break;
@@ -377,7 +383,7 @@ internal static partial class Sentences
 					var close = p;
 					while (true)
 					{
-						close = PreviousIndex<TSpan, TDecoder>(Close, input[..close]);
+						close = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Close, input[..close]);
 						if (close < 0)
 						{
 							break;
@@ -387,7 +393,7 @@ internal static partial class Sentences
 
 					// Having looked back past ParaSep, Sp's, Close's, and intervening Extend|Format,
 					// is there an SATerm?
-					if (Previous<TSpan, TDecoder>(SATerm, input[..p]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(SATerm, input[..p]))
 					{
 						break;
 					}

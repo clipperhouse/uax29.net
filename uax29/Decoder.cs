@@ -8,28 +8,22 @@ using Property = uint;
 
 internal interface IDecoder<TSpan>
 {
-	static abstract Property Ignore { get; }
-	static abstract Dict Dict { get; }
-
 	static abstract OperationStatus DecodeLastRune(ReadOnlySpan<TSpan> input, out Rune result, out int consumed);
 	static abstract OperationStatus DecodeFirstRune(ReadOnlySpan<TSpan> input, out Rune result, out int consumed);
 }
 
-internal interface IDictAndIgnore
+internal interface IDict
 {
 	static abstract Dict Dict { get; }
+}
+
+internal interface IIgnore
+{
 	static abstract Property Ignore { get; }
 }
 
-internal readonly struct Utf8Decoder<TDictAndIgnore> : IDecoder<byte>
-	where TDictAndIgnore : struct, IDictAndIgnore  // for non-ref for devirtualization purposes
+internal readonly struct Utf8Decoder : IDecoder<byte>
 {
-	static Property IDecoder<byte>.Ignore
-	=> TDictAndIgnore.Ignore;
-
-	static Dict IDecoder<byte>.Dict
-	=> TDictAndIgnore.Dict;
-
 	static OperationStatus IDecoder<byte>.DecodeFirstRune(ReadOnlySpan<byte> input, out Rune result, out int consumed)
 	=> Rune.DecodeFromUtf8(input, out result, out consumed);
 
@@ -37,15 +31,8 @@ internal readonly struct Utf8Decoder<TDictAndIgnore> : IDecoder<byte>
 	=> Rune.DecodeLastFromUtf8(input, out result, out consumed);
 }
 
-internal readonly struct Utf16Decoder<TDictAndIgnore> : IDecoder<char>
-	where TDictAndIgnore : struct, IDictAndIgnore  // for non-ref for devirtualization purposes
+internal readonly struct Utf16Decoder : IDecoder<char>
 {
-	static Property IDecoder<char>.Ignore
-	=> TDictAndIgnore.Ignore;
-
-	static Dict IDecoder<char>.Dict
-	=> TDictAndIgnore.Dict;
-
 	static OperationStatus IDecoder<char>.DecodeFirstRune(ReadOnlySpan<char> input, out Rune result, out int consumed)
 	=> Rune.DecodeFromUtf16(input, out result, out consumed);
 

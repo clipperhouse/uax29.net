@@ -1,7 +1,5 @@
 namespace uax29;
 
-using System.ComponentModel;
-
 public enum TokenType
 {
 	Words, Graphemes, Sentences

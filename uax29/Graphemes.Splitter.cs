@@ -9,20 +9,27 @@ using Property = uint;
 
 /// Make SplitterBase helpers available
 using static SplitterBase;
+using static uax29.Sentences;
 
 internal static partial class Graphemes
 {
-	private readonly struct GraphemesIgnore : IDictAndIgnore
+	private readonly struct GraphemesIgnore : IIgnore
 	{
-		static Dict IDictAndIgnore.Dict { get; } = Graphemes.Dict;
-		static Property IDictAndIgnore.Ignore { get; } = Extend;
+		static Property IIgnore.Ignore { get; } = Extend;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder<GraphemesIgnore>>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder<GraphemesIgnore>>.Split;
+	private readonly struct GraphemesDict : IDict
+	{
+		static Dict IDict.Dict { get; } = Graphemes.Dict;
+	}
 
-	internal sealed class Splitter<TSpan, TDecoder>
-		where TDecoder : struct, IDecoder<TSpan>
+	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, GraphemesDict, GraphemesIgnore>.Split;
+	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, GraphemesDict, GraphemesIgnore>.Split;
+
+	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
 		internal Splitter() : base()
 		{ }
@@ -160,7 +167,7 @@ internal static partial class Graphemes
 				}
 
 				// https://unicode.org/reports/tr29/#GB11
-				if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous<TSpan, TDecoder>(Extended_Pictographic, input[..(pos - lastWidth)]))
+				if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous<TSpan, TDecoder, TDict, TIgnore>(Extended_Pictographic, input[..(pos - lastWidth)]))
 				{
 					pos += w;
 					continue;

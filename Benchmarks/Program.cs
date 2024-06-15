@@ -4,12 +4,12 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using uax29;
 
-var summary = BenchmarkRunner.Run<Benchmark>();
+//var summary = BenchmarkRunner.Run<Benchmark>();
 
-//var benchmark = new Benchmark();
-//benchmark.Setup();
-//var throughput = benchmark.Throughput();
-//Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+var benchmark = new Benchmark();
+benchmark.Setup();
+var throughput = benchmark.Throughput();
+Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 [MemoryDiagnoser]
 public class Benchmark

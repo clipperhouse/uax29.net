@@ -14,8 +14,10 @@ internal static class SplitterBase
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>The index if found, or -1 if not</returns>
-	internal static int PreviousIndex<TSpan, TDecoder>(Property property, ReadOnlySpan<TSpan> input)
+	internal static int PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict: struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
 		// Start at the end of the buffer and move backwards
 		var i = input.Length;
@@ -33,9 +35,9 @@ internal static class SplitterBase
 			}
 
 			i -= w;
-			var lookup = TDecoder.Dict.Lookup(rune.Value);
+			var lookup = TDict.Dict.Lookup(rune.Value);
 
-			if (lookup.Is(TDecoder.Ignore))
+			if (lookup.Is(TIgnore.Ignore))
 			{
 				continue;
 			}
@@ -58,10 +60,12 @@ internal static class SplitterBase
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>True if found, otherwise false</returns>
-	internal static bool Previous<TSpan, TDecoder>(Property property, ReadOnlySpan<TSpan> input)
+	internal static bool Previous<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
-		return PreviousIndex<TSpan, TDecoder>(property, input) != -1;
+		return PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(property, input) != -1;
 	}
 
 	/// <summary>
@@ -70,8 +74,10 @@ internal static class SplitterBase
 	/// <param name="property">Property to attempt to find</param>
 	/// <param name="input">Data in which to seek</param>
 	/// <returns>True if found, otherwise false</returns>
-	internal static bool Subsequent<TSpan, TDecoder>(Property property, ReadOnlySpan<TSpan> input)
+	internal static bool Subsequent<TSpan, TDecoder, TDict, TIgnore>(Property property, ReadOnlySpan<TSpan> input)
 		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
 		var i = 0;
 		while (i < input.Length)
@@ -87,9 +93,9 @@ internal static class SplitterBase
 				break;
 			}
 
-			var lookup = TDecoder.Dict.Lookup(rune.Value);
+			var lookup = TDict.Dict.Lookup(rune.Value);
 
-			if (lookup.Is(TDecoder.Ignore))
+			if (lookup.Is(TIgnore.Ignore))
 			{
 				i += w;
 				continue;

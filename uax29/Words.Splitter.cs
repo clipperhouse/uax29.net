@@ -11,24 +11,30 @@ using static SplitterBase;
 
 internal static partial class Words
 {
-	private readonly struct WordsIgnore : IDictAndIgnore
+	private readonly struct WordsIgnore : IIgnore
 	{
-		static Dict IDictAndIgnore.Dict { get; } = Words.Dict;
-		static Property IDictAndIgnore.Ignore { get; } = Extend | Format | ZWJ;
+		static Property IIgnore.Ignore { get; } = Extend | Format | ZWJ;
 	}
 
-	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder<WordsIgnore>>.Split;
-	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder<WordsIgnore>>.Split;
+	private readonly struct WordsDict : IDict
+	{
+		static Dict IDict.Dict { get; } = Words.Dict;
+	}
 
-	internal sealed class Splitter<TSpan, TDecoder>
-		where TDecoder : struct, IDecoder<TSpan>
+	internal static readonly Split<byte> SplitUtf8Bytes = Splitter<byte, Utf8Decoder, WordsDict, WordsIgnore>.Split;
+	internal static readonly Split<char> SplitChars = Splitter<char, Utf16Decoder, WordsDict, WordsIgnore>.Split;
+
+	internal sealed class Splitter<TSpan, TDecoder, TDict, TIgnore>
+		where TDecoder : struct, IDecoder<TSpan> // force non-reference so gets de-virtualized
+		where TDict : struct, IDict // force non-reference so gets de-virtualized
+		where TIgnore : struct, IIgnore // force non-reference so gets de-virtualized
 	{
 		internal Splitter() : base()
 		{ }
 
 		const Property AHLetter = ALetter | Hebrew_Letter;
 		const Property MidNumLetQ = MidNumLet | Single_Quote;
-		
+
 		public static int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
 		{
 			if (input.Length == 0)
@@ -134,7 +140,7 @@ internal static partial class Words
 				// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 				// https://unicode.org/reports/tr29/#WB5
-				if (current.Is(AHLetter) && last.Is(AHLetter | TDecoder.Ignore))
+				if (current.Is(AHLetter) && last.Is(AHLetter | TIgnore.Ignore))
 				{
 					// Optimization: maybe a run without ignored characters
 					if (last.Is(AHLetter))
@@ -169,7 +175,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper look back per WB4
-					if (Previous<TSpan, TDecoder>(AHLetter, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -177,12 +183,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB6 can possibly apply
-				var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | TDecoder.Ignore);
+				var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB6
 				if (maybeWB6)
 				{
-					if (Subsequent<TSpan, TDecoder>(AHLetter, input[(pos + w)..]) && Previous<TSpan, TDecoder>(AHLetter, input[..pos]))
+					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -190,13 +196,13 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7 can possibly apply
-				var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | TDecoder.Ignore);
+				var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7
 				if (maybeWB7)
 				{
-					var i = PreviousIndex<TSpan, TDecoder>(MidLetter | MidNumLetQ, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder>(AHLetter, input[..i]))
+					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(MidLetter | MidNumLetQ, input[..pos]);
+					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -204,12 +210,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7a can possibly apply
-				var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | TDecoder.Ignore);
+				var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7a
 				if (maybeWB7a)
 				{
-					if (Previous<TSpan, TDecoder>(Hebrew_Letter, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -217,12 +223,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7b can possibly apply
-				var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | TDecoder.Ignore);
+				var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7b
 				if (maybeWB7b)
 				{
-					if (Subsequent<TSpan, TDecoder>(Hebrew_Letter, input[(pos + w)..]) && Previous<TSpan, TDecoder>(Hebrew_Letter, input[..pos]))
+					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -230,13 +236,13 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB7c can possibly apply
-				var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | TDecoder.Ignore);
+				var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB7c
 				if (maybeWB7c)
 				{
-					var i = PreviousIndex<TSpan, TDecoder>(Double_Quote, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder>(Hebrew_Letter, input[..i]))
+					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(Double_Quote, input[..pos]);
+					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Hebrew_Letter, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -246,7 +252,7 @@ internal static partial class Words
 				// https://unicode.org/reports/tr29/#WB8
 				// https://unicode.org/reports/tr29/#WB9
 				// https://unicode.org/reports/tr29/#WB10
-				if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | TDecoder.Ignore))
+				if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | TIgnore.Ignore))
 				{
 					// Note: this logic de facto expresses WB5 as well, but harmless since WB5
 					// was already tested above
@@ -289,7 +295,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper lookback per WB4
-					if (Previous<TSpan, TDecoder>(Numeric | AHLetter, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric | AHLetter, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -297,13 +303,13 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB11 can possibly apply
-				var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | TDecoder.Ignore);
+				var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB11
 				if (maybeWB11)
 				{
-					var i = PreviousIndex<TSpan, TDecoder>(MidNum | MidNumLetQ, input[..pos]);
-					if (i > 0 && Previous<TSpan, TDecoder>(Numeric, input[..i]))
+					var i = PreviousIndex<TSpan, TDecoder, TDict, TIgnore>(MidNum | MidNumLetQ, input[..pos]);
+					if (i > 0 && Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[..i]))
 					{
 						pos += w;
 						continue;
@@ -311,12 +317,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB12 can possibly apply
-				var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | TDecoder.Ignore);
+				var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB12
 				if (maybeWB12)
 				{
-					if (Subsequent<TSpan, TDecoder>(Numeric, input[(pos + w)..]) && Previous<TSpan, TDecoder>(Numeric, input[..pos]))
+					if (Subsequent<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[(pos + w)..]) && Previous<TSpan, TDecoder, TDict, TIgnore>(Numeric, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -324,7 +330,7 @@ internal static partial class Words
 				}
 
 				// https://unicode.org/reports/tr29/#WB13
-				if (current.Is(Katakana) && last.Is(Katakana | TDecoder.Ignore))
+				if (current.Is(Katakana) && last.Is(Katakana | TIgnore.Ignore))
 				{
 					// Optimization: maybe a run without ignored characters
 					if (last.Is(Katakana))
@@ -359,7 +365,7 @@ internal static partial class Words
 					}
 
 					// Otherwise, do proper lookback per WB4
-					if (Previous<TSpan, TDecoder>(Katakana, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(Katakana, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -367,12 +373,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB13a can possibly apply
-				var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | TDecoder.Ignore);
+				var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB13a
 				if (maybeWB13a)
 				{
-					if (Previous<TSpan, TDecoder>(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -380,12 +386,12 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB13b can possibly apply
-				var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | TDecoder.Ignore);
+				var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB13b
 				if (maybeWB13b)
 				{
-					if (Previous<TSpan, TDecoder>(ExtendNumLet, input[..pos]))
+					if (Previous<TSpan, TDecoder, TDict, TIgnore>(ExtendNumLet, input[..pos]))
 					{
 						pos += w;
 						continue;
@@ -393,7 +399,7 @@ internal static partial class Words
 				}
 
 				// Optimization: determine if WB15 or WB16 can possibly apply
-				var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | TDecoder.Ignore);
+				var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | TIgnore.Ignore);
 
 				// https://unicode.org/reports/tr29/#WB15 and
 				// https://unicode.org/reports/tr29/#WB16
@@ -427,7 +433,7 @@ internal static partial class Words
 							break;
 						}
 
-						if (lookup.Is(TDecoder.Ignore))
+						if (lookup.Is(TIgnore.Ignore))
 						{
 							continue;
 						}
