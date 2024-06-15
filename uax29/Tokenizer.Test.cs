@@ -65,143 +65,6 @@ public class TestTokenizer
 		Assert.That(first.SequenceEqual(second));
 	}
 
-	/// <summary>
-	/// Ensure that streamed text and static text return identical results.
-	/// </summary>
-	[Test]
-	public void Stream()
-	{
-		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var examples = new List<string>()
-		{
-			example,											// smaller than the buffer
-			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
-		};
-
-		foreach (var input in examples)
-		{
-			var bytes = Encoding.UTF8.GetBytes(input);
-			var staticTokens = Tokenizer.Create(bytes);
-
-			using var stream = new MemoryStream(bytes);
-			var streamTokens = Tokenizer.Create(stream);
-
-			foreach (var streamToken in streamTokens)
-			{
-				staticTokens.MoveNext();
-
-				var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
-				var streamCurrent = Encoding.UTF8.GetString(streamToken);
-
-				Assert.That(staticCurrent, Is.EqualTo(streamCurrent));
-			}
-
-			Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
-			Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
-		}
-	}
-
-	/// <summary>
-	/// Ensure that streamed text and static text return identical results.
-	/// </summary>
-	[Test]
-	public void StreamReader()
-	{
-		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var examples = new List<string>()
-		{
-			example,											// smaller than the buffer
-			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
-		};
-
-		foreach (var input in examples)
-		{
-			var bytes = Encoding.UTF8.GetBytes(input);
-			var staticTokens = Tokenizer.Create(bytes);
-
-			using var stream = new MemoryStream(bytes);
-			using var reader = new StreamReader(stream);
-			var streamTokens = Tokenizer.Create(reader);
-
-			foreach (var streamToken in streamTokens)
-			{
-				staticTokens.MoveNext();
-				var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
-
-				Assert.That(staticCurrent, Is.EqualTo(streamToken.ToString()));
-			}
-
-			Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
-			Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
-		}
-	}
-
-	[Test]
-	public void SetStream()
-	{
-		var input = "Hello, how are you?";
-		var bytes = Encoding.UTF8.GetBytes(input);
-		using var stream = new MemoryStream(bytes);
-
-		var tokens = Tokenizer.Create(stream);
-
-		var first = new List<string>();
-		foreach (var token in tokens)
-		{
-			var s = Encoding.UTF8.GetString(token);
-			first.Add(s);
-		}
-
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
-
-		using var stream2 = new MemoryStream(bytes);
-
-		tokens.SetStream(stream2);
-
-		var second = new List<string>();
-		foreach (var token in tokens)
-		{
-			var s = Encoding.UTF8.GetString(token);
-			second.Add(s);
-		}
-
-		Assert.That(first.SequenceEqual(second));
-	}
-
-	[Test]
-	public void SetStreamReader()
-	{
-		var input = "Hello, how are you?";
-		var bytes = Encoding.UTF8.GetBytes(input);
-		using var stream = new MemoryStream(bytes);
-		using var reader = new StreamReader(stream);
-
-		var tokens = Tokenizer.Create(reader);
-
-		var first = new List<string>();
-		foreach (var token in tokens)
-		{
-			var s = token.ToString();
-			first.Add(s);
-		}
-
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
-
-		using var stream2 = new MemoryStream(bytes);
-		using var reader2 = new StreamReader(stream2);
-
-		tokens.SetStream(reader2);
-
-		var second = new List<string>();
-		foreach (var token in tokens)
-		{
-			var s = token.ToString();
-			second.Add(s);
-		}
-
-		Assert.That(first.SequenceEqual(second));
-	}
-
 	[Test]
 	public void Enumerator()
 	{
@@ -227,33 +90,68 @@ public class TestTokenizer
 	}
 
 	[Test]
-	public void StreamEnumerator()
+	public void ToList()
 	{
-		var input = "Hello, how are you?";
-		var bytes = Encoding.UTF8.GetBytes(input);
-		using var stream = new MemoryStream(bytes);
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var tokens = Tokenizer.Create(example);
+		var list = tokens.ToList();
 
-		var tokens = Tokenizer.Create(stream);
-
-		var first = new List<string>();
-		while (tokens.MoveNext())
+		var i = 0;
+		foreach (var token in tokens)
 		{
-			var s = tokens.Current.ToString();
-			first.Add(s);
+			Assert.That(token.SequenceEqual(list[i]));
+			i++;
 		}
 
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
+		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
 
-		using var stream2 = new MemoryStream(bytes);
-		var tokens2 = Tokenizer.Create(stream2);
+		// Tokenizer should reset back to the beginning
+		Assert.That(tokens.start, Is.EqualTo(0));
+		Assert.That(tokens.end, Is.EqualTo(0));
 
-		var second = new List<string>();
-		foreach (var token in tokens2)
+		var threw = false;
+		tokens.MoveNext();
+		try
 		{
-			var s = token.ToString();
-			second.Add(s);
+			tokens.ToList();
 		}
-		Assert.That(first.SequenceEqual(second));
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToList after iteration has begun should throw");
+	}
+
+	[Test]
+	public void ToArray()
+	{
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var tokens = Tokenizer.Create(example);
+		var array = tokens.ToArray();
+
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			Assert.That(token.SequenceEqual(array[i]));
+			i++;
+		}
+
+		Assert.That(array, Has.Length.EqualTo(i), "ToArray should return the same number of tokens as iteration");
+
+		// Tokenizer should reset back to the beginning
+		Assert.That(tokens.start, Is.EqualTo(0));
+		Assert.That(tokens.end, Is.EqualTo(0));
+
+		var threw = false;
+		tokens.MoveNext();
+		try
+		{
+			tokens.ToArray();
+		}
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
 	}
 }
-

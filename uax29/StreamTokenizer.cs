@@ -52,6 +52,8 @@ public ref struct StreamTokenizer<T> where T : struct
 
 	internal Buffer<T> buffer;
 
+	bool begun = false;
+
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
@@ -65,6 +67,8 @@ public ref struct StreamTokenizer<T> where T : struct
 
 	public bool MoveNext()
 	{
+		begun = true;
+
 		buffer.Consume(tok.Current.Length); // the previous token
 		var input = buffer.Contents;
 		tok.SetText(input);
@@ -76,6 +80,40 @@ public ref struct StreamTokenizer<T> where T : struct
 	public readonly StreamTokenizer<T> GetEnumerator()
 	{
 		return this;
+	}
+
+	/// <summary>
+	/// Iterates over all tokens and collects them into a List, allocating a new array for each token.
+	/// </summary>
+	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
+	public readonly List<T[]> ToList()
+	{
+		if (begun)
+		{
+			throw new InvalidOperationException("ToList must not be called after iteration has begun.");
+		}
+
+		var result = new List<T[]>();
+		foreach (var token in this)
+		{
+			result.Add(token.ToArray());
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Iterates over all tokens and collects them into an Array, allocating a new array for each token.
+	/// </summary>
+	/// <returns>byte[][] or char[][], depending on the input</returns>
+	public readonly T[][] ToArray()
+	{
+		if (begun)
+		{
+			throw new InvalidOperationException("ToArray must not be called after iteration has begun.");
+		}
+
+		return this.ToList().ToArray();
 	}
 }
 

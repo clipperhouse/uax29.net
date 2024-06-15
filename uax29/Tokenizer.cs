@@ -75,8 +75,10 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 
 	readonly Split<TSpan> split;
 
-	int start = 0;
-	int end = 0;
+	internal int start = 0;
+	internal int end = 0;
+
+	bool begun = false;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -95,6 +97,8 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// <returns>Whether there are any more tokens. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
+		begun = true;
+
 		if (end < input.Length)
 		{
 			var advance = this.split(input[end..]);
@@ -137,6 +141,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		this.start = 0;
 		this.end = 0;
+		this.begun = false;
 	}
 
 	/// <summary>
@@ -146,5 +151,40 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	{
 		Reset();
 		this.input = input;
+	}
+
+	/// <summary>
+	/// Iterates over all tokens and collects them into a list, allocating a new array for each token.
+	/// </summary>
+	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
+	public List<TSpan[]> ToList()
+	{
+		if (begun)
+		{
+			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
+		}
+
+		var result = new List<TSpan[]>();
+		foreach (var token in this)
+		{
+			result.Add(token.ToArray());
+		}
+
+		this.Reset();
+		return result;
+	}
+
+	/// <summary>
+	/// Iterates over all tokens and collects them into an array, allocating a new array for each token.
+	/// </summary>
+	/// <returns>byte[][] or char[][], depending on the input</returns>
+	public TSpan[][] ToArray()
+	{
+		if (begun)
+		{
+			throw new InvalidOperationException("ToArray must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
+		}
+
+		return this.ToList().ToArray();
 	}
 }
