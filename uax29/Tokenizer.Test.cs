@@ -255,5 +255,139 @@ public class TestTokenizer
 		}
 		Assert.That(first.SequenceEqual(second));
 	}
-}
 
+	[Test]
+	public void ToList()
+	{
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var tokens = Tokenizer.Create(example);
+		var list = tokens.ToList();
+
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			Assert.That(token.SequenceEqual(list[i]));
+			i++;
+		}
+
+		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
+
+		// Tokenizer should reset back to the beginning
+		Assert.That(tokens.start, Is.EqualTo(0));
+		Assert.That(tokens.end, Is.EqualTo(0));
+
+		var threw = false;
+		tokens.MoveNext();
+		try
+		{
+			tokens.ToList();
+		}
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToList after iteration has begun should throw");
+	}
+
+	[Test]
+	public void ToArray()
+	{
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var tokens = Tokenizer.Create(example);
+		var array = tokens.ToArray();
+
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			Assert.That(token.SequenceEqual(array[i]));
+			i++;
+		}
+
+		Assert.That(array, Has.Length.EqualTo(i), "ToArray should return the same number of tokens as iteration");
+
+		// Tokenizer should reset back to the beginning
+		Assert.That(tokens.start, Is.EqualTo(0));
+		Assert.That(tokens.end, Is.EqualTo(0));
+
+		var threw = false;
+		tokens.MoveNext();
+		try
+		{
+			tokens.ToArray();
+		}
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
+	}
+
+	[Test]
+	public void StreamToList()
+	{
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var bytes = Encoding.UTF8.GetBytes(example);
+		using var stream = new MemoryStream(bytes);
+
+		var list = Tokenizer.Create(stream).ToList();
+
+		stream.Seek(0, SeekOrigin.Begin);
+		var tokens = Tokenizer.Create(stream);
+
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			Assert.That(token.SequenceEqual(list[i]));
+			i++;
+		}
+
+		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
+
+		var threw = false;
+		tokens.MoveNext();
+		try
+		{
+			tokens.ToList();
+		}
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToList after iteration has begun should throw");
+	}
+
+	[Test]
+	public void StreamToArray()
+	{
+		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+		var bytes = Encoding.UTF8.GetBytes(example);
+		using var stream = new MemoryStream(bytes);
+
+		var list = Tokenizer.Create(stream).ToList();
+
+		stream.Seek(0, SeekOrigin.Begin);
+		var tokens = Tokenizer.Create(stream);
+
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			Assert.That(token.SequenceEqual(list[i]));
+			i++;
+		}
+
+		Assert.That(list, Has.Count.EqualTo(i), "ToArray should return the same number of tokens as iteration");
+
+		var threw = false;
+		tokens.MoveNext();
+		try
+		{
+			tokens.ToArray();
+		}
+		catch (InvalidOperationException)
+		{
+			threw = true;
+		}
+		Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
+	}
+
+}
