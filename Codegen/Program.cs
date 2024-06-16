@@ -123,7 +123,7 @@ namespace uax29;
 
 using Property = uint;
 
-static partial class {typ}s
+internal static partial class {typ}s
 {{
 ");
 
@@ -133,7 +133,7 @@ static partial class {typ}s
 			}
 
 			dict.Write(@"
-	static readonly Dict Dict = new(GetDict());
+	internal static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 ");
@@ -162,12 +162,12 @@ static partial class {typ}s
 
 			using var reader = new StringReader(data);
 
-			using var dict = new StreamWriter($"../Tests/{typ}s.Tests.cs");
+			using var dict = new StreamWriter($"../uax29/{typ}s.Test.cs");
 			dict.WriteLine($"// generated from {url}");
 			dict.Write(@$"namespace Tests;
-public static partial class UnicodeTests
+internal static partial class {typ}s
 {{
-	public readonly static UnicodeTest[] {typ}s = [
+	internal readonly static UnicodeTest[] UnicodeTests = [
 ");
 			while (true)
 			{

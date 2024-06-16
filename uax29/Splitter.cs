@@ -32,7 +32,7 @@ internal abstract class SplitterBase<TSpan>
     /// (Always true in the current implementation, we may implement streaming in the future.)
     /// </param>
     /// <returns></returns>
-    public abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF);
+    internal abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF);
 
     /// <summary>
     /// Seek backward until it hits a rune which matches property.

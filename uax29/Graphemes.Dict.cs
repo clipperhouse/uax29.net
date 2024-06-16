@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = uint;
 
-static partial class Graphemes
+internal static partial class Graphemes
 {
 	const Property Prepend = 1;
 	const Property CR = 2;
@@ -21,7 +21,7 @@ static partial class Graphemes
 	const Property ZWJ = 4096;
 	const Property Extended_Pictographic = 8192;
 
-	static readonly Dict Dict = new(GetDict());
+	internal static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0600, Prepend},

@@ -4,7 +4,7 @@ namespace uax29;
 
 using Property = uint;
 
-static partial class Words
+internal static partial class Words
 {
 	const Property Double_Quote = 1;
 	const Property Single_Quote = 2;
@@ -26,7 +26,7 @@ static partial class Words
 	const Property WSegSpace = 131072;
 	const Property Extended_Pictographic = 262144;
 
-	static readonly Dict Dict = new(GetDict());
+	internal static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0022, Double_Quote},

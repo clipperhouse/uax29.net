@@ -7,8 +7,8 @@ using Property = uint;
 
 internal class Dict
 {
-	internal FrozenDictionary<int, Property> lookups;
-	public Dict(Dictionary<int, Property> lookups)
+	FrozenDictionary<int, Property> lookups;
+	internal Dict(Dictionary<int, Property> lookups)
 	{
 		this.lookups = lookups.ToFrozenDictionary();
 	}
@@ -18,7 +18,7 @@ internal class Dict
 	/// </summary>
 	/// <param name="rune">The rune to look up.</param>
 	/// <returns>The categories (Property) of the rune if found, otherwise 0.</returns>
-	public Property Lookup(int rune)
+	internal Property Lookup(int rune)
 	{
 		if (lookups.TryGetValue(rune, out Property property))
 		{

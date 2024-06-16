@@ -1,8 +1,8 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/SentenceBreakTest.txt
 namespace Tests;
-public static partial class UnicodeTests
+internal static partial class Sentences
 {
-	public readonly static UnicodeTest[] Sentences = [
+	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0001, 0x0001], [[0x0001, 0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [998.0] <START OF HEADING> (Other) ÷ [0.3]"),
 		new([0x0001, 0x00CC, 0x0088, 0x0001], [[0x0001, 0x00CC, 0x0088, 0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [5.0] COMBINING DIAERESIS (Extend_FE) × [998.0] <START OF HEADING> (Other) ÷ [0.3]"),
 		new([0x0001, 0x000D], [[0x0001, 0x000D]], "÷ [0.2] <START OF HEADING> (Other) × [998.0] <CARRIAGE RETURN (CR)> (CR) ÷ [0.3]"),

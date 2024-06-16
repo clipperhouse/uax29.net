@@ -44,7 +44,7 @@ public class TestUnicode
 		}
 	}
 
-	static readonly UnicodeTest[] WordsTests = UnicodeTests.Words;
+	static readonly UnicodeTest[] WordsTests = Words.UnicodeTests;
 	[Test, TestCaseSource(nameof(WordsTests))]
 	public void WordsBytes(UnicodeTest test)
 	{
@@ -59,7 +59,7 @@ public class TestUnicode
 		TestTokenizerChars(tokens, test);
 	}
 
-	static readonly UnicodeTest[] SentencesTests = UnicodeTests.Sentences;
+	static readonly UnicodeTest[] SentencesTests = Sentences.UnicodeTests;
 	[Test, TestCaseSource(nameof(SentencesTests))]
 	public void SentencesBytes(UnicodeTest test)
 	{
@@ -74,7 +74,7 @@ public class TestUnicode
 		TestTokenizerChars(tokens, test);
 	}
 
-	static readonly UnicodeTest[] GraphemesTests = UnicodeTests.Graphemes;
+	static readonly UnicodeTest[] GraphemesTests = Graphemes.UnicodeTests;
 	[Test, TestCaseSource(nameof(GraphemesTests))]
 	public void GraphemesBytes(UnicodeTest test)
 	{

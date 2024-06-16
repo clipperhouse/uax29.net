@@ -11,7 +11,7 @@ internal static partial class Sentences
     internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
     internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
 
-    internal class Splitter<TSpan> : SplitterBase<TSpan>
+    internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
             base(Sentences.Dict, Ignore, decodeFirstRune, decodeLastRune)
@@ -21,7 +21,7 @@ internal static partial class Sentences
         const Property ParaSep = Sep | CR | LF;
         new const Property Ignore = Extend | Format;
 
-        public override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
             if (input.Length == 0)
             {

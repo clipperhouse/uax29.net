@@ -1,8 +1,8 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/GraphemeBreakTest.txt
 namespace Tests;
-public static partial class UnicodeTests
+internal static partial class Graphemes
 {
-	public readonly static UnicodeTest[] Graphemes = [
+	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0020, 0x0020], [[0x0020], [0x0020]], "÷ [0.2] SPACE (Other) ÷ [999.0] SPACE (Other) ÷ [0.3]"),
 		new([0x0020, 0x00CC, 0x0088, 0x0020], [[0x0020, 0x00CC, 0x0088], [0x0020]], "÷ [0.2] SPACE (Other) × [9.0] COMBINING DIAERESIS (Extend_ExtCccZwj) ÷ [999.0] SPACE (Other) ÷ [0.3]"),
 		new([0x0020, 0x000D], [[0x0020], [0x000D]], "÷ [0.2] SPACE (Other) ÷ [5.0] <CARRIAGE RETURN (CR)> (CR) ÷ [0.3]"),
