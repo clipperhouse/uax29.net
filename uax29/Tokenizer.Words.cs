@@ -46,7 +46,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this byte[] input) => GetWords(input.AsSpan());
+    public static Tokenizer<byte> GetWords(this byte[] input) => new(input.AsSpan(), Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Create an enumerator of words in the given string.

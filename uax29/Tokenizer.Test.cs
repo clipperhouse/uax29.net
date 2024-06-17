@@ -66,10 +66,39 @@ public class TestTokenizer
 		Assert.That(first.SequenceEqual(second));
 	}
 
+	static int ExpectedOverloads()
+	{
+		var expected = 0;
+
+		expected++;     // string
+		expected++;     // char[]
+		expected++;     // Span<char>
+		expected++;     // ReadOnlySpan<char>
+		expected++;     // Memory<char>
+		expected++;     // ReadOnlyMemory<char>
+
+		expected++;     // byte[]
+		expected++;     // Span<byte>
+		expected++;     // ReadOnlySpan<byte>
+		expected++;     // Memory<byte>
+		expected++;     // ReadOnlyMemory<byte>
+
+		expected++;     // Stream
+		expected++;     // TextReader
+
+		expected *= 2;  // One regular call, one extension call
+
+		return expected;
+	}
+
+
 	[Test]
 	public void Overloads()
 	{
 		// no assertions, just needs to compile
+
+		int expected = ExpectedOverloads();
+		int got = 0;
 
 		var input = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(input);
@@ -78,50 +107,61 @@ public class TestTokenizer
 
 		{
 			// chars
-			input.GetWords();
+
+			input.GetWords(); got++;
+			Tokenizer.GetWords(input); got++;
 
 			var array = input.ToCharArray();
-			array.GetWords();
-			Tokenizer.GetWords(array);
+			array.GetWords(); got++;
+			Tokenizer.GetWords(array); got++;
 
 			var span = new Span<char>(array);
-			span.GetWords();
-			Tokenizer.GetWords(span);
+			span.GetWords(); got++;
+			Tokenizer.GetWords(span); got++;
 
 			ReadOnlySpan<char> rspan = input.AsSpan();
-			rspan.GetWords();
-			Tokenizer.GetWords(rspan);
+			rspan.GetWords(); got++;
+			Tokenizer.GetWords(rspan); got++;
 
 			var mem = new Memory<char>(array);
-			mem.GetWords();
-			Tokenizer.GetWords(mem);
+			mem.GetWords(); got++;
+			Tokenizer.GetWords(mem); got++;
 
 			ReadOnlyMemory<char> rmem = input.AsMemory();
-			rmem.GetWords();
-			Tokenizer.GetWords(rmem);
+			rmem.GetWords(); got++;
+			Tokenizer.GetWords(rmem); got++;
 
-			reader.GetWords();
-			Tokenizer.GetWords(reader);
+			reader.GetWords(); got++;
+			Tokenizer.GetWords(reader); got++;
 		}
 
 		{
 			// bytes
-			bytes.GetWords();
+
+			bytes.GetWords(); got++;
+			Tokenizer.GetWords(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
-			span.GetWords();
+			span.GetWords(); got++;
+			Tokenizer.GetWords(span); got++;
 
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
-			rspan.GetWords();
+			rspan.GetWords(); got++;
+			Tokenizer.GetWords(rspan); got++;
 
 			Memory<byte> mem = bytes.AsMemory();
-			mem.GetWords();
+			mem.GetWords(); got++;
+			Tokenizer.GetWords(mem); got++;
 
 			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			rmem.GetWords();
+			rmem.GetWords(); got++;
+			Tokenizer.GetWords(rmem); got++;
 
-			stream.GetWords();
+			stream.GetWords(); got++;
+			Tokenizer.GetWords(stream); got++;
 		}
+
+		Assert.That(got, Is.EqualTo(expected));
 	}
 
 	[Test]
