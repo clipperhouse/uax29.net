@@ -3,6 +3,7 @@
 using uax29;
 using System.Linq;
 using System.Text;
+using System.Data.SqlTypes;
 
 [TestFixture]
 public class TestTokenizer
@@ -66,9 +67,70 @@ public class TestTokenizer
 	}
 
 	[Test]
+	public void Overloads()
+	{
+		// no assertions, just needs to compile
+
+		var input = "Hello, how are you?";
+		var bytes = Encoding.UTF8.GetBytes(input);
+		using var stream = new MemoryStream(bytes);
+		using var reader = new StreamReader(stream);
+
+		{
+			// chars
+			input.GetWords();
+
+			var array = input.ToCharArray();
+			array.GetWords();
+			Tokenizer.GetWords(array);
+
+			var span = new Span<char>(array);
+			span.GetWords();
+			Tokenizer.GetWords(span);
+
+			ReadOnlySpan<char> rspan = input.AsSpan();
+			rspan.GetWords();
+			Tokenizer.GetWords(rspan);
+
+			var mem = new Memory<char>(array);
+			mem.GetWords();
+			Tokenizer.GetWords(mem);
+
+			ReadOnlyMemory<char> rmem = input.AsMemory();
+			rmem.GetWords();
+			Tokenizer.GetWords(rmem);
+
+			reader.GetWords();
+			Tokenizer.GetWords(reader);
+		}
+
+		{
+			// bytes
+			bytes.GetWords();
+
+			Span<byte> span = bytes.AsSpan();
+			span.GetWords();
+
+			ReadOnlySpan<byte> rspan = bytes.AsSpan();
+			rspan.GetWords();
+
+			Memory<byte> mem = bytes.AsMemory();
+			mem.GetWords();
+
+			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
+			rmem.GetWords();
+
+			stream.GetWords();
+		}
+	}
+
+	[Test]
 	public void Enumerator()
 	{
 		var input = "Hello, how are you?";
+		var mem = input.AsMemory();
+		var bytes = Encoding.UTF8.GetBytes(input);
+		mem.GetWords();
 
 		var tokens = Tokenizer.Create(input);
 		var first = new List<string>();
