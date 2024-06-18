@@ -14,7 +14,6 @@ dotnet add package uax29.net
 using uax29;
 using System.Text;
 
-
 var example = "Hello, 🌏 world. 你好，世界.";
 
 // The tokenizer can split words, graphemes or sentences.
@@ -46,6 +45,7 @@ world
 界
 .
 */
+
 
 var utf8bytes = Encoding.UTF8.GetBytes(example);
 var graphemes = utf8bytes.GetGraphemes();
@@ -87,11 +87,13 @@ d
 
 ### Data types
 
-For UTF-8 bytes, you pass `byte[]`, `Span<byte>` or `Stream`. For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`.
+For UTF-8 bytes, pass `byte[]`, `Span<byte>` or `Stream`; the resulting tokens will be `ReadOnlySpan<byte>`.
+
+For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`; the resulting tokens will be `ReadOnlySpan<char>`.
 
 ### Conformance
 
-We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
@@ -101,7 +103,9 @@ When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, 
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
 
-For `Stream` or `TextReader`/`StreamReader`, a default `byte[]` or `char[]` buffer needs to be allocated behind the scenes. You can specify the size when calling `Create`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
+Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
+
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
 
 ### Invalid inputs
 
