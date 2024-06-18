@@ -86,6 +86,7 @@ public class TestTokenizer
 		expected++;     // TextReader
 
 		expected *= 2;  // One regular call, one extension call
+		expected *= 3;  // Words, Graphemes, Sentences
 
 		return expected;
 	}
@@ -134,6 +135,68 @@ public class TestTokenizer
 			Tokenizer.GetWords(reader); got++;
 		}
 
+
+		{
+			// chars
+
+			input.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(input); got++;
+
+			var array = input.ToCharArray();
+			array.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(array); got++;
+
+			var span = new Span<char>(array);
+			span.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(span); got++;
+
+			ReadOnlySpan<char> rspan = input.AsSpan();
+			rspan.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(rspan); got++;
+
+			var mem = new Memory<char>(array);
+			mem.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(mem); got++;
+
+			ReadOnlyMemory<char> rmem = input.AsMemory();
+			rmem.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(rmem); got++;
+
+			reader.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(reader); got++;
+		}
+
+
+		{
+			// chars
+
+			input.GetSentences(); got++;
+			Tokenizer.GetSentences(input); got++;
+
+			var array = input.ToCharArray();
+			array.GetSentences(); got++;
+			Tokenizer.GetSentences(array); got++;
+
+			var span = new Span<char>(array);
+			span.GetSentences(); got++;
+			Tokenizer.GetSentences(span); got++;
+
+			ReadOnlySpan<char> rspan = input.AsSpan();
+			rspan.GetSentences(); got++;
+			Tokenizer.GetSentences(rspan); got++;
+
+			var mem = new Memory<char>(array);
+			mem.GetSentences(); got++;
+			Tokenizer.GetSentences(mem); got++;
+
+			ReadOnlyMemory<char> rmem = input.AsMemory();
+			rmem.GetSentences(); got++;
+			Tokenizer.GetSentences(rmem); got++;
+
+			reader.GetSentences(); got++;
+			Tokenizer.GetSentences(reader); got++;
+		}
+
 		{
 			// bytes
 
@@ -158,6 +221,60 @@ public class TestTokenizer
 
 			stream.GetWords(); got++;
 			Tokenizer.GetWords(stream); got++;
+		}
+
+
+		{
+			// bytes
+
+			bytes.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(bytes); got++;
+
+			Span<byte> span = bytes.AsSpan();
+			span.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(span); got++;
+
+			ReadOnlySpan<byte> rspan = bytes.AsSpan();
+			rspan.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(rspan); got++;
+
+			Memory<byte> mem = bytes.AsMemory();
+			mem.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(mem); got++;
+
+			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
+			rmem.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(rmem); got++;
+
+			stream.GetGraphemes(); got++;
+			Tokenizer.GetGraphemes(stream); got++;
+		}
+
+
+		{
+			// bytes
+
+			bytes.GetSentences(); got++;
+			Tokenizer.GetSentences(bytes); got++;
+
+			Span<byte> span = bytes.AsSpan();
+			span.GetSentences(); got++;
+			Tokenizer.GetSentences(span); got++;
+
+			ReadOnlySpan<byte> rspan = bytes.AsSpan();
+			rspan.GetSentences(); got++;
+			Tokenizer.GetSentences(rspan); got++;
+
+			Memory<byte> mem = bytes.AsMemory();
+			mem.GetSentences(); got++;
+			Tokenizer.GetSentences(mem); got++;
+
+			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
+			rmem.GetSentences(); got++;
+			Tokenizer.GetSentences(rmem); got++;
+
+			stream.GetSentences(); got++;
+			Tokenizer.GetSentences(stream); got++;
 		}
 
 		Assert.That(got, Is.EqualTo(expected));
