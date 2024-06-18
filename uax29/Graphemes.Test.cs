@@ -1,6 +1,11 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/GraphemeBreakTest.txt
 namespace Tests;
-internal static partial class Graphemes
+
+using System.Text;
+using uax29;
+
+[TestFixture]
+public class GraphemesTests
 {
 	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0020, 0x0020], [[0x0020], [0x0020]], "÷ [0.2] SPACE (Other) ÷ [999.0] SPACE (Other) ÷ [0.3]"),
@@ -607,4 +612,19 @@ internal static partial class Graphemes
 		new([0x0061, 0x00E2, 0x0080, 0x008D, 0x00E2, 0x009C, 0x0081], [[0x0061, 0x00E2, 0x0080, 0x008D], [0x00E2, 0x009C, 0x0081]], "÷ [0.2] LATIN SMALL LETTER A (Other) × [9.0] ZERO WIDTH JOINER (ZWJ_ExtCccZwj) ÷ [999.0] UPPER BLADE SCISSORS (Other) ÷ [0.3]"),
 
 	];
+
+	static readonly UnicodeTest[] Tests = UnicodeTests;
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{
+		var tokens = Tokenizer.GetGraphemes(test.input);
+		TestUnicode.TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.GetGraphemes(s);
+		TestUnicode.TestTokenizerChars(tokens, test);
+	}
 }

@@ -14,13 +14,12 @@ public class UnicodeTest(byte[] input, byte[][] expected, string comment)
 [TestFixture]
 public class TestUnicode
 {
-
 	[SetUp]
 	public void Setup()
 	{
 	}
 
-	static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
+	internal static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -31,7 +30,8 @@ public class TestUnicode
 			i++;
 		}
 	}
-	static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
+
+	internal static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -42,51 +42,6 @@ public class TestUnicode
 			Assert.That(s.SequenceEqual(got), $"{test.comment}");
 			i++;
 		}
-	}
-
-	static readonly UnicodeTest[] WordsTests = Words.UnicodeTests;
-	[Test, TestCaseSource(nameof(WordsTests))]
-	public void WordsBytes(UnicodeTest test)
-	{
-		var tokens = Tokenizer.GetWords(test.input);
-		TestTokenizerBytes(tokens, test);
-	}
-	[Test, TestCaseSource(nameof(WordsTests))]
-	public void WordsString(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetWords(s);
-		TestTokenizerChars(tokens, test);
-	}
-
-	static readonly UnicodeTest[] SentencesTests = Sentences.UnicodeTests;
-	[Test, TestCaseSource(nameof(SentencesTests))]
-	public void SentencesBytes(UnicodeTest test)
-	{
-		var tokens = Tokenizer.GetSentences(test.input);
-		TestTokenizerBytes(tokens, test);
-	}
-	[Test, TestCaseSource(nameof(SentencesTests))]
-	public void SentencesString(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetSentences(s);
-		TestTokenizerChars(tokens, test);
-	}
-
-	static readonly UnicodeTest[] GraphemesTests = Graphemes.UnicodeTests;
-	[Test, TestCaseSource(nameof(GraphemesTests))]
-	public void GraphemesBytes(UnicodeTest test)
-	{
-		var tokens = Tokenizer.GetGraphemes(test.input);
-		TestTokenizerBytes(tokens, test);
-	}
-	[Test, TestCaseSource(nameof(GraphemesTests))]
-	public void GraphemesString(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetGraphemes(s);
-		TestTokenizerChars(tokens, test);
 	}
 
 	private delegate Tokenizer<byte> ByteMethod(byte[] input);
