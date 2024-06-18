@@ -14,44 +14,68 @@ dotnet add package uax29.net
 using uax29;
 using System.Text;
 
-var example = "Here is some example text. 你好，世界.";
 
-// The tokenizer can take a string or ReadOnlySpan<char>
-var tokens = Tokenizer.GetWords(example);
+var example = "Hello, 🌏 world. 你好，世界.";
+
+// The tokenizer can split words, graphemes or sentences.
+// It operates on strings, UTF-8 bytes, and streams.
+
+var words = example.GetWords();
 
 // Iterate over the tokens
-foreach (var token in tokens)
+foreach (var word in words)
 {
-	// token is ReadOnlySpan<char>
-	// If you need it back as a string:
-	Console.WriteLine(token.ToString());
+    // word is ReadOnlySpan<char>
+    // If you need it back as a string:
+    Console.WriteLine(word.ToString());
 }
 
+/*
+Hello
+,
 
-// The tokenizer can also take raw UTF-8 bytes
+🌏
+
+world
+.
+
+你
+好
+，
+世
+界
+.
+*/
+
 var utf8bytes = Encoding.UTF8.GetBytes(example);
-var tokens2 = Tokenizer.GetWords(utf8bytes);
+var graphemes = utf8bytes.GetGraphemes();
 
 // Iterate over the tokens		
-foreach (var token in tokens2)
+foreach (var grapheme in graphemes)
 {
-	// token is a ReadOnlySpan<byte> of UTF-8 bytes
-	// If you need it back as a string:
-	var s = Encoding.UTF8.GetString(token);
-	Console.WriteLine(s);
+    // grapheme is a ReadOnlySpan<byte> of UTF-8 bytes
+    // If you need it back as a string:
+    var s = Encoding.UTF8.GetString(grapheme);
+    Console.WriteLine(s);
 }
+
 /*
-Here
- 
-is
- 
-some
- 
-example
- 
-text
+H
+e
+l
+l
+o
+,
+
+🌏
+
+w
+o
+r
+l
+d
 .
- 
+
 你
 好
 ，
@@ -61,16 +85,9 @@ text
 */
 ```
 
-The constructor above has an optional second parameter to specify whether you wish to split words, graphemes, or sentences.
-
-You can also pass a `Stream` of UTF-8 bytes, or a `TextReader`/`StreamReader` of `char`.
-
 ### Data types
 
-`Tokenizer.Create` can take UTF-8 bytes, or UTF-16 string/char.
-
-For UTF-8 bytes, you pass `byte[]` or `Stream`. For strings/chars, pass `string`, `char[]` or `TextReader`/`StreamReader`.
-
+For UTF-8 bytes, you pass `byte[]`, `Span<byte>` or `Stream`. For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`.
 
 ### Conformance
 
