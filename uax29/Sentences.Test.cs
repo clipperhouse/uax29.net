@@ -1,6 +1,11 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/SentenceBreakTest.txt
 namespace Tests;
-internal static partial class Sentences
+
+using System.Text;
+using uax29;
+
+[TestFixture]
+public class SentencesTests
 {
 	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0001, 0x0001], [[0x0001, 0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [998.0] <START OF HEADING> (Other) ÷ [0.3]"),
@@ -507,4 +512,19 @@ internal static partial class Sentences
 		new([0x00E2, 0x0081, 0x00A0, 0x0021, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x00E2, 0x0081, 0x00A0], [[0x00E2, 0x0081, 0x00A0, 0x0021, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x00E2, 0x0081, 0x00A0]], "÷ [0.2] WORD JOINER (Format_FE) × [998.0] EXCLAMATION MARK (STerm) × [5.0] WORD JOINER (Format_FE) × [9.0] SPACE (Sp) × [5.0] WORD JOINER (Format_FE) × [10.0] SPACE (Sp) × [5.0] WORD JOINER (Format_FE) × [5.0] WORD JOINER (Format_FE) ÷ [0.3]"),
 
 	];
+
+	static readonly UnicodeTest[] Tests = UnicodeTests;
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{
+		var tokens = Tokenizer.GetSentences(test.input);
+		TestUnicode.TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.GetSentences(s);
+		TestUnicode.TestTokenizerChars(tokens, test);
+	}
 }

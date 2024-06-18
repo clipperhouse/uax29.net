@@ -1,6 +1,11 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/WordBreakTest.txt
 namespace Tests;
-internal static partial class Words
+
+using System.Text;
+using uax29;
+
+[TestFixture]
+public class WordsTests
 {
 	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0001, 0x0001], [[0x0001], [0x0001]], "÷ [0.2] <START OF HEADING> (Other) ÷ [999.0] <START OF HEADING> (Other) ÷ [0.3]"),
@@ -1828,4 +1833,19 @@ internal static partial class Words
 		new([0x0061, 0x005F, 0x0061, 0x002C, 0x002C, 0x0061], [[0x0061, 0x005F, 0x0061], [0x002C], [0x002C], [0x0061]], "÷ [0.2] LATIN SMALL LETTER A (ALetter) × [13.1] LOW LINE (ExtendNumLet) × [13.2] LATIN SMALL LETTER A (ALetter) ÷ [999.0] COMMA (MidNum) ÷ [999.0] COMMA (MidNum) ÷ [999.0] LATIN SMALL LETTER A (ALetter) ÷ [0.3]"),
 
 	];
+
+	static readonly UnicodeTest[] Tests = UnicodeTests;
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{
+		var tokens = Tokenizer.GetWords(test.input);
+		TestUnicode.TestTokenizerBytes(tokens, test);
+	}
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.GetWords(s);
+		TestUnicode.TestTokenizerChars(tokens, test);
+	}
 }

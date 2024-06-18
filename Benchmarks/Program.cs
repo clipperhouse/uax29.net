@@ -18,8 +18,6 @@ public class Benchmark
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
 
-	private static readonly TokenType tokenType = TokenType.Words;
-
 	[GlobalSetup]
 	public void Setup()
 	{
@@ -31,7 +29,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeBytes()
 	{
-		var tokens = Tokenizer.Create(sample, tokenType);
+		var tokens = Tokenizer.GetWords(sample);
 		foreach (var token in tokens)
 		{
 		}
@@ -40,7 +38,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeString()
 	{
-		var tokens = Tokenizer.Create(sampleStr, tokenType);
+		var tokens = Tokenizer.GetWords(sampleStr);
 		foreach (var token in tokens)
 		{
 		}
@@ -51,7 +49,7 @@ public class Benchmark
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
-		var tokens = Tokenizer.Create(stream, tokenType);
+		var tokens = Tokenizer.GetWords(stream);
 		foreach (var token in tokens)
 		{
 		}
@@ -63,7 +61,7 @@ public class Benchmark
 		// This is to test to observe allocations.
 
 		// The creation will allocate a buffer of 1024 bytes
-		var tokens = Tokenizer.Create(sampleStream, tokenType);
+		var tokens = Tokenizer.GetWords(sampleStream);
 
 		var runs = 10;
 		// keep in mind the 10 runs when interpreting the benchmark
@@ -90,7 +88,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizerGraphemes()
 	{
-		var tokens = Tokenizer.Create(sample, TokenType.Graphemes);
+		var tokens = Tokenizer.GetGraphemes(sample);
 		foreach (var token in tokens)
 		{
 		}
@@ -103,7 +101,7 @@ public class Benchmark
 		// warmup
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = Tokenizer.Create(sample, tokenType);
+			var tokens = Tokenizer.GetWords(sample);
 			foreach (var token in tokens)
 			{
 
@@ -116,7 +114,7 @@ public class Benchmark
 
 		for (var i = 0; i < runs; i++)
 		{
-			var tokens = Tokenizer.Create(sample, tokenType);
+			var tokens = Tokenizer.GetWords(sample);
 			foreach (var token in tokens)
 			{
 

@@ -14,44 +14,68 @@ dotnet add package uax29.net
 using uax29;
 using System.Text;
 
-var example = "Here is some example text. 你好，世界.";
+var example = "Hello, 🌏 world. 你好，世界.";
 
-// The tokenizer can take a string or ReadOnlySpan<char>
-var tokens = Tokenizer.Create(example);
+// The tokenizer can split words, graphemes or sentences.
+// It operates on strings, UTF-8 bytes, and streams.
+
+var words = example.GetWords();
 
 // Iterate over the tokens
-foreach (var token in tokens)
+foreach (var word in words)
 {
-	// token is ReadOnlySpan<char>
-	// If you need it back as a string:
-	Console.WriteLine(token.ToString());
+    // word is ReadOnlySpan<char>
+    // If you need it back as a string:
+    Console.WriteLine(word.ToString());
 }
 
+/*
+Hello
+,
 
-// The tokenizer can also take raw UTF-8 bytes
+🌏
+
+world
+.
+
+你
+好
+，
+世
+界
+.
+*/
+
+
 var utf8bytes = Encoding.UTF8.GetBytes(example);
-var tokens2 = Tokenizer.Create(utf8bytes);
+var graphemes = utf8bytes.GetGraphemes();
 
 // Iterate over the tokens		
-foreach (var token in tokens2)
+foreach (var grapheme in graphemes)
 {
-	// token is a ReadOnlySpan<byte> of UTF-8 bytes
-	// If you need it back as a string:
-	var s = Encoding.UTF8.GetString(token);
-	Console.WriteLine(s);
+    // grapheme is a ReadOnlySpan<byte> of UTF-8 bytes
+    // If you need it back as a string:
+    var s = Encoding.UTF8.GetString(grapheme);
+    Console.WriteLine(s);
 }
+
 /*
-Here
- 
-is
- 
-some
- 
-example
- 
-text
+H
+e
+l
+l
+o
+,
+
+🌏
+
+w
+o
+r
+l
+d
 .
- 
+
 你
 好
 ，
@@ -61,20 +85,15 @@ text
 */
 ```
 
-The constructor above has an optional second parameter to specify whether you wish to split words, graphemes, or sentences.
-
-You can also pass a `Stream` of UTF-8 bytes, or a `TextReader`/`StreamReader` of `char`.
-
 ### Data types
 
-`Tokenizer.Create` can take UTF-8 bytes, or UTF-16 string/char.
+For UTF-8 bytes, pass `byte[]`, `Span<byte>` or `Stream`; the resulting tokens will be `ReadOnlySpan<byte>`.
 
-For UTF-8 bytes, you pass `byte[]` or `Stream`. For strings/chars, pass `string`, `char[]` or `TextReader`/`StreamReader`.
-
+For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`; the resulting tokens will be `ReadOnlySpan<char>`.
 
 ### Conformance
 
-We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
@@ -84,7 +103,9 @@ When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, 
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
 
-For `Stream` or `TextReader`/`StreamReader`, a default `byte[]` or `char[]` buffer needs to be allocated behind the scenes. You can specify the size when calling `Create`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
+Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
+
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
 
 ### Invalid inputs
 

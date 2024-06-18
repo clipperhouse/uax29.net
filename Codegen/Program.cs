@@ -165,7 +165,12 @@ internal static partial class {typ}s
 			using var dict = new StreamWriter($"../uax29/{typ}s.Test.cs");
 			dict.WriteLine($"// generated from {url}");
 			dict.Write(@$"namespace Tests;
-internal static partial class {typ}s
+
+using System.Text;
+using uax29;
+
+[TestFixture]
+public class {typ}sTests
 {{
 	internal readonly static UnicodeTest[] UnicodeTests = [
 ");
@@ -225,9 +230,24 @@ internal static partial class {typ}s
 
 				dict.WriteLine($"		new({input}, {expected}, \"{comment}\"),");
 			}
-			dict.Write(@"
+			dict.Write(@$"
 	];
-}
+
+	static readonly UnicodeTest[] Tests = UnicodeTests;
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{{
+		var tokens = Tokenizer.Get{typ}s(test.input);
+		TestUnicode.TestTokenizerBytes(tokens, test);
+	}}
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Tokenizer.Get{typ}s(s);
+		TestUnicode.TestTokenizerChars(tokens, test);
+	}}
+}}
 ");
 		}
 	}
