@@ -48,14 +48,14 @@ public class TestUnicode
 	[Test, TestCaseSource(nameof(WordsTests))]
 	public void WordsBytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.Create(test.input);
+		var tokens = Tokenizer.GetWords(test.input);
 		TestTokenizerBytes(tokens, test);
 	}
 	[Test, TestCaseSource(nameof(WordsTests))]
 	public void WordsString(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.Create(s);
+		var tokens = Tokenizer.GetWords(s);
 		TestTokenizerChars(tokens, test);
 	}
 
@@ -63,14 +63,14 @@ public class TestUnicode
 	[Test, TestCaseSource(nameof(SentencesTests))]
 	public void SentencesBytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.Create(test.input, TokenType.Sentences);
+		var tokens = Tokenizer.GetSentences(test.input);
 		TestTokenizerBytes(tokens, test);
 	}
 	[Test, TestCaseSource(nameof(SentencesTests))]
 	public void SentencesString(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.Create(s, TokenType.Sentences);
+		var tokens = Tokenizer.GetSentences(s);
 		TestTokenizerChars(tokens, test);
 	}
 
@@ -78,16 +78,22 @@ public class TestUnicode
 	[Test, TestCaseSource(nameof(GraphemesTests))]
 	public void GraphemesBytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.Create(test.input, TokenType.Graphemes);
+		var tokens = Tokenizer.GetGraphemes(test.input);
 		TestTokenizerBytes(tokens, test);
 	}
 	[Test, TestCaseSource(nameof(GraphemesTests))]
 	public void GraphemesString(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.Create(s, TokenType.Graphemes);
+		var tokens = Tokenizer.GetGraphemes(s);
 		TestTokenizerChars(tokens, test);
 	}
+
+	private delegate Tokenizer<byte> ByteMethod(byte[] input);
+	static readonly ByteMethod[] byteMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+
+	private delegate Tokenizer<char> CharMethod(char[] input);
+	static readonly CharMethod[] charMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 
 	[Test]
 	public void InvalidUTF8()
@@ -104,10 +110,10 @@ public class TestUnicode
             (byte)'d', (byte)'e', (byte)'f',
 		];
 
-		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
+		foreach (var method in byteMethods)
 		{
 			var results = new List<byte>();
-			var tokens = Tokenizer.Create(invalidUtf8Bytes, tokenType);
+			var tokens = method(invalidUtf8Bytes);
 			foreach (var token in tokens)
 			{
 				results.AddRange(token);
@@ -124,10 +130,10 @@ public class TestUnicode
             '\uDC00', '\uDC00', // Two low surrogates
 		];
 
-		foreach (TokenType tokenType in Enum.GetValues(typeof(TokenType)))
+		foreach (var method in charMethods)
 		{
 			var results = new List<char>();
-			var tokens = Tokenizer.Create(invalidChars, tokenType);
+			var tokens = method(invalidChars);
 			foreach (var token in tokens)
 			{
 				results.AddRange(token);

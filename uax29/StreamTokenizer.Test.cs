@@ -63,11 +63,11 @@ public class TestStreamTokenizer
         foreach (var input in examples)
         {
             var bytes = Encoding.UTF8.GetBytes(input);
-            var staticTokens = Tokenizer.Create(bytes);
+            var staticTokens = Tokenizer.GetWords(bytes);
 
             using var stream = new MemoryStream(bytes);
             using var reader = new StreamReader(stream);
-            var streamTokens = Tokenizer.Create(reader);
+            var streamTokens = Tokenizer.GetWords(reader);
 
             foreach (var streamToken in streamTokens)
             {
@@ -89,7 +89,7 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(input);
         using var stream = new MemoryStream(bytes);
 
-        var tokens = Tokenizer.Create(stream);
+        var tokens = Tokenizer.GetWords(stream);
 
         var first = new List<string>();
         foreach (var token in tokens)
@@ -122,7 +122,7 @@ public class TestStreamTokenizer
         using var stream = new MemoryStream(bytes);
         using var reader = new StreamReader(stream);
 
-        var tokens = Tokenizer.Create(reader);
+        var tokens = Tokenizer.GetWords(reader);
 
         var first = new List<string>();
         foreach (var token in tokens)
@@ -155,7 +155,7 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(input);
         using var stream = new MemoryStream(bytes);
 
-        var tokens = Tokenizer.Create(stream);
+        var tokens = Tokenizer.GetWords(stream);
 
         var first = new List<string>();
         while (tokens.MoveNext())
@@ -167,7 +167,7 @@ public class TestStreamTokenizer
         Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
         using var stream2 = new MemoryStream(bytes);
-        var tokens2 = Tokenizer.Create(stream2);
+        var tokens2 = Tokenizer.GetWords(stream2);
 
         var second = new List<string>();
         foreach (var token in tokens2)
@@ -186,10 +186,10 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(example);
         using var stream = new MemoryStream(bytes);
 
-        var list = Tokenizer.Create(stream).ToList();
+        var list = Tokenizer.GetWords(stream).ToList();
 
         stream.Seek(0, SeekOrigin.Begin);
-        var tokens = Tokenizer.Create(stream);
+        var tokens = Tokenizer.GetWords(stream);
 
         var i = 0;
         foreach (var token in tokens)
@@ -220,10 +220,10 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(example);
         using var stream = new MemoryStream(bytes);
 
-        var list = Tokenizer.Create(stream).ToList();
+        var list = Tokenizer.GetWords(stream).ToList();
 
         stream.Seek(0, SeekOrigin.Begin);
-        var tokens = Tokenizer.Create(stream);
+        var tokens = Tokenizer.GetWords(stream);
 
         var i = 0;
         foreach (var token in tokens)

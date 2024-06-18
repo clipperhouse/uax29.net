@@ -3,7 +3,6 @@
 using uax29;
 using System.Linq;
 using System.Text;
-using System.Data.SqlTypes;
 
 [TestFixture]
 public class TestTokenizer
@@ -19,7 +18,7 @@ public class TestTokenizer
 		var example = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(example);
 
-		var tokens = Tokenizer.Create(example);
+		var tokens = Tokenizer.GetWords(example);
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -45,7 +44,7 @@ public class TestTokenizer
 	{
 		var example = "Hello, how are you?";
 
-		var tokens = Tokenizer.Create(example);
+		var tokens = Tokenizer.GetWords(example);
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -172,7 +171,7 @@ public class TestTokenizer
 		var bytes = Encoding.UTF8.GetBytes(input);
 		mem.GetWords();
 
-		var tokens = Tokenizer.Create(input);
+		var tokens = Tokenizer.GetWords(input);
 		var first = new List<string>();
 		while (tokens.MoveNext())
 		{
@@ -181,7 +180,7 @@ public class TestTokenizer
 		}
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing		
 
-		var tokens2 = Tokenizer.Create(input);
+		var tokens2 = Tokenizer.GetWords(input);
 		var second = new List<string>();
 		foreach (var token in tokens2)
 		{
@@ -195,7 +194,7 @@ public class TestTokenizer
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.Create(example);
+		var tokens = Tokenizer.GetWords(example);
 		var list = tokens.ToList();
 
 		var i = 0;
@@ -228,7 +227,7 @@ public class TestTokenizer
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.Create(example);
+		var tokens = Tokenizer.GetWords(example);
 		var array = tokens.ToArray();
 
 		var i = 0;
