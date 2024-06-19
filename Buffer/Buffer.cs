@@ -1,8 +1,8 @@
 ﻿namespace uax29;
 
-internal delegate int Read<T>(T[] buffer, int offset, int count) where T : struct;
+public delegate int Read<T>(T[] buffer, int offset, int count) where T : struct;
 
-internal ref struct Buffer<T> where T : struct
+public ref struct Buffer<T> where T : struct
 {
     /// <summary>
     /// Allows the active span of the array to move with reduced copying.
@@ -19,7 +19,7 @@ internal ref struct Buffer<T> where T : struct
     /// </summary>
     public bool EOF { get; private set; }
 
-    internal Buffer(Read<T> read, int minItems, T[]? storage = null)
+    public Buffer(Read<T> read, int minItems, T[]? storage = null)
     {
         this.read = read;
         this.minItems = minItems;
@@ -31,7 +31,7 @@ internal ref struct Buffer<T> where T : struct
         this.storage = storage;
     }
 
-    internal ReadOnlySpan<T> Contents
+    public ReadOnlySpan<T> Contents
     {
         get
         {
@@ -57,7 +57,7 @@ internal ref struct Buffer<T> where T : struct
         }
     }
 
-    internal void Consume(int consumed)
+    public void Consume(int consumed)
     {
         var remaining = end - start;
         if (consumed > remaining)
@@ -68,7 +68,7 @@ internal ref struct Buffer<T> where T : struct
         start += consumed;
     }
 
-    internal void SetRead(Read<T> read)
+    public void SetRead(Read<T> read)
     {
         this.read = read;
         start = 0;
