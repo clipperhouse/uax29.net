@@ -33,4 +33,22 @@
     dotnet test -c Release
     dotnet test -c Debug
   -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>SimpleBuffer</PackageId>
+    <Version>0.9.0</Version>
+    <Authors>clipperhouse</Authors>
+    <Description>SimpleBuffer is a buffer implementation for .NET, designed for use with streams and readers.</Description>
+    <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://example.com</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon> -->
+    <RepositoryUrl>https://github.com/clipperhouse/uax29.net</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
 </Project>

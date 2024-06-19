@@ -1,8 +1,8 @@
 ﻿namespace uax29;
 
-public delegate int Read<T>(T[] buffer, int offset, int count) where T : struct;
+public delegate int Read<T>(T[] buffer, int offset, int count);
 
-public ref struct Buffer<T> where T : struct
+public ref struct Buffer<T>
 {
     /// <summary>
     /// Allows the active span of the array to move with reduced copying.
