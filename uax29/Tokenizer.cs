@@ -1,15 +1,23 @@
 namespace uax29;
 
-internal delegate int Split<TSpan>(ReadOnlySpan<TSpan> input, bool atEOF = true);
+/// <summary>
+/// The function that splits a string or UTF-8 byte array into tokens.
+/// </summary>
+/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
+/// <param name="input">The string to split/tokenize.</param>
+/// <param name="atEOF">The split may need to know if further data to be expected, such as from a stream.</param>
+/// <returns>How many bytes/chars were consumed from the input.</returns>
+internal delegate int Split<T>(ReadOnlySpan<T> input, bool atEOF = true);
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
-public ref struct Tokenizer<TSpan> where TSpan : struct
+/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
+public ref struct Tokenizer<T> where T : struct
 {
-	ReadOnlySpan<TSpan> input;
+	ReadOnlySpan<T> input;
 
-	readonly Split<TSpan> split;
+	readonly Split<T> split;
 
 	internal int start = 0;
 	internal int end = 0;
@@ -21,7 +29,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal Tokenizer(ReadOnlySpan<TSpan> input, Split<TSpan> split)
+	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split)
 	{
 		this.input = input;
 		this.split = split;
@@ -57,7 +65,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// If the input was a string, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
 	/// If the input was UTF-8 bytes, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
 	/// </summary>
-	public readonly ReadOnlySpan<TSpan> Current
+	public readonly ReadOnlySpan<T> Current
 	{
 		get
 		{
@@ -65,7 +73,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 		}
 	}
 
-	public readonly Tokenizer<TSpan> GetEnumerator()
+	public readonly Tokenizer<T> GetEnumerator()
 	{
 		return this;
 	}
@@ -83,7 +91,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// <summary>
 	/// (Re)sets the text to be tokenized, and resets the iterator back to the the start.
 	/// </summary>
-	public void SetText(ReadOnlySpan<TSpan> input)
+	public void SetText(ReadOnlySpan<T> input)
 	{
 		Reset();
 		this.input = input;
@@ -93,14 +101,14 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// Iterates over all tokens and collects them into a list, allocating a new array for each token.
 	/// </summary>
 	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
-	public List<TSpan[]> ToList()
+	public List<T[]> ToList()
 	{
 		if (begun)
 		{
 			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
 		}
 
-		var result = new List<TSpan[]>();
+		var result = new List<T[]>();
 		foreach (var token in this)
 		{
 			result.Add(token.ToArray());
@@ -114,7 +122,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 	/// Iterates over all tokens and collects them into an array, allocating a new array for each token.
 	/// </summary>
 	/// <returns>byte[][] or char[][], depending on the input</returns>
-	public TSpan[][] ToArray()
+	public T[][] ToArray()
 	{
 		if (begun)
 		{
