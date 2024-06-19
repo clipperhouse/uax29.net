@@ -7,26 +7,38 @@ internal ref struct Buffer<T> where T : struct
     /// <summary>
     /// Allows the active span of the array to move with reduced copying.
     /// </summary>
-    Read<T> Read;
-
-    internal const int factor = 2;
+    Read<T> read;
+    internal int minItems = 0;
     internal readonly T[] storage;
+
     internal int start = 0;
     internal int end = 0;
 
-    internal Buffer(Read<T> read, int maxTokenSize)
+    internal Buffer(Read<T> read, int minItems, T[]? storage = null)
     {
-        this.Read = read;
-        storage = new T[maxTokenSize * factor];
+        this.read = read;
+        this.minItems = minItems;
+        if (storage != null && storage.Length < minItems)
+        {
+            throw new ArgumentException($"Storage ({typeof(T)}[{storage.Length}]) must be at least as large as minItems ({minItems}).");
+        }
+        storage ??= new T[minItems];
+        this.storage = storage;
     }
 
     internal ReadOnlySpan<T> Contents
     {
         get
         {
-            if (end < storage.Length)
+            var len = end - start;
+            if (len < minItems)
             {
-                var read = Read(storage, end, storage.Length - end);
+                // Move the remaining unconsumed data to the start of the buffer
+                Array.Copy(storage, start, storage, 0, end - start);
+                end -= start;
+                start = 0;
+
+                var read = this.read(storage, end, storage.Length - end);
                 end += read;
             }
             return storage.AsSpan(start, end - start);
@@ -42,20 +54,11 @@ internal ref struct Buffer<T> where T : struct
         }
 
         start += consumed;
-
-        // Optimization: move the array less often
-        if (start >= storage.Length / factor)
-        {
-            // Move the remaining unconsumed data to the start of the buffer
-            Array.Copy(storage, start, storage, 0, end - start);
-            end -= start;
-            start = 0;
-        }
     }
 
     internal void SetRead(Read<T> read)
     {
-        this.Read = read;
+        this.read = read;
         start = 0;
         end = 0;
     }

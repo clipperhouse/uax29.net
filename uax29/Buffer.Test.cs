@@ -42,12 +42,12 @@ public class TestBuffer
 		var bytes = Encoding.UTF8.GetBytes(input);
 		using var stream = new MemoryStream(bytes);
 
-		const int maxTokenLength = 16;
-		const int factor = Buffer<byte>.factor;
-		const int storageSize = factor * maxTokenLength;
+		const int minItems = 16;
+		const int factor = 2;
+		const int storageSize = factor * minItems;
 
 		Read<byte> read = stream.Read;
-		var buffer = new Buffer<byte>(read, maxTokenLength);
+		var buffer = new Buffer<byte>(read, minItems, new byte[storageSize]);
 
 		var consumed = 0;
 
@@ -57,7 +57,7 @@ public class TestBuffer
 		Assert.That(buffer.end, Is.EqualTo(storageSize));
 
 		{
-			// start should move, since we haven't consumed half yet
+			// start should move forward, since we haven't consumed half yet
 			var consume = 4;
 			buffer.Consume(consume);
 			consumed += consume;
@@ -70,14 +70,10 @@ public class TestBuffer
 		}
 
 		{
-			// now exceed half of storage size
+			// now exceed minItems
 			var consume = 15;
 			buffer.Consume(consume);
 			consumed += consume;   // gets us to 19 = 15 + 4
-
-			// should have moved the array contents to the front
-			Assert.That(buffer.start, Is.EqualTo(0));
-			Assert.That(buffer.end, Is.EqualTo(storageSize - consumed));
 
 			// trigger a read, should be full
 			Assert.That(buffer.Contents.Length, Is.EqualTo(storageSize));

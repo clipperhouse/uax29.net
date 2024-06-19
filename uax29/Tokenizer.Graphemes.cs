@@ -106,18 +106,30 @@ public static partial class Tokenizer
     /// Split the graphemes in the given <see cref="Stream"/> of UTF-8 encoded bytes.
     /// </summary>
     /// <param name="stream">The stream of UTF-8 bytes to tokenize.</param>
-    /// <param name="maxTokenBytes">
-    /// Optional, the maximum token size in bytes. Tokens that exceed this size will simply be cut off at this length, no error will occur.
-    /// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
-    /// Behind the scenes, a buffer of 2 * maxTokenSize will be created. If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
+    /// <param name="minBufferBytes">
+    /// Optional, the minimum bytes to buffer from the Stream. This determines the maximum grapheme token size. Tokens that exceed the bytes in the buffer
+    /// will simply be cut off at this length, no error will occur.
+    /// 
+    /// Default is 256 bytes.
+    /// </param>
+    /// <param name="bufferStorage">
+    /// Optional, a byte array for underlying buffer storage. It must be at least as large at minBufferBytes.
+    /// 
+    /// If not provided, storage of 2 * minBufferBytes will be allocated by default.
+    /// 
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferBytes allows fewer, larger reads the stream, 
+    /// which is more efficient, but will increase memory usage.
+    /// 
+    /// You might also wish to use ArrayPool<byte> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<byte> GetGraphemes(this Stream stream, int maxTokenBytes = 1024)
+    public static StreamTokenizer<byte> GetGraphemes(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         var tok = new Tokenizer<byte>([], Graphemes.SplitUtf8Bytes);
-        var buffer = new Buffer<byte>(stream.Read, maxTokenBytes);
+        bufferStorage ??= new byte[minBufferBytes * 2];
+        var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
         return new StreamTokenizer<byte>(buffer, tok);
     }
 
@@ -125,18 +137,30 @@ public static partial class Tokenizer
     /// Split the graphemes in the given <see cref="TextReader"/> / <see cref="StreamReader"/>.
     /// </summary>
     /// <param name="stream">The stream/text reader of char to tokenize.</param>
-    /// <param name="maxTokenBytes">
-    /// Optional, the maximum token size in chars. Tokens that exceed this size will simply be cut off at this length, no error will occur.
-    /// Default is 1024 chars. The tokenizer is intended for natural language, so we don't expect you'll find text with a token beyond a couple of dozen bytes.
-    /// Behind the scenes, a buffer of 2 * maxTokenSize will be created. If this cutoff is too small for your data, increase it. If you'd like to save memory, reduce it.
+    /// <param name="minBufferChars">
+    /// Optional, the minimum chars to buffer from the reader. This determines the maximum grapheme token size. Tokens that exceed the chars in the buffer
+    /// will simply be cut off at this length, no error will occur.
+    /// 
+    /// Default is 256 chars.
+    /// </param>
+    /// <param name="bufferStorage">
+    /// Optional, a char array for underlying buffer storage. It must be at least as large at minBufferChars.
+    /// 
+    /// If not provided, storage of 2 * minBufferChars will be allocated by default.
+    /// 
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferChars allows fewer, larger reads the reader, 
+    /// which is more efficient, but will increase memory usage.
+    /// 
+    /// You might also wish to use ArrayPool<char> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<char> GetGraphemes(this TextReader stream, int maxTokenBytes = 1024)
+    public static StreamTokenizer<char> GetGraphemes(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         var tok = new Tokenizer<char>([], Graphemes.SplitChars);
-        var buffer = new Buffer<char>(stream.Read, maxTokenBytes);
+        bufferStorage ??= new char[minBufferChars * 2];
+        var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
         return new StreamTokenizer<char>(buffer, tok);
     }
 }
