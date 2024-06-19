@@ -2,6 +2,8 @@
 
 namespace uax29;
 
+using Buffer;
+
 /// <summary>
 /// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>

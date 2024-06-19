@@ -1,7 +1,7 @@
 ﻿namespace Tests;
 
-using System.Text;
 using Buffer;
+using System.Text;
 
 [TestFixture]
 public class TestBuffer
