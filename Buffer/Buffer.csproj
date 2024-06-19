@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
   <!-- Exclude test packages from the Release build -->
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
@@ -35,10 +36,10 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <PackageId>uax29.net</PackageId>
-    <Version>1.1.0</Version>
+    <PackageId>SimpleBuffer</PackageId>
+    <Version>0.9.0</Version>
     <Authors>clipperhouse</Authors>
-    <Description>uax29.net tokenizes (splits) words, sentences and graphemes, based on Unicode text segmentation (UAX #29), for Unicode version 15.0.0. https://unicode.org/reports/tr29/</Description>
+    <Description>SimpleBuffer is a buffer implementation for .NET, designed for use with streams and readers.</Description>
     <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://example.com</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon> -->
@@ -48,10 +49,6 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Buffer\Buffer.csproj" />
   </ItemGroup>
 
 </Project>
