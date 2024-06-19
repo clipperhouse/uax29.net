@@ -1,4 +1,6 @@
-﻿namespace uax29;
+﻿using Buffer;
+
+namespace uax29;
 
 /// <summary>
 /// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.

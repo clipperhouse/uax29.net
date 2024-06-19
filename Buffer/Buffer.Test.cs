@@ -1,7 +1,7 @@
 ﻿namespace Tests;
 
-using uax29;
 using System.Text;
+using Buffer;
 
 [TestFixture]
 public class TestBuffer
