@@ -3,7 +3,7 @@
 namespace uax29;
 
 /// <summary>
-/// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
+/// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>
 public ref struct StreamTokenizer<T> where T : struct
 {
@@ -16,10 +16,10 @@ public ref struct StreamTokenizer<T> where T : struct
 	bool begun = false;
 
 	/// <summary>
-	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// StreamTokenizer is a small data structure for splitting strings.
 	/// </summary>
-	/// <param name="stream">A stream of UTF-8 encoded bytes.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
+	/// <param name="buffer">For backing storage, typically created from a Stream or TextReader.</param>
+	/// <param name="split">A delegate that does the tokenizing. See Split<T> for details.</param>
 	internal StreamTokenizer(Buffer<T> buffer, Split<T> split)
 	{
 		this.buffer = buffer;
