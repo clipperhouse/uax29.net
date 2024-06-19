@@ -14,6 +14,11 @@ internal ref struct Buffer<T> where T : struct
     internal int start = 0;
     internal int end = 0;
 
+    /// <summary>
+    /// Indicates that the last read operation reached the end of the stream, i.e. the number of read items was zero.
+    /// </summary>
+    public bool EOF { get; private set; }
+
     internal Buffer(Read<T> read, int minItems, T[]? storage = null)
     {
         this.read = read;
@@ -38,8 +43,15 @@ internal ref struct Buffer<T> where T : struct
                 end -= start;
                 start = 0;
 
-                var read = this.read(storage, end, storage.Length - end);
-                end += read;
+                if (!EOF)
+                {
+                    var read = this.read(storage, end, storage.Length - end);
+                    if (read == 0)
+                    {
+                        EOF = true;
+                    }
+                    end += read;
+                }
             }
             return storage.AsSpan(start, end - start);
         }
