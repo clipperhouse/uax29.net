@@ -37,7 +37,7 @@ public ref struct Tokenizer<TSpan> where TSpan : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..]);
+			var advance = this.split(input[end..], true);
 			// Interpret as EOF
 			if (advance == 0)
 			{

@@ -36,7 +36,7 @@ public ref struct StreamTokenizer<T> where T : struct
 		{
 			buffer.Consume(this.Current.Length);    // previous token
 
-			var advance = this.split(buffer.Contents);
+			var advance = this.split(buffer.Contents, buffer.EOF);
 			// Interpret as EOF
 			if (advance == 0)
 			{
