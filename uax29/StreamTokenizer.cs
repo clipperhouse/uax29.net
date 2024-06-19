@@ -7,9 +7,11 @@ namespace uax29;
 /// </summary>
 public ref struct StreamTokenizer<T> where T : struct
 {
-	internal Tokenizer<T> tok;
-
 	internal Buffer<T> buffer;
+	readonly Split<T> split;
+
+	internal const int start = 0;   // with buffer, it's always 0
+	internal int end = 0;
 
 	bool begun = false;
 
@@ -18,23 +20,42 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="stream">A stream of UTF-8 encoded bytes.</param>
 	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	internal StreamTokenizer(Buffer<T> buffer, Tokenizer<T> tok)
+	internal StreamTokenizer(Buffer<T> buffer, Split<T> split)
 	{
-		this.tok = tok;
 		this.buffer = buffer;
+		this.split = split;
 	}
 
 	public bool MoveNext()
 	{
 		begun = true;
 
-		buffer.Consume(tok.Current.Length); // the previous token
-		var input = buffer.Contents;
-		tok.SetText(input);
-		return tok.MoveNext();
+		if (end < buffer.Contents.Length)
+		{
+			buffer.Consume(this.Current.Length);    // previous token
+
+			var advance = this.split(buffer.Contents);
+			// Interpret as EOF
+			if (advance == 0)
+			{
+				return false;
+			}
+
+			end = advance;
+
+			return true;
+		}
+
+		return false;
 	}
 
-	public readonly ReadOnlySpan<T> Current => tok.Current;
+	public ReadOnlySpan<T> Current
+	{
+		get
+		{
+			return buffer.Contents[start..end];
+		}
+	}
 
 	public readonly StreamTokenizer<T> GetEnumerator()
 	{
@@ -44,7 +65,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// <summary>
 	/// Iterates over all tokens and collects them into a List, allocating a new array for each token.
 	/// </summary>
-	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
+	/// <returns>List<byte[]> or List<char[]>, depending on the input.</returns>
 	public readonly List<T[]> ToList()
 	{
 		if (begun)
@@ -64,7 +85,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// <summary>
 	/// Iterates over all tokens and collects them into an Array, allocating a new array for each token.
 	/// </summary>
-	/// <returns>byte[][] or char[][], depending on the input</returns>
+	/// <returns>byte[][] or char[][], depending on the input.</returns>
 	public readonly T[][] ToArray()
 	{
 		if (begun)
@@ -84,7 +105,6 @@ public static class StreamExtensions
 	/// <param name="stream">The new stream</param>
 	public static void SetStream(ref this StreamTokenizer<byte> tokenizer, Stream stream)
 	{
-		tokenizer.tok.SetText([]);
 		tokenizer.buffer.SetRead(stream.Read);
 	}
 
@@ -94,7 +114,6 @@ public static class StreamExtensions
 	/// <param name="stream">The new stream</param>
 	public static void SetStream(ref this StreamTokenizer<char> tokenizer, TextReader stream)
 	{
-		tokenizer.tok.SetText([]);
 		tokenizer.buffer.SetRead(stream.Read);
 	}
 }
