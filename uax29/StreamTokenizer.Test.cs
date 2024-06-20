@@ -51,6 +51,53 @@ public class TestStreamTokenizer
     /// Ensure that streamed text and static text return identical results.
     /// </summary>
     [Test]
+    public void Stream2()
+    {
+        var example = "abcdef ghijk"; // ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+        var examples = new List<string>()
+        {
+            example,											// smaller than the buffer
+			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
+		};
+
+        foreach (var input in examples)
+        {
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var staticTokens = bytes.GetWords();
+
+            using var stream = new MemoryStream(bytes);
+            var streamTokens = stream.GetWords2();
+
+            foreach (var streamToken in streamTokens)
+            {
+                staticTokens.MoveNext();
+
+                var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+                var streamCurrent = Encoding.UTF8.GetString(streamToken);
+
+                Assert.That(streamCurrent, Is.EqualTo(staticCurrent));
+            }
+
+            staticTokens.Reset();
+            foreach (var streamToken in streamTokens)
+            {
+                staticTokens.MoveNext();
+
+                var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+                var streamCurrent = Encoding.UTF8.GetString(streamToken);
+
+                Assert.That(streamCurrent, Is.EqualTo(staticCurrent));
+            }
+
+            Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
+            Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
+        }
+    }
+
+    /// <summary>
+    /// Ensure that streamed text and static text return identical results.
+    /// </summary>
+    [Test]
     public void StreamReader()
     {
         var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";

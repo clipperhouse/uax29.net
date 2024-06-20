@@ -40,12 +40,6 @@ internal static partial class Words
 
                 if (eot)
                 {
-                    if (!atEOF)
-                    {
-                        // TODO Token extends past current data, request more
-                        return 0;
-                    }
-
                     // https://unicode.org/reports/tr29/#WB2
                     break;
                 }

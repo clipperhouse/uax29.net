@@ -134,6 +134,11 @@ public static partial class Tokenizer
         return new StreamTokenizer<byte>(buffer, Words.SplitUtf8Bytes);
     }
 
+    public static StreamTokenizer2 GetWords2(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    {
+        return new StreamTokenizer2(stream, Words.SplitUtf8Bytes);
+    }
+
     /// <summary>
     /// Split the words in the given <see cref="TextReader"/> / <see cref="StreamReader"/>.
     /// </summary>
