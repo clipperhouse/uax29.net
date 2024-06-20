@@ -1,4 +1,6 @@
-﻿namespace uax29;
+﻿using Buffer;
+
+namespace uax29;
 
 public static partial class Tokenizer
 {
@@ -127,10 +129,9 @@ public static partial class Tokenizer
     /// </returns>
     public static StreamTokenizer<byte> GetGraphemes(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
-        var tok = new Tokenizer<byte>([], Graphemes.SplitUtf8Bytes);
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamTokenizer<byte>(buffer, tok);
+        return new StreamTokenizer<byte>(buffer, Graphemes.SplitUtf8Bytes);
     }
 
     /// <summary>
@@ -158,9 +159,8 @@ public static partial class Tokenizer
     /// </returns>
     public static StreamTokenizer<char> GetGraphemes(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
-        var tok = new Tokenizer<char>([], Graphemes.SplitChars);
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
-        return new StreamTokenizer<char>(buffer, tok);
+        return new StreamTokenizer<char>(buffer, Graphemes.SplitChars);
     }
 }

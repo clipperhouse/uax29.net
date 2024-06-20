@@ -1,4 +1,4 @@
-﻿namespace uax29;
+﻿namespace Buffer;
 
 public delegate int Read<T>(T[] buffer, int offset, int count);
 

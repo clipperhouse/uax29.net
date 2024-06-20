@@ -1,38 +1,63 @@
-﻿namespace uax29;
+﻿using Buffer;
+
+namespace uax29;
+
+using Buffer;
 
 /// <summary>
-/// Tokenizer splits a stream of UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
+/// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>
 public ref struct StreamTokenizer<T> where T : struct
 {
-	internal Tokenizer<T> tok;
-
 	internal Buffer<T> buffer;
+	readonly Split<T> split;
+
+	internal const int start = 0;   // with buffer, it's always 0
+	internal int end = 0;
 
 	bool begun = false;
 
 	/// <summary>
-	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// StreamTokenizer is a small data structure for splitting strings.
 	/// </summary>
-	/// <param name="stream">A stream of UTF-8 encoded bytes.</param>
-	/// <param name="tokenType">Optional, choose to tokenize words, graphemes or sentences. Default is words.</param>
-	internal StreamTokenizer(Buffer<T> buffer, Tokenizer<T> tok)
+	/// <param name="buffer">For backing storage, typically created from a Stream or TextReader.</param>
+	/// <param name="split">A delegate that does the tokenizing. See Split<T> for details.</param>
+	internal StreamTokenizer(Buffer<T> buffer, Split<T> split)
 	{
-		this.tok = tok;
 		this.buffer = buffer;
+		this.split = split;
 	}
 
 	public bool MoveNext()
 	{
 		begun = true;
 
-		buffer.Consume(tok.Current.Length); // the previous token
-		var input = buffer.Contents;
-		tok.SetText(input);
-		return tok.MoveNext();
+		if (end < buffer.Contents.Length)
+		{
+			buffer.Consume(this.Current.Length);    // previous token
+
+			var advance = this.split(buffer.Contents, buffer.EOF);
+			// Interpret as EOF
+			if (advance == 0)
+			{
+				return false;
+			}
+
+			end = advance;
+
+			return true;
+		}
+
+		return false;
 	}
 
-	public readonly ReadOnlySpan<T> Current => tok.Current;
+	public ReadOnlySpan<T> Current
+	{
+		get
+		{
+			return buffer.Contents[start..end];
+		}
+	}
 
 	public readonly StreamTokenizer<T> GetEnumerator()
 	{
@@ -42,7 +67,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// <summary>
 	/// Iterates over all tokens and collects them into a List, allocating a new array for each token.
 	/// </summary>
-	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
+	/// <returns>List<byte[]> or List<char[]>, depending on the input.</returns>
 	public readonly List<T[]> ToList()
 	{
 		if (begun)
@@ -62,7 +87,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// <summary>
 	/// Iterates over all tokens and collects them into an Array, allocating a new array for each token.
 	/// </summary>
-	/// <returns>byte[][] or char[][], depending on the input</returns>
+	/// <returns>byte[][] or char[][], depending on the input.</returns>
 	public readonly T[][] ToArray()
 	{
 		if (begun)
@@ -82,7 +107,6 @@ public static class StreamExtensions
 	/// <param name="stream">The new stream</param>
 	public static void SetStream(ref this StreamTokenizer<byte> tokenizer, Stream stream)
 	{
-		tokenizer.tok.SetText([]);
 		tokenizer.buffer.SetRead(stream.Read);
 	}
 
@@ -92,7 +116,6 @@ public static class StreamExtensions
 	/// <param name="stream">The new stream</param>
 	public static void SetStream(ref this StreamTokenizer<char> tokenizer, TextReader stream)
 	{
-		tokenizer.tok.SetText([]);
 		tokenizer.buffer.SetRead(stream.Read);
 	}
 }
