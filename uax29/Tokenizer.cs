@@ -1,4 +1,4 @@
-namespace uax29;
+namespace UAX29;
 
 /// <summary>
 /// The function that splits a string or UTF-8 byte array into tokens.

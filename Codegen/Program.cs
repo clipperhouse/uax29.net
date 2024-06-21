@@ -119,7 +119,7 @@ internal class Program
 			dict.WriteLine($"// generated from {urls[0]}");
 
 			dict.Write(@$"
-namespace uax29;
+namespace UAX29;
 
 using Property = uint;
 
@@ -167,7 +167,7 @@ internal static partial class {typ}s
 			dict.Write(@$"namespace Tests;
 
 using System.Text;
-using uax29;
+using UAX29;
 
 [TestFixture]
 public class {typ}sTests

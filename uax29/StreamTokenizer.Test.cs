@@ -1,7 +1,7 @@
 ﻿namespace Tests;
 
 using System.Text;
-using uax29;
+using UAX29;
 
 [TestFixture]
 public class TestStreamTokenizer

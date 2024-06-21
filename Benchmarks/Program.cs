@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using uax29;
+using UAX29;
 
 var summary = BenchmarkRunner.Run<Benchmark>();
 

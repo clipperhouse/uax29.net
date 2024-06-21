@@ -1,6 +1,6 @@
 // generated from https://www.unicode.org/Public/15.0.0/ucd/auxiliary/WordBreakProperty.txt
 
-namespace uax29;
+namespace UAX29;
 
 using Property = uint;
 

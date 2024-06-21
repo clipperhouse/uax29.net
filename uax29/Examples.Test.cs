@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using uax29;
+using UAX29;
 
 namespace Tests;
 
