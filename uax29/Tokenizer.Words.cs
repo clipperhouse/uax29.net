@@ -11,7 +11,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this Span<byte> input) => new(input, Words.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetWords(Span<byte> input) => new(input, Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -20,7 +20,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this ReadOnlySpan<byte> input) => new(input, Words.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetWords(ReadOnlySpan<byte> input) => new(input, Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -29,7 +29,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this Memory<byte> input) => new(input.Span, Words.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetWords(Memory<byte> input) => new(input.Span, Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -38,7 +38,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this ReadOnlyMemory<byte> input) => new(input.Span, Words.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetWords(ReadOnlyMemory<byte> input) => new(input.Span, Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the words in the given array of UTF-8 encoded bytes.
@@ -47,7 +47,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(this byte[] input) => new(input.AsSpan(), Words.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetWords(byte[] input) => new(input.AsSpan(), Words.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the words in the given string.
@@ -56,7 +56,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(this string input) => new(input.AsSpan(), Words.SplitChars);
+    public static Tokenizer<char> GetWords(string input) => new(input.AsSpan(), Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given string.
@@ -65,7 +65,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(this char[] input) => new(input.AsSpan(), Words.SplitChars);
+    public static Tokenizer<char> GetWords(char[] input) => new(input.AsSpan(), Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given <see cref="Span"/> of <see cref="char"/>.
@@ -75,7 +75,7 @@ public static partial class Tokenizer
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
     /// 
-    public static Tokenizer<char> GetWords(this Span<char> input) => new(input, Words.SplitChars);
+    public static Tokenizer<char> GetWords(Span<char> input) => new(input, Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -84,7 +84,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(this ReadOnlySpan<char> input) => new(input, Words.SplitChars);
+    public static Tokenizer<char> GetWords(ReadOnlySpan<char> input) => new(input, Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -93,7 +93,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(this Memory<char> input) => new(input.Span, Words.SplitChars);
+    public static Tokenizer<char> GetWords(Memory<char> input) => new(input.Span, Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -102,7 +102,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(this ReadOnlyMemory<char> input) => new(input.Span, Words.SplitChars);
+    public static Tokenizer<char> GetWords(ReadOnlyMemory<char> input) => new(input.Span, Words.SplitChars);
 
     /// <summary>
     /// Split the words in the given <see cref="Stream"/> of UTF-8 encoded bytes.
@@ -127,7 +127,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<byte> GetWords(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamTokenizer<byte> GetWords(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
@@ -157,7 +157,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<char> GetWords(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamTokenizer<char> GetWords(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);

@@ -11,7 +11,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(this Span<byte> input) => new(input, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(Span<byte> input) => new(input, Sentences.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -20,7 +20,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(this ReadOnlySpan<byte> input) => new(input, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(ReadOnlySpan<byte> input) => new(input, Sentences.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -29,7 +29,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(this Memory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(Memory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -38,7 +38,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(this ReadOnlyMemory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(ReadOnlyMemory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the sentences in the given array of UTF-8 encoded bytes.
@@ -47,7 +47,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(this byte[] input) => new(input.AsSpan(), Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(byte[] input) => new(input.AsSpan(), Sentences.SplitUtf8Bytes);
 
     /// <summary>
     /// Split the sentences in the given string.
@@ -56,7 +56,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<char> GetSentences(this string input) => new(input.AsSpan(), Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(string input) => new(input.AsSpan(), Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given string.
@@ -65,7 +65,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<char> GetSentences(this char[] input) => new(input.AsSpan(), Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(char[] input) => new(input.AsSpan(), Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Span"/> of <see cref="char"/>.
@@ -75,7 +75,7 @@ public static partial class Tokenizer
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
     /// 
-    public static Tokenizer<char> GetSentences(this Span<char> input) => new(input, Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(Span<char> input) => new(input, Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -84,7 +84,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<char> GetSentences(this ReadOnlySpan<char> input) => new(input, Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(ReadOnlySpan<char> input) => new(input, Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -93,7 +93,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<char> GetSentences(this Memory<char> input) => new(input.Span, Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(Memory<char> input) => new(input.Span, Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -102,7 +102,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<char> GetSentences(this ReadOnlyMemory<char> input) => new(input.Span, Sentences.SplitChars);
+    public static Tokenizer<char> GetSentences(ReadOnlyMemory<char> input) => new(input.Span, Sentences.SplitChars);
 
 
 
@@ -129,7 +129,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static StreamTokenizer<byte> GetSentences(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamTokenizer<byte> GetSentences(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
@@ -159,7 +159,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static StreamTokenizer<char> GetSentences(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamTokenizer<char> GetSentences(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);

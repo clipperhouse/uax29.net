@@ -27,10 +27,10 @@ public class TestStreamTokenizer
         foreach (var input in examples)
         {
             var bytes = Encoding.UTF8.GetBytes(input);
-            var staticTokens = bytes.GetWords();
+            var staticTokens = Tokenizer.GetWords(bytes);
 
             using var stream = new MemoryStream(bytes);
-            var streamTokens = stream.GetWords();
+            var streamTokens = Tokenizer.GetWords(stream);
 
             foreach (var streamToken in streamTokens)
             {
