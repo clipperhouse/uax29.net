@@ -1,6 +1,6 @@
 namespace Tests;
 
-using uax29;
+using UAX29;
 using System.Linq;
 using System.Text;
 

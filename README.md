@@ -7,11 +7,11 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 ### Example
 
 ```
-dotnet add package uax29.net
+dotnet add package UAX29
 ```
 
 ```csharp
-using uax29;
+using UAX29;
 using System.Text;
 
 var example = "Hello, 🌏 world. 你好，世界.";

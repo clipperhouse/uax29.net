@@ -1,6 +1,6 @@
 ﻿using Buffer;
 
-namespace uax29;
+namespace UAX29;
 
 public static partial class Tokenizer
 {
