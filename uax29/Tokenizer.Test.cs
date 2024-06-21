@@ -317,7 +317,7 @@ public class TestTokenizer
 		var i = 0;
 		foreach (var token in tokens)
 		{
-			Assert.That(token.SequenceEqual(list[i]));
+			Assert.That(token.SequenceEqual(list[i].Span));
 			i++;
 		}
 
@@ -350,7 +350,7 @@ public class TestTokenizer
 		var i = 0;
 		foreach (var token in tokens)
 		{
-			Assert.That(token.SequenceEqual(array[i]));
+			Assert.That(token.SequenceEqual(array[i].Span));
 			i++;
 		}
 
