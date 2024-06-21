@@ -97,6 +97,22 @@ We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
+This is the same algorithm that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
+
+### Major version changes
+
+If you are using v1.x of this package, v2 has been renamed:
+
+`dotnet add package uax29.net` → `dotnet add package UAX29`
+
+`using uax29` → `using UAX29`
+
+We now use extension methods:
+
+`Tokenizer.Create(input)` → `input.GetWords()`
+
+`Tokenizer.Create(input, TokenType.Graphemes)` → `input.GetGraphemes()`
+
 ### Performance
 
 When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, that's around 25MM tokens/s. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
@@ -105,7 +121,7 @@ The tokenizer is implemented as a `ref struct`, so you should see zero allocatio
 
 Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
 
-For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
 
 ### Invalid inputs
 
@@ -123,10 +139,10 @@ The .Net Core standard library has a similar enumerator for graphemes.
 
 ### Other language implementations
 
+[Java](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html)
+
 [JavaScript](https://github.com/tc39/proposal-intl-segmenter)
 
 [Rust](https://unicode-rs.github.io/unicode-segmentation/unicode_segmentation/trait.UnicodeSegmentation.html)
-
-[Java](https://lucene.apache.org/core/3_5_0/api/core/org/apache/lucene/analysis/standard/StandardTokenizerImpl.html)
 
 [Python](https://uniseg-python.readthedocs.io/en/latest/)
