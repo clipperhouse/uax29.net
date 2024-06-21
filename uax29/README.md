@@ -19,7 +19,7 @@ var example = "Hello, 🌏 world. 你好，世界.";
 // The tokenizer can split words, graphemes or sentences.
 // It operates on strings, UTF-8 bytes, and streams.
 
-var words = example.GetWords();
+var words = Tokenizer.GetWords(example);
 
 // Iterate over the tokens
 foreach (var word in words)
@@ -46,9 +46,8 @@ world
 .
 */
 
-
 var utf8bytes = Encoding.UTF8.GetBytes(example);
-var graphemes = utf8bytes.GetGraphemes();
+var graphemes = Tokenizer.GetGraphemes(utf8bytes);
 
 // Iterate over the tokens		
 foreach (var grapheme in graphemes)
@@ -109,9 +108,9 @@ If you are using v1.x of this package, v2 has been renamed:
 
 We now use extension methods:
 
-`Tokenizer.Create(input)` → `input.GetWords()`
+`Tokenizer.Create(input)` → `Tokenizer.GetWords(input)`
 
-`Tokenizer.Create(input, TokenType.Graphemes)` → `input.GetGraphemes()`
+`Tokenizer.Create(input, TokenType.Graphemes)` → `Tokenizer.GetGraphemes(input)`
 
 ### Performance
 

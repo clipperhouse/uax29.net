@@ -21,7 +21,7 @@ public class TestExample
         // The tokenizer can split words, graphemes or sentences.
         // It operates on strings, UTF-8 bytes, and streams.
 
-        var words = example.GetWords();
+        var words = Tokenizer.GetWords(example);
 
         // Iterate over the tokens
         foreach (var word in words)
@@ -49,7 +49,7 @@ public class TestExample
         */
 
         var utf8bytes = Encoding.UTF8.GetBytes(example);
-        var graphemes = utf8bytes.GetGraphemes();
+        var graphemes = Tokenizer.GetGraphemes(utf8bytes);
 
         // Iterate over the tokens		
         foreach (var grapheme in graphemes)
