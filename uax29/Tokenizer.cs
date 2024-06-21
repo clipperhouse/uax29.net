@@ -98,35 +98,37 @@ public ref struct Tokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// Iterates over all tokens and collects them into a list, allocating a new array for each token.
+	/// Iterates over all tokens and collects them into a list. A new underlying array is allocated, and original input data is copied.
 	/// </summary>
-	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
-	public List<T[]> ToList()
+	/// <returns>List<ReadOnlyMemory<byte>> or List<ReadOnlyMemory<byte>>, depending on the input.</returns>
+	public readonly List<ReadOnlyMemory<T>> ToList()
 	{
 		if (begun)
 		{
 			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
 		}
 
-		var result = new List<T[]>();
-		foreach (var token in this)
-		{
-			result.Add(token.ToArray());
-		}
+		var copy = this.input.ToArray();
+		var tokenizer = new Tokenizer<T>(copy, this.split);
 
-		this.Reset();
-		return result;
+		var list = new List<ReadOnlyMemory<T>>();
+		foreach (var token in tokenizer)
+		{
+			ReadOnlyMemory<T> mem = token.ToArray();
+			list.Add(mem);
+		}
+		return list;
 	}
 
 	/// <summary>
-	/// Iterates over all tokens and collects them into an array, allocating a new array for each token.
+	/// Iterates over all tokens and collects them into an array. A new underlying array is allocated, and original input data is copied.
 	/// </summary>
-	/// <returns>byte[][] or char[][], depending on the input</returns>
-	public T[][] ToArray()
+	/// <returns>ReadOnlyMemory<byte>[] or ReadOnlyMemory<byte>[], depending on the input.</returns>
+	public readonly ReadOnlyMemory<T>[] ToArray()
 	{
 		if (begun)
 		{
-			throw new InvalidOperationException("ToArray must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
+			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
 		}
 
 		return this.ToList().ToArray();
