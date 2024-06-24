@@ -1,21 +1,10 @@
-using System.Collections.Immutable;
-
 namespace UAX29;
-
-/// <summary>
-/// The function that splits a string or UTF-8 byte array into tokens.
-/// </summary>
-/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-/// <param name="input">The string to split/tokenize.</param>
-/// <param name="atEOF">The split may need to know if further data to be expected, such as from a stream.</param>
-/// <returns>How many bytes/chars were consumed from the input.</returns>
-internal delegate int Split<T>(ReadOnlySpan<T> input, bool atEOF = true);
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-public ref struct Tokenizer<T> where T : struct
+public ref struct RangeTokenizer<T> where T : struct
 {
 	ReadOnlySpan<T> input;
 
@@ -31,7 +20,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split)
+	internal RangeTokenizer(ReadOnlySpan<T> input, Split<T> split)
 	{
 		this.input = input;
 		this.split = split;
@@ -67,15 +56,15 @@ public ref struct Tokenizer<T> where T : struct
 	/// If the input was a string, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="char"/>.
 	/// If the input was UTF-8 bytes, <see cref="Current"/> will be <see cref="ReadOnlySpan"/> of <see cref="byte"/>.
 	/// </summary>
-	public readonly ReadOnlySpan<T> Current
+	public readonly Range Current
 	{
 		get
 		{
-			return input[start..end];
+			return new Range(start, end);
 		}
 	}
 
-	public readonly Tokenizer<T> GetEnumerator()
+	public readonly RangeTokenizer<T> GetEnumerator()
 	{
 		return this;
 	}
@@ -103,17 +92,17 @@ public ref struct Tokenizer<T> where T : struct
 	/// Iterates over all tokens and collects them into a list, allocating a new array for each token.
 	/// </summary>
 	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
-	public List<T[]> ToList()
+	public List<Range> ToList()
 	{
 		if (begun)
 		{
 			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
 		}
 
-		var result = new List<T[]>();
+		var result = new List<Range>();
 		foreach (var token in this)
 		{
-			result.Add(token.ToArray());
+			result.Add(token);
 		}
 
 		this.Reset();
@@ -124,7 +113,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// Iterates over all tokens and collects them into an array, allocating a new array for each token.
 	/// </summary>
 	/// <returns>byte[][] or char[][], depending on the input</returns>
-	public T[][] ToArray()
+	public Range[] ToArray()
 	{
 		if (begun)
 		{
@@ -132,20 +121,5 @@ public ref struct Tokenizer<T> where T : struct
 		}
 
 		return this.ToList().ToArray();
-	}
-
-	/// <summary>
-	/// Get the ranges (boundaries) of the tokens.
-	/// </summary>
-	/// <returns>
-	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input 
-	/// using [range] or .AsSpan(range) to get the tokens.
-	/// </returns>
-	public RangeTokenizer<T> Ranges
-	{
-		get
-		{
-			return new RangeTokenizer<T>(input, split);
-		}
 	}
 }
