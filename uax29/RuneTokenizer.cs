@@ -89,10 +89,10 @@ public ref struct RuneTokenizer<T> where T : struct
 		}
 	}
 
-	public readonly RuneTokenizer<T> GetEnumerator()
-	{
-		return this;
-	}
+	// public readonly RuneTokenizer<T> GetEnumerator()
+	// {
+	// 	return this;
+	// }
 
 	/// <summary>
 	/// Resets the tokenizer back to the first rune.
@@ -124,9 +124,9 @@ public ref struct RuneTokenizer<T> where T : struct
 		}
 
 		var result = new List<Rune>();
-		foreach (var token in this)
+		while (MoveNext())
 		{
-			result.Add(token);
+			result.Add(Current);
 		}
 
 		this.Reset();

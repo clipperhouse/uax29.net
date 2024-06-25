@@ -136,9 +136,9 @@ public class TestRuneTokenizer
 		var list = runes.ToList();
 
 		var i = 0;
-		foreach (var rune in runes)
+		while (runes.MoveNext())
 		{
-			Assert.That(rune, Is.EqualTo(list[i]));
+			Assert.That(runes.Current, Is.EqualTo(list[i]));
 			i++;
 		}
 
@@ -166,9 +166,9 @@ public class TestRuneTokenizer
 		var array = runes.ToArray();
 
 		var i = 0;
-		foreach (var rune in runes)
+		while (runes.MoveNext())
 		{
-			Assert.That(rune, Is.EqualTo(array[i]));
+			Assert.That(runes.Current, Is.EqualTo(array[i]));
 			i++;
 		}
 
