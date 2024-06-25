@@ -9,13 +9,13 @@ namespace UAX29;
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 public ref struct RuneTokenizer<T> where T : struct
 {
-	ReadOnlySpan<T> input;
+	internal ReadOnlySpan<T> input;
 
 	readonly Decoder<T> DecodeFirstRune;
 	readonly Decoder<T> DecodeLastRune;
 
-	internal int start = 0;
-	internal int end = 0;
+	int start = 0;
+	int end = 0;
 
 	bool begun = false;
 
@@ -93,6 +93,12 @@ public ref struct RuneTokenizer<T> where T : struct
 			DecodeLastRune(input[start..end], out Rune rune, out int _);
 			return rune;
 		}
+	}
+
+	internal void Consume(int consumed)
+	{
+		start += consumed;
+		end = start;
 	}
 
 	// public readonly RuneTokenizer<T> GetEnumerator()

@@ -15,24 +15,32 @@ public class TestSplitter2
     [Test]
     public void Hmm()
     {
-        var example = "abcdefghijk lmnopq r 你好.";
+        var example = "abc defg \"hijkl\" mnopq r 你好.";
+        var words = Tokenizer.GetWords(example).ToArray();
 
         var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
 
         var splitter = new Words.Splitter2<char>();
-        var pos = 0;
+        var start = 0;
+        var end = 0;
 
+        var i = 0;
         while (true)
         {
             var advance = splitter.Split(runes);
-            var val = example[pos..(pos + advance)];
-            pos += advance;
-            runes.start = pos;
-
             if (advance == 0)
             {
                 break;
             }
+
+            start = end;
+            end += advance;
+            var val = example[start..end];
+
+            Assert.That(val, Is.EqualTo(words[i]));
+            runes.Consume(advance);
+
+            i++;
         }
     }
 }
