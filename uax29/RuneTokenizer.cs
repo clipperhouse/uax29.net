@@ -15,7 +15,6 @@ public ref struct RuneTokenizer<T> where T : struct
 	readonly Decoder<T> DecodeLastRune;
 
 	internal int pos = 0;
-	internal Rune rune;
 
 	bool begun = false;
 
@@ -44,7 +43,7 @@ public ref struct RuneTokenizer<T> where T : struct
 			return false;
 		}
 
-		var status = DecodeFirstRune(input[pos..], out this.rune, out int consumed);
+		var status = DecodeFirstRune(input[pos..], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
@@ -67,7 +66,7 @@ public ref struct RuneTokenizer<T> where T : struct
 			return false;
 		}
 
-		var status = DecodeLastRune(input[..pos], out this.rune, out int consumed);
+		var status = DecodeLastRune(input[..pos], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
@@ -85,7 +84,8 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		get
 		{
-			return this.rune;
+			DecodeLastRune(input[..pos], out Rune rune, out int _);
+			return rune;
 		}
 	}
 
