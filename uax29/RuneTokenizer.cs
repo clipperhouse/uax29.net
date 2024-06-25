@@ -14,7 +14,8 @@ public ref struct RuneTokenizer<T> where T : struct
 	readonly Decoder<T> DecodeFirstRune;
 	readonly Decoder<T> DecodeLastRune;
 
-	internal int pos = 0;
+	internal int start = 0;
+	internal int end = 0;
 
 	bool begun = false;
 
@@ -31,49 +32,54 @@ public ref struct RuneTokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// Move to the next token. Use <see cref="Current"/> to retrieve the rune.
+	/// Move to the next rune. Use <see cref="Current"/> to retrieve the rune.
 	/// </summary>
 	/// <returns>Whether there are any more runes. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
 		begun = true;
 
-		if (pos >= input.Length)
+		if (end >= input.Length)
 		{
+			start = end;
 			return false;
 		}
 
-		var status = DecodeFirstRune(input[pos..], out _, out int consumed);
+		var status = DecodeFirstRune(input[end..], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
 			throw new InvalidOperationException("Rune could not be decoded");
 		}
 
-		pos += consumed;
+		start = end;
+		end += consumed;
 		return true;
 	}
 
 	/// <summary>
-	/// Move to the next token. Use <see cref="Current"/> to retrieve the rune.
+	/// Move to the previous rune. Use <see cref="Current"/> to retrieve the rune.
 	/// </summary>
-	/// <returns>Whether there are any more runes. False typically means EOF.</returns>
+	/// <returns>Whether there are any more runes. False typically means the beginning of the string.</returns>
 	public bool MovePrevious()
 	{
-		if (pos == 0)
+		if (start == 0)
 		{
 			begun = false;
+			end = start;
 			return false;
 		}
 
-		var status = DecodeLastRune(input[..pos], out _, out int consumed);
+		var status = DecodeLastRune(input[..start], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
 			throw new InvalidOperationException("Rune could not be decoded");
 		}
 
-		pos -= consumed;
+		end = start;
+		start -= consumed;
+
 		return true;
 	}
 
@@ -84,7 +90,7 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		get
 		{
-			DecodeLastRune(input[..pos], out Rune rune, out int _);
+			DecodeLastRune(input[start..end], out Rune rune, out int _);
 			return rune;
 		}
 	}
@@ -99,7 +105,7 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// </summary>
 	public void Reset()
 	{
-		this.pos = 0;
+		this.end = 0;
 		this.begun = false;
 	}
 
