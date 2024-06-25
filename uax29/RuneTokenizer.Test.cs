@@ -13,18 +13,21 @@ public class TestRuneTokenizer
 	}
 
 	[Test]
-	public void Basic()
+	public void Next()
 	{
 		var example = "Hello, how are you, 😀 👨‍❤️‍👩";
-		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16);
+		var expected = example.EnumerateRunes();
 
-		var got = "";
-		foreach (var rune in runes)
 		{
-			got += rune.ToString();
+			var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16).ToArray();
+			Assert.That(runes.SequenceEqual(expected));
 		}
 
-		Assert.That(got, Is.EqualTo(example));
+		{
+			var bytes = Encoding.UTF8.GetBytes(example);
+			var runes = new RuneTokenizer<byte>(bytes, Rune.DecodeFromUtf8).ToArray();
+			Assert.That(runes.SequenceEqual(expected));
+		}
 	}
 
 	[Test]
@@ -111,27 +114,23 @@ public class TestRuneTokenizer
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.GetWords(example);
-		var list = tokens.ToList();
+		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16);
+		var list = runes.ToList();
 
 		var i = 0;
-		foreach (var token in tokens)
+		foreach (var rune in runes)
 		{
-			Assert.That(token.SequenceEqual(list[i]));
+			Assert.That(rune, Is.EqualTo(list[i]));
 			i++;
 		}
 
 		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
 
-		// Tokenizer should reset back to the beginning
-		Assert.That(tokens.start, Is.EqualTo(0));
-		Assert.That(tokens.end, Is.EqualTo(0));
-
 		var threw = false;
-		tokens.MoveNext();
+		runes.MoveNext();
 		try
 		{
-			tokens.ToList();
+			runes.ToList();
 		}
 		catch (InvalidOperationException)
 		{
@@ -140,31 +139,28 @@ public class TestRuneTokenizer
 		Assert.That(threw, Is.True, "Calling ToList after iteration has begun should throw");
 	}
 
+
 	[Test]
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.GetWords(example);
-		var array = tokens.ToArray();
+		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16);
+		var array = runes.ToArray();
 
 		var i = 0;
-		foreach (var token in tokens)
+		foreach (var rune in runes)
 		{
-			Assert.That(token.SequenceEqual(array[i]));
+			Assert.That(rune, Is.EqualTo(array[i]));
 			i++;
 		}
 
 		Assert.That(array, Has.Length.EqualTo(i), "ToArray should return the same number of tokens as iteration");
 
-		// Tokenizer should reset back to the beginning
-		Assert.That(tokens.start, Is.EqualTo(0));
-		Assert.That(tokens.end, Is.EqualTo(0));
-
 		var threw = false;
-		tokens.MoveNext();
+		runes.MoveNext();
 		try
 		{
-			tokens.ToArray();
+			runes.ToArray();
 		}
 		catch (InvalidOperationException)
 		{
