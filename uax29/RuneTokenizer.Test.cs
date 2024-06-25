@@ -19,14 +19,32 @@ public class TestRuneTokenizer
 		var expected = example.EnumerateRunes();
 
 		{
-			var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16).ToArray();
+			var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).ToArray();
 			Assert.That(runes.SequenceEqual(expected));
 		}
 
 		{
 			var bytes = Encoding.UTF8.GetBytes(example);
-			var runes = new RuneTokenizer<byte>(bytes, Rune.DecodeFromUtf8).ToArray();
+			var runes = new RuneTokenizer<byte>(bytes, Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).ToArray();
 			Assert.That(runes.SequenceEqual(expected));
+		}
+	}
+
+	[Test]
+	public void Previous()
+	{
+		var example = "Hello, how are you, 😀 👨‍❤️‍👩";
+		var expected = example.EnumerateRunes().Reverse().ToArray();
+		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
+
+		// move to the end
+		while (runes.MoveNext()) { }
+
+		var i = 0;
+		while (runes.MovePrevious())
+		{
+			Assert.That(runes.Current, Is.EqualTo(expected[i]));
+			i++;
 		}
 	}
 
@@ -114,7 +132,7 @@ public class TestRuneTokenizer
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16);
+		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
 		var list = runes.ToList();
 
 		var i = 0;
@@ -144,7 +162,7 @@ public class TestRuneTokenizer
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16);
+		var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
 		var array = runes.ToArray();
 
 		var i = 0;

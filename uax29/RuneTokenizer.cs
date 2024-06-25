@@ -12,6 +12,7 @@ public ref struct RuneTokenizer<T> where T : struct
 	ReadOnlySpan<T> input;
 
 	readonly Decoder<T> DecodeFirstRune;
+	readonly Decoder<T> DecodeLastRune;
 
 	internal int pos = 0;
 	internal Rune rune;
@@ -23,10 +24,11 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal RuneTokenizer(ReadOnlySpan<T> input, Decoder<T> decodeFirstRune)
+	internal RuneTokenizer(ReadOnlySpan<T> input, Decoder<T> decodeFirstRune, Decoder<T> decodeLastRune)
 	{
 		this.input = input;
 		this.DecodeFirstRune = decodeFirstRune;
+		this.DecodeLastRune = decodeLastRune;
 	}
 
 	/// <summary>
@@ -50,6 +52,29 @@ public ref struct RuneTokenizer<T> where T : struct
 		}
 
 		pos += consumed;
+		return true;
+	}
+
+	/// <summary>
+	/// Move to the next token. Use <see cref="Current"/> to retrieve the rune.
+	/// </summary>
+	/// <returns>Whether there are any more runes. False typically means EOF.</returns>
+	public bool MovePrevious()
+	{
+		if (pos == 0)
+		{
+			begun = false;
+			return false;
+		}
+
+		var status = DecodeLastRune(input[..pos], out this.rune, out int consumed);
+		if (status != OperationStatus.Done)
+		{
+			// Garbage in, garbage out
+			throw new InvalidOperationException("Rune could not be decoded");
+		}
+
+		pos -= consumed;
 		return true;
 	}
 
