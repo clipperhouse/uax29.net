@@ -15,7 +15,8 @@ public class TestSplitter2
     [Test]
     public void Hmm()
     {
-        var example = "abc defg \"hijkl\" mnopq r 你好.";
+        var example = File.ReadAllText("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
+
         var words = Tokenizer.GetWords(example).ToArray();
 
         var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);

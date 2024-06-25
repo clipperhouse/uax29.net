@@ -51,6 +51,8 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
                 {
                     return false;
                 }
+
+                break;
             }
         }
 
@@ -98,6 +100,8 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
                 {
                     return false;
                 }
+
+                break;
             }
         }
 
