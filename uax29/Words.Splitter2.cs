@@ -26,7 +26,7 @@ internal static partial class Words
                 var last = current;
 
                 var rune = runes.Current;
-                var w = rune.Utf16SequenceLength;
+                var w = runes.CurrentWidth;
                 current = Dict.Lookup(rune.Value);
 
                 var sot = pos == 0;             // "start of text"
@@ -166,42 +166,30 @@ internal static partial class Words
                     // Note: this logic de facto expresses WB5 as well, but harmless since WB5
                     // was already tested above
 
-                    // // Optimization: maybe a run without ignored characters
-                    // if (last.Is(Numeric | AHLetter))
-                    // {
-                    //     pos += w;
-                    //     while (pos < input.Length)
-                    //     {
-                    //         status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
-                    //         if (status != OperationStatus.Done)
-                    //         {
-                    //             // Garbage in, garbage out
-                    //             break;
-                    //         }
-                    //         if (w2 == 0)
-                    //         {
-                    //             break;
-                    //         }
+                    // Optimization: maybe a run without ignored characters
+                    if (last.Is(Numeric | AHLetter))
+                    {
+                        pos += w;
 
-                    //         var lookup = Dict.Lookup(rune2.Value);
+                        var runes2 = runes; // shallow copy
+                        while (runes2.MoveNext())
+                        {
+                            var lookup = Dict.Lookup(runes2.Current.Value);
 
-                    //         if (!lookup.Is(Numeric | AHLetter))
-                    //         {
-                    //             break;
-                    //         }
-                    //         if (w2 == 0)
-                    //         {
-                    //             break;
-                    //         }
+                            if (!lookup.Is(Numeric | AHLetter))
+                            {
+                                break;
+                            }
 
-                    //         // Update stateful vars
-                    //         current = lookup;
-                    //         w = w2;
+                            // Update stateful vars
+                            runes.MoveNext();
+                            current = lookup;
+                            w = runes2.CurrentWidth;
 
-                    //         pos += w;
-                    //     }
-                    //     continue;
-                    // }
+                            pos += w;
+                        }
+                        continue;
+                    }
 
                     // Otherwise, do proper lookback per WB4
                     if (Previous(Numeric | AHLetter, runes))
@@ -240,37 +228,30 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB13
                 if (current.Is(Katakana) && last.Is(Katakana | Ignore))
                 {
-                    // // Optimization: maybe a run without ignored characters
-                    // if (last.Is(Katakana))
-                    // {
-                    //     pos += w;
-                    //     while (pos < input.Length)
-                    //     {
-                    //         status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
-                    //         if (status != OperationStatus.Done)
-                    //         {
-                    //             // Garbage in, garbage out
-                    //             break;
-                    //         }
-                    //         if (w2 == 0)
-                    //         {
-                    //             break;
-                    //         }
+                    // Optimization: maybe a run without ignored characters
+                    if (last.Is(Katakana))
+                    {
+                        pos += w;
 
-                    //         var lookup = Dict.Lookup(rune2.Value);
-                    //         if (!lookup.Is(Katakana))
-                    //         {
-                    //             break;
-                    //         }
+                        var runes2 = runes; // shallow copy
+                        while (runes2.MoveNext())
+                        {
+                            var lookup = Dict.Lookup(runes2.Current.Value);
 
-                    //         // Update stateful vars
-                    //         current = lookup;
-                    //         w = w2;
+                            if (!lookup.Is(Katakana))
+                            {
+                                break;
+                            }
 
-                    //         pos += w;
-                    //     }
-                    //     continue;
-                    // }
+                            // Update stateful vars
+                            runes.MoveNext();
+                            current = lookup;
+                            w = runes2.CurrentWidth;
+
+                            pos += w;
+                        }
+                        continue;
+                    }
 
                     // Otherwise, do proper lookback per WB4
                     if (Previous(Katakana, runes))
@@ -319,7 +300,6 @@ internal static partial class Words
                     var count = 0;
 
                     var runes2 = runes; // shallow copy
-
                     while (runes2.MovePrevious())
                     {
                         var rune2 = runes2.Current;

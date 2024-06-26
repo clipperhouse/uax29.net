@@ -95,6 +95,14 @@ public ref struct RuneTokenizer<T> where T : struct
 		}
 	}
 
+	public readonly int CurrentWidth
+	{
+		get
+		{
+			return end - start;
+		}
+	}
+
 	internal void Consume(int consumed)
 	{
 		start += consumed;

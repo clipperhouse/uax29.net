@@ -42,9 +42,11 @@ public class TestSplitter2
 
             start = end;
             end += advance;
-            var val = example[start..end];
 
-            Assert.That(val, Is.EqualTo(words[i]));
+            var got = example[start..end];
+            var expected = words[i];
+
+            Assert.That(got, Is.EqualTo(expected));
             runes.Consume(advance);
 
             i++;
