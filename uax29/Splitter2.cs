@@ -1,8 +1,5 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
-using System.Text;
-
 /// A bitmap of Unicode categories
 using Property = uint;
 
@@ -29,13 +26,16 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
     internal abstract int Split(RuneTokenizer<TSpan> runes, bool atEOF);
 
     /// <summary>
-    /// Seek backward until it hits a rune which matches property.
+    /// Seek backward until it hits a rune which matches the seek parameter.
     /// </summary>
-    /// <param name="property">Property to attempt to find</param>
+    /// <param name="seek">Property to attempt to find</param>
     /// <param name="runes">Data in which to seek</param>
+    /// <param name="intermediate">Optional, Property which needs to be found before finding seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Previous(Property property, RuneTokenizer<TSpan> runes, Property intermediate = 0)
+    internal bool Previous(Property seek, RuneTokenizer<TSpan> runes, Property intermediate = 0)
     {
+        // N.B: runes is passed by value, i.e. is a copy, so navigating here does not affect the caller
+
         if (intermediate != 0)
         {
             while (runes.MovePrevious())
@@ -65,7 +65,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
                 continue;
             }
 
-            if (lookup.Is(property))
+            if (lookup.Is(seek))
             {
                 return true;
             }
@@ -78,13 +78,16 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
 
 
     /// <summary>
-    /// Seek forward until it hits a rune which matches property.
+    /// Seek backward until it hits a rune which matches the seek parameter.
     /// </summary>
-    /// <param name="property">Property to attempt to find</param>
+    /// <param name="seek">Property to attempt to find</param>
     /// <param name="runes">Data in which to seek</param>
+    /// <param name="intermediate">Optional, Property which needs to be found before finding seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Subsequent(Property property, RuneTokenizer<TSpan> runes, Property intermediate = 0)
+    internal bool Subsequent(Property seek, RuneTokenizer<TSpan> runes, Property intermediate = 0)
     {
+        // N.B: runes is passed by value, i.e. is a copy, so navigating here does not affect the caller
+
         if (intermediate != 0)
         {
             while (runes.MoveNext())
@@ -114,7 +117,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
                 continue;
             }
 
-            if (lookup.Is(property))
+            if (lookup.Is(seek))
             {
                 return true;
             }

@@ -1,22 +1,28 @@
 ﻿namespace Tests;
 
-using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using UAX29;
 
 [TestFixture]
 public class TestSplitter2
 {
+    string example;
+
     [SetUp]
     public void Setup()
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        var names = assembly.GetManifestResourceNames();
+        using var stream = assembly.GetManifestResourceStream("uax29.sample.txt");
+
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        example = reader.ReadToEnd();
     }
 
     [Test]
     public void Hmm()
     {
-        var example = File.ReadAllText("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
-
         var words = Tokenizer.GetWords(example).ToArray();
 
         var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
