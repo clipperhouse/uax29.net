@@ -5,6 +5,9 @@ using Property = uint;
 
 internal static partial class Words
 {
+    internal static readonly Split2<byte> Split2Utf8Bytes = new Splitter2<byte>().Split;
+    internal static readonly Split2<char> Split2Chars = new Splitter2<char>().Split;
+
     internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
     {
         internal Splitter2() :

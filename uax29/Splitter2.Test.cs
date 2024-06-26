@@ -13,8 +13,7 @@ public class TestSplitter2
     public void Setup()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var names = assembly.GetManifestResourceNames();
-        using var stream = assembly.GetManifestResourceStream("uax29.sample.txt");
+        using var stream = assembly.GetManifestResourceStream("uax29.sample.txt") ?? throw new Exception("not found");
 
         using var reader = new StreamReader(stream, Encoding.UTF8);
         example = reader.ReadToEnd();
@@ -50,6 +49,23 @@ public class TestSplitter2
             runes.Consume(advance);
 
             i++;
+        }
+    }
+
+    [Test]
+    public void Static()
+    {
+        var example = Encoding.UTF8.GetBytes(this.example);
+        var words = Tokenizer.GetWords(this.example).ToArray();
+        var words2 = Tokenizer2.GetWords(this.example).ToArray();
+
+        Assert.That(words, Has.Length.EqualTo(words2.Length));
+
+        for (var i = 0; i < words.Length; i++)
+        {
+            var expected = words[i].ToString();
+            var got = words2[i].ToString();
+            Assert.That(expected, Is.EqualTo(got));
         }
     }
 }

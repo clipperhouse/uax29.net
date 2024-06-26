@@ -3,6 +3,19 @@ using System.Text;
 
 namespace UAX29;
 
+internal static class RuneTokenizer
+{
+	internal static RuneTokenizer<char> Create(ReadOnlySpan<char> input)
+	{
+		return new RuneTokenizer<char>(input, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
+	}
+
+	internal static RuneTokenizer<byte> Create(ReadOnlySpan<byte> input)
+	{
+		return new RuneTokenizer<byte>(input, Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8);
+	}
+}
+
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
@@ -39,7 +52,7 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		begun = true;
 
-		if (end >= input.Length)
+		if (!Any())
 		{
 			start = end;
 			return false;
@@ -55,6 +68,11 @@ public ref struct RuneTokenizer<T> where T : struct
 		start = end;
 		end += consumed;
 		return true;
+	}
+
+	internal bool Any()
+	{
+		return end < input.Length;
 	}
 
 	/// <summary>
