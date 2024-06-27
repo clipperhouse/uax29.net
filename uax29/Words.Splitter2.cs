@@ -30,9 +30,10 @@ internal static partial class Words
 
                 var rune = runes.Current;
                 var w = runes.CurrentWidth;
-                current = Dict.Lookup(rune.Value);
+                current = Dict.Lookup(rune);
 
                 var sot = pos == 0;             // "start of text"
+
                 // https://unicode.org/reports/tr29/#WB1
                 if (sot)
                 {
@@ -177,7 +178,7 @@ internal static partial class Words
                         var runes2 = runes; // shallow copy
                         while (runes2.MoveNext())
                         {
-                            var lookup = Dict.Lookup(runes2.Current.Value);
+                            var lookup = Dict.Lookup(runes2.Current);
 
                             if (!lookup.Is(Numeric | AHLetter))
                             {
@@ -239,7 +240,7 @@ internal static partial class Words
                         var runes2 = runes; // shallow copy
                         while (runes2.MoveNext())
                         {
-                            var lookup = Dict.Lookup(runes2.Current.Value);
+                            var lookup = Dict.Lookup(runes2.Current);
 
                             if (!lookup.Is(Katakana))
                             {
@@ -306,7 +307,7 @@ internal static partial class Words
                     while (runes2.MovePrevious())
                     {
                         var rune2 = runes2.Current;
-                        var lookup = Dict.Lookup(rune2.Value);
+                        var lookup = Dict.Lookup(rune2);
 
                         if (lookup.Is(Ignore))
                         {

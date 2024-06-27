@@ -7,14 +7,33 @@ internal static class RuneTokenizer
 {
 	internal static RuneTokenizer<char> Create(ReadOnlySpan<char> input)
 	{
-		return new RuneTokenizer<char>(input, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
+		return new RuneTokenizer<char>(input, Decoders.Char);
 	}
 
 	internal static RuneTokenizer<byte> Create(ReadOnlySpan<byte> input)
 	{
-		return new RuneTokenizer<byte>(input, Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8);
+		return new RuneTokenizer<byte>(input, Decoders.Utf8);
 	}
 }
+
+internal static class Decoders
+{
+	internal readonly static Decoders<char> Char = new(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
+	internal readonly static Decoders<byte> Utf8 = new(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8);
+}
+
+internal class Decoders<T>
+{
+	internal Decoder<T> FirstRune;
+	internal Decoder<T> LastRune;
+
+	internal Decoders(Decoder<T> firstRune, Decoder<T> lastRune)
+	{
+		this.FirstRune = firstRune;
+		this.LastRune = lastRune;
+	}
+}
+
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -22,26 +41,22 @@ internal static class RuneTokenizer
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 public ref struct RuneTokenizer<T> where T : struct
 {
-	internal ReadOnlySpan<T> input;
+	internal readonly ReadOnlySpan<T> input;
 
-	readonly Decoder<T> DecodeFirstRune;
-	readonly Decoder<T> DecodeLastRune;
+	readonly Decoders<T> Decode;
 
 	int start = 0;
 	int end = 0;
-
-	bool begun = false;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal RuneTokenizer(ReadOnlySpan<T> input, Decoder<T> decodeFirstRune, Decoder<T> decodeLastRune)
+	internal RuneTokenizer(ReadOnlySpan<T> input, Decoders<T> decoders)
 	{
 		this.input = input;
-		this.DecodeFirstRune = decodeFirstRune;
-		this.DecodeLastRune = decodeLastRune;
+		this.Decode = decoders;
 	}
 
 	/// <summary>
@@ -50,15 +65,13 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// <returns>Whether there are any more runes. False typically means EOF.</returns>
 	public bool MoveNext()
 	{
-		begun = true;
-
 		if (!Any())
 		{
 			start = end;
 			return false;
 		}
 
-		var status = DecodeFirstRune(input[end..], out _, out int consumed);
+		var status = Decode.FirstRune(input[end..], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
@@ -70,7 +83,7 @@ public ref struct RuneTokenizer<T> where T : struct
 		return true;
 	}
 
-	internal bool Any()
+	internal readonly bool Any()
 	{
 		return end < input.Length;
 	}
@@ -83,12 +96,11 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		if (start == 0)
 		{
-			begun = false;
 			end = start;
 			return false;
 		}
 
-		var status = DecodeLastRune(input[..start], out _, out int consumed);
+		var status = Decode.LastRune(input[..start], out _, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
@@ -104,12 +116,12 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// <summary>
 	/// The current rune
 	/// </summary>
-	public readonly Rune Current
+	public readonly int Current
 	{
 		get
 		{
-			DecodeLastRune(input[start..end], out Rune rune, out int _);
-			return rune;
+			Decode.LastRune(input[start..end], out Rune rune, out int _);
+			return rune.Value;
 		}
 	}
 
@@ -138,30 +150,15 @@ public ref struct RuneTokenizer<T> where T : struct
 	public void Reset()
 	{
 		this.end = 0;
-		this.begun = false;
-	}
-
-	/// <summary>
-	/// (Re)sets the text to be tokenized, and resets the iterator back to the the start.
-	/// </summary>
-	public void SetText(ReadOnlySpan<T> input)
-	{
-		Reset();
-		this.input = input;
 	}
 
 	/// <summary>
 	/// Iterates over all runes and collects them into a list, allocating a new array for each token.
 	/// </summary>
 	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
-	public List<Rune> ToList()
+	public List<int> ToList()
 	{
-		if (begun)
-		{
-			throw new InvalidOperationException("ToList must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
-		}
-
-		var result = new List<Rune>();
+		var result = new List<int>();
 		while (MoveNext())
 		{
 			result.Add(Current);
@@ -175,13 +172,8 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// Iterates over all runes and collects them into an array, allocating a new array for each token.
 	/// </summary>
 	/// <returns>byte[][] or char[][], depending on the input</returns>
-	public Rune[] ToArray()
+	public int[] ToArray()
 	{
-		if (begun)
-		{
-			throw new InvalidOperationException("ToArray must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
-		}
-
 		return this.ToList().ToArray();
 	}
 }

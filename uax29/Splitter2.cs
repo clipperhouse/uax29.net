@@ -40,7 +40,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
         {
             while (runes.MovePrevious())
             {
-                var lookup = Dict.Lookup(runes.Current.Value);
+                var lookup = Dict.Lookup(runes.Current);
 
                 if (lookup.Is(Ignore))
                 {
@@ -58,7 +58,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
 
         while (runes.MovePrevious())
         {
-            var lookup = Dict.Lookup(runes.Current.Value);
+            var lookup = Dict.Lookup(runes.Current);
 
             if (lookup.Is(Ignore))
             {
@@ -92,7 +92,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
         {
             while (runes.MoveNext())
             {
-                var lookup = Dict.Lookup(runes.Current.Value);
+                var lookup = Dict.Lookup(runes.Current);
 
                 if (lookup.Is(Ignore))
                 {
@@ -110,7 +110,7 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
 
         while (runes.MoveNext())
         {
-            var lookup = Dict.Lookup(runes.Current.Value);
+            var lookup = Dict.Lookup(runes.Current);
 
             if (lookup.Is(Ignore))
             {

@@ -24,7 +24,7 @@ public class TestSplitter2
     {
         var words = Tokenizer.GetWords(example).ToArray();
 
-        var runes = new RuneTokenizer<char>(example, Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16);
+        var runes = RuneTokenizer.Create(example);
 
         var splitter = new Words.Splitter2<char>();
         var start = 0;
