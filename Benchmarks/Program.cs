@@ -36,6 +36,16 @@ public class Benchmark
 	}
 
 	[Benchmark]
+	public void Tokenize2Bytes()
+	{
+		var tokens = Tokenizer2.GetWords(sample);
+		foreach (var token in tokens)
+		{
+		}
+	}
+
+
+	// [Benchmark]
 	public void TokenizeString()
 	{
 		var tokens = Tokenizer.GetWords(sampleStr);
@@ -45,7 +55,7 @@ public class Benchmark
 	}
 
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
@@ -55,7 +65,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizeSetStream()
 	{
 		// This is to test to observe allocations.
@@ -76,7 +86,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void StringInfoGraphemes()
 	{
 		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
@@ -85,7 +95,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizerGraphemes()
 	{
 		var tokens = Tokenizer.GetGraphemes(sample);
