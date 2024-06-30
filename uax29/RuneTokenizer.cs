@@ -71,12 +71,15 @@ public ref struct RuneTokenizer<T> where T : struct
 			return false;
 		}
 
-		var status = Decode.FirstRune(input[end..], out _, out int consumed);
+		var status = Decode.FirstRune(input[end..], out Rune rune, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
 			throw new InvalidOperationException("Rune could not be decoded");
 		}
+
+		this.rune = rune.Value;
+		this.width = consumed;
 
 		start = end;
 		end += consumed;
@@ -100,18 +103,23 @@ public ref struct RuneTokenizer<T> where T : struct
 			return false;
 		}
 
-		var status = Decode.LastRune(input[..start], out _, out int consumed);
+		var status = Decode.LastRune(input[..start], out Rune rune, out int consumed);
 		if (status != OperationStatus.Done)
 		{
 			// Garbage in, garbage out
 			throw new InvalidOperationException("Rune could not be decoded");
 		}
 
+		this.rune = rune.Value;
+		this.width = consumed;
+
 		end = start;
 		start -= consumed;
 
 		return true;
 	}
+
+	int rune;
 
 	/// <summary>
 	/// The current rune
@@ -120,16 +128,17 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		get
 		{
-			Decode.LastRune(input[start..end], out Rune rune, out int _);
-			return rune.Value;
+			return this.rune;
 		}
 	}
+
+	int width;
 
 	public readonly int CurrentWidth
 	{
 		get
 		{
-			return end - start;
+			return this.width;
 		}
 	}
 
@@ -137,6 +146,8 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		start += consumed;
 		end = start;
+		this.rune = 0;
+		this.width = 0;
 	}
 
 	// public readonly RuneTokenizer<T> GetEnumerator()
