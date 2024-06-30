@@ -84,30 +84,9 @@ internal abstract class SplitterBase2<TSpan> where TSpan : struct
     /// <param name="runes">Data in which to seek</param>
     /// <param name="intermediate">Optional, Property which needs to be found before finding seek</param>
     /// <returns>True if found, otherwise false</returns>
-    internal bool Subsequent(Property seek, RuneTokenizer<TSpan> runes, Property intermediate = 0)
+    internal bool Subsequent(Property seek, RuneTokenizer<TSpan> runes)
     {
         // N.B: runes is passed by value, i.e. is a copy, so navigating here does not affect the caller
-
-        if (intermediate != 0)
-        {
-            while (runes.MoveNext())
-            {
-                var lookup = Dict.Lookup(runes.Current);
-
-                if (lookup.Is(Ignore))
-                {
-                    continue;
-                }
-
-                if (!lookup.Is(intermediate))
-                {
-                    return false;
-                }
-
-                break;
-            }
-        }
-
         while (runes.MoveNext())
         {
             var lookup = Dict.Lookup(runes.Current);
