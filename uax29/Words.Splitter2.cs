@@ -23,13 +23,15 @@ internal static partial class Words
             // These vars are stateful across loop iterations
             int pos = 0;
             Property current = 0;
-            Property lastExIgnore = 0;  // "last excluding ignored categories"
+            Property lastExIgnore = 0;      // "last excluding ignored categories"
+            Property lastLastExIgnore = 0;  // "last one before that"
 
             while (runes.MoveNext())
             {
                 var last = current;
                 if (!last.Is(Ignore))
                 {
+                    lastLastExIgnore = lastExIgnore;
                     lastExIgnore = last;
                 }
 
@@ -111,17 +113,11 @@ internal static partial class Words
                     }
                 }
 
-                // Optimization: determine if WB7 can possibly apply
-                var maybeWB7 = current.Is(AHLetter) && lastExIgnore.Is(MidLetter | MidNumLetQ);
-
                 // https://unicode.org/reports/tr29/#WB7
-                if (maybeWB7)
+                if (current.Is(AHLetter) && lastExIgnore.Is(MidLetter | MidNumLetQ) && lastLastExIgnore.Is(AHLetter))
                 {
-                    if (Previous(AHLetter, runes, MidLetter | MidNumLetQ))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB7a
@@ -144,17 +140,11 @@ internal static partial class Words
                     }
                 }
 
-                // Optimization: determine if WB7c can possibly apply
-                var maybeWB7c = current.Is(Hebrew_Letter) && lastExIgnore.Is(Double_Quote);
-
                 // https://unicode.org/reports/tr29/#WB7c
-                if (maybeWB7c)
+                if (current.Is(Hebrew_Letter) && lastExIgnore.Is(Double_Quote) && lastLastExIgnore.Is(Hebrew_Letter))
                 {
-                    if (Previous(Hebrew_Letter, runes, Double_Quote))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB8
@@ -166,17 +156,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB11 can possibly apply
-                var maybeWB11 = current.Is(Numeric) && lastExIgnore.Is(MidNum | MidNumLetQ);
-
                 // https://unicode.org/reports/tr29/#WB11
-                if (maybeWB11)
+                if (current.Is(Numeric) && lastExIgnore.Is(MidNum | MidNumLetQ) && lastLastExIgnore.Is(Numeric))
                 {
-                    if (Previous(Numeric, runes, MidNum | MidNumLetQ))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if WB12 can possibly apply
