@@ -1,7 +1,10 @@
 using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
+
 using UAX29;
 
 var summary = BenchmarkRunner.Run<Benchmark>();
@@ -11,9 +14,22 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 // var throughput = benchmark.Throughput();
 // Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
-[MemoryDiagnoser]
+
+// [MemoryDiagnoser]
+// [Config(typeof(Config))]
 public class Benchmark
 {
+	private class Config : ManualConfig
+	{
+		public Config()
+		{
+			AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
+			// You can also use other profilers like:
+			// AddDiagnoser(new EtwProfiler());
+			// AddDiagnoser(new PerfCollectProfiler()); // for Linux
+		}
+	}
+
 	static byte[] sample = [];
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
