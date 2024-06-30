@@ -25,6 +25,7 @@ internal static partial class Words
             Property current = 0;
             Property lastExIgnore = 0;      // "last excluding ignored categories"
             Property lastLastExIgnore = 0;  // "last one before that"
+            int regionalIndicatorCount = 0;
 
             while (runes.MoveNext())
             {
@@ -200,39 +201,13 @@ internal static partial class Words
                 // Optimization: determine if WB15 or WB16 can possibly apply
                 var maybeWB1516 = current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator);
 
-                // https://unicode.org/reports/tr29/#WB15 and
+                // https://unicode.org/reports/tr29/#WB15
                 // https://unicode.org/reports/tr29/#WB16
                 if (maybeWB1516)
                 {
-                    // WB15: Odd number of RI before hitting start of text
-                    // WB16: Odd number of RI before hitting [^RI], aka "not RI"
+                    regionalIndicatorCount++;
 
-                    var count = 0;
-
-                    var runes2 = runes; // shallow copy
-                    while (runes2.MovePrevious())
-                    {
-                        var rune2 = runes2.Current;
-                        var lookup = Dict.Lookup(rune2);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Regional_Indicator))
-                        {
-                            // It's WB16
-                            break;
-                        }
-
-                        count++;
-                    }
-
-                    // If i == 0, we fell through and hit sot (start of text), so WB15 applies
-                    // If i > 0, we hit a non-RI, so WB16 applies
-
-                    var odd = count % 2 == 1;
+                    var odd = regionalIndicatorCount % 2 == 1;
                     if (odd)
                     {
                         pos += w;
