@@ -89,6 +89,31 @@ internal static partial class Words
                 // https://unicode.org/reports/tr29/#WB5
                 if (current.Is(AHLetter) && last.Is(AHLetter | Ignore))
                 {
+                    // Optimization: maybe a run without ignored characters
+                    if (last.Is(AHLetter))
+                    {
+                        pos += w;
+
+                        var runes2 = runes; // shallow copy
+                        while (runes2.MoveNext())
+                        {
+                            var lookup = Dict.Lookup(runes2.Current);
+
+                            if (!lookup.Is(AHLetter))
+                            {
+                                break;
+                            }
+
+                            // Update stateful vars
+                            runes.MoveNext();
+                            current = lookup;
+                            w = runes2.CurrentWidth;
+
+                            pos += w;
+                        }
+                        continue;
+                    }
+
                     // Otherwise, do proper look back per WB4
                     if (Previous(AHLetter, runes))
                     {
