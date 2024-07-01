@@ -1,7 +1,10 @@
 using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
+
 using UAX29;
 
 var summary = BenchmarkRunner.Run<Benchmark>();
@@ -11,9 +14,22 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 // var throughput = benchmark.Throughput();
 // Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
-[MemoryDiagnoser]
+
+// [MemoryDiagnoser]
+// [Config(typeof(Config))]
 public class Benchmark
 {
+	private class Config : ManualConfig
+	{
+		public Config()
+		{
+			AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
+			// You can also use other profilers like:
+			// AddDiagnoser(new EtwProfiler());
+			// AddDiagnoser(new PerfCollectProfiler()); // for Linux
+		}
+	}
+
 	static byte[] sample = [];
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
@@ -36,6 +52,16 @@ public class Benchmark
 	}
 
 	[Benchmark]
+	public void Tokenize2Bytes()
+	{
+		var tokens = Tokenizer2.GetWords(sample);
+		foreach (var token in tokens)
+		{
+		}
+	}
+
+
+	// [Benchmark]
 	public void TokenizeString()
 	{
 		var tokens = Tokenizer.GetWords(sampleStr);
@@ -45,7 +71,7 @@ public class Benchmark
 	}
 
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
@@ -55,7 +81,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizeSetStream()
 	{
 		// This is to test to observe allocations.
@@ -76,7 +102,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void StringInfoGraphemes()
 	{
 		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
@@ -85,7 +111,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizerGraphemes()
 	{
 		var tokens = Tokenizer.GetGraphemes(sample);

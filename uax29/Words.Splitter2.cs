@@ -1,58 +1,41 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
-using System.Text;
-
 /// A bitmap of Unicode categories
 using Property = uint;
 
 internal static partial class Words
 {
-    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
-    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
+    internal static readonly Split2<byte> Split2Utf8Bytes = new Splitter2<byte>().Split;
+    internal static readonly Split2<char> Split2Chars = new Splitter2<char>().Split;
 
-    internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
+    internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
     {
-        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
-        { }
+        internal Splitter2() : base(Words.Dict, Ignore) { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
         new const Property Ignore = Extend | Format | ZWJ;
 
-        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal override int Split(RuneTokenizer<TSpan> runes, bool atEOF = true)
         {
-            if (input.Length == 0)
-            {
-                return 0;
-            }
-
             // These vars are stateful across loop iterations
             int pos = 0;
-            int w;
             Property current = 0;
             Property lastExIgnore = 0;      // "last excluding ignored categories"
-            Property lastLastExIgnore = 0;  // "the last one before that"
+            Property lastLastExIgnore = 0;  // "last one before that"
             int regionalIndicatorCount = 0;
 
-            while (true)
+            // https://unicode.org/reports/tr29/#WB1
+            if (runes.MoveNext())
             {
-                var sot = pos == 0;             // "start of text"
-                var eot = pos == input.Length;   // "end of text"
+                // start of text always advances
+                var rune = runes.Current;
+                current = Dict.Lookup(rune);
+                pos += runes.CurrentWidth;
+            }
 
-                if (eot)
-                {
-                    if (!atEOF)
-                    {
-                        // TODO Token extends past current data, request more
-                        return 0;
-                    }
-
-                    // https://unicode.org/reports/tr29/#WB2
-                    break;
-                }
-
+            while (runes.MoveNext())
+            {
                 var last = current;
                 if (!last.Is(Ignore))
                 {
@@ -60,33 +43,9 @@ internal static partial class Words
                     lastExIgnore = last;
                 }
 
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    break;
-                }
-                if (w == 0)
-                {
-                    if (atEOF)
-                    {
-                        // Just return the bytes, we can't do anything with them
-                        pos = input.Length;
-                        break;
-                    }
-                    // Rune extends past current data, request more
-                    return 0;
-                }
-
-                current = Dict.Lookup(rune.Value);
-
-                // https://unicode.org/reports/tr29/#WB1
-                if (sot)
-                {
-                    pos += w;
-                    continue;
-                }
+                var rune = runes.Current;
+                var w = runes.CurrentWidth;
+                current = Dict.Lookup(rune);
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -140,17 +99,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB6 can possibly apply
-                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter);
-
                 // https://unicode.org/reports/tr29/#WB6
-                if (maybeWB6)
+                if (current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter) && Subsequent(AHLetter, runes))
                 {
-                    if (Subsequent(AHLetter, input[(pos + w)..]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB7
@@ -167,17 +120,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB7b can possibly apply
-                var maybeWB7b = current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter);
-
                 // https://unicode.org/reports/tr29/#WB7b
-                if (maybeWB7b)
+                if (current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter) && Subsequent(Hebrew_Letter, runes))
                 {
-                    if (Subsequent(Hebrew_Letter, input[(pos + w)..]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB7c
@@ -203,21 +150,15 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB12 can possibly apply
-                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric);
-
                 // https://unicode.org/reports/tr29/#WB12
-                if (maybeWB12)
+                if (current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric) && Subsequent(Numeric, runes))
                 {
-                    if (Subsequent(Numeric, input[(pos + w)..]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB13
-                if (current.Is(Katakana) && lastExIgnore.Is(Katakana | Ignore))
+                if (current.Is(Katakana) && lastExIgnore.Is(Katakana))
                 {
                     pos += w;
                     continue;
@@ -237,7 +178,6 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB15 or WB16 can possibly apply
                 var maybeWB1516 = current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator);
 
                 // https://unicode.org/reports/tr29/#WB15
