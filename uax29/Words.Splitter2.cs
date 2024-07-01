@@ -10,9 +10,7 @@ internal static partial class Words
 
     internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
     {
-        internal Splitter2() :
-            base(Words.Dict, Ignore)
-        { }
+        internal Splitter2() : base(Words.Dict, Ignore) { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;

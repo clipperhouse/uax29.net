@@ -10,9 +10,7 @@ internal static partial class Graphemes
 
     internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
     {
-        internal Splitter2() :
-            base(Graphemes.Dict, Ignore)
-        { }
+        internal Splitter2() : base(Graphemes.Dict, Ignore) { }
 
         new const Property Ignore = Extend;
 
