@@ -101,17 +101,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB6 can possibly apply
-                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter);
-
                 // https://unicode.org/reports/tr29/#WB6
-                if (maybeWB6)
+                if (current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter) && Subsequent(AHLetter, runes))
                 {
-                    if (Subsequent(AHLetter, runes))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB7
@@ -128,17 +122,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB7b can possibly apply
-                var maybeWB7b = current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter);
-
                 // https://unicode.org/reports/tr29/#WB7b
-                if (maybeWB7b)
+                if (current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter) && Subsequent(Hebrew_Letter, runes))
                 {
-                    if (Subsequent(Hebrew_Letter, runes))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB7c
@@ -164,17 +152,11 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB12 can possibly apply
-                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric);
-
                 // https://unicode.org/reports/tr29/#WB12
-                if (maybeWB12)
+                if (current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric) && Subsequent(Numeric, runes))
                 {
-                    if (Subsequent(Numeric, runes))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB13
@@ -198,7 +180,6 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB15 or WB16 can possibly apply
                 var maybeWB1516 = current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator);
 
                 // https://unicode.org/reports/tr29/#WB15
