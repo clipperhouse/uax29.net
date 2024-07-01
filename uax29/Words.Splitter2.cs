@@ -27,6 +27,15 @@ internal static partial class Words
             Property lastLastExIgnore = 0;  // "last one before that"
             int regionalIndicatorCount = 0;
 
+            // https://unicode.org/reports/tr29/#WB1
+            if (runes.MoveNext())
+            {
+                // start of text always advances
+                var rune = runes.Current;
+                current = Dict.Lookup(rune);
+                pos += runes.CurrentWidth;
+            }
+
             while (runes.MoveNext())
             {
                 var last = current;
@@ -39,15 +48,6 @@ internal static partial class Words
                 var rune = runes.Current;
                 var w = runes.CurrentWidth;
                 current = Dict.Lookup(rune);
-
-                var sot = pos == 0;             // "start of text"
-
-                // https://unicode.org/reports/tr29/#WB1
-                if (sot)
-                {
-                    pos += w;
-                    continue;
-                }
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
