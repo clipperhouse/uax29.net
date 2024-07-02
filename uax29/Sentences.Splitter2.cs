@@ -97,31 +97,35 @@ internal static partial class Sentences
 
                     // ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
                     // Zero or more of not-the-above properties; consume them
-                    while (runesRight.MoveNext())
+                    while (runesRight.Any())
                     {
                         var lookup = Dict.Lookup(runesRight.Current);
 
-                        if (!lookup.Is(OLetter | Upper | Lower | ParaSep | SATerm))
+                        if (lookup.Is(Ignore))
                         {
+                            runesRight.MoveNext();
                             continue;
                         }
 
-                        // un-consume it
-                        runesRight.MovePrevious();
+                        if (!lookup.Is(OLetter | Upper | Lower | ParaSep | SATerm))
+                        {
+                            runesRight.MoveNext();
+                            continue;
+                        }
+
                         break;
                     }
 
                     // Skip the Ignore
-                    while (runesRight.MoveNext())
+                    while (runesRight.Any())
                     {
                         var lookup = Dict.Lookup(runesRight.Current);
                         if (lookup.Is(Ignore))
                         {
+                            runesRight.MoveNext();
                             continue;
                         }
 
-                        // un-consume it
-                        runesRight.MovePrevious();
                         break;
                     }
 
