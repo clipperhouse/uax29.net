@@ -9,7 +9,7 @@ namespace UAX29;
 /// <param name="input">The string to split/tokenize.</param>
 /// <param name="atEOF">The split may need to know if further data to be expected, such as from a stream.</param>
 /// <returns>How many bytes/chars were consumed from the input.</returns>
-internal delegate int Split2<T>(RuneTokenizer<T> input, bool atEOF = true) where T : struct;
+internal delegate int Split2<T>(RuneTokenizer<T> input) where T : struct;
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.

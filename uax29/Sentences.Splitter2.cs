@@ -9,7 +9,7 @@ internal static partial class Sentences
     const Property ParaSep = Sep | CR | LF;
     const Property Ignore = Extend | Format;
 
-    internal static int Split<TSpan>(RuneTokenizer<TSpan> runes, bool atEOF = true) where TSpan : struct
+    internal static int Split<TSpan>(RuneTokenizer<TSpan> runes) where TSpan : struct
     {
         // These vars are stateful across loop iterations
         int pos = 0;

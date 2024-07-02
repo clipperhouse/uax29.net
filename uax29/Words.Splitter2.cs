@@ -9,7 +9,7 @@ internal static partial class Words
     const Property MidNumLetQ = MidNumLet | Single_Quote;
     const Property Ignore = Extend | Format | ZWJ;
 
-    internal static int Split<TSpan>(RuneTokenizer<TSpan> runes, bool atEOF = true) where TSpan : struct
+    internal static int Split<TSpan>(RuneTokenizer<TSpan> runes) where TSpan : struct
     {
         // These vars are stateful across loop iterations
         int pos = 0;
