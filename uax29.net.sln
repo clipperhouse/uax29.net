@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uax29", "uax29\uax29.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codegen", "Codegen\Codegen.csproj", "{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profile", "Profile\Profile.csproj", "{C12C3FC4-06EA-4573-B469-C34E28286F93}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C12C3FC4-06EA-4573-B469-C34E28286F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C12C3FC4-06EA-4573-B469-C34E28286F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C12C3FC4-06EA-4573-B469-C34E28286F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C12C3FC4-06EA-4573-B469-C34E28286F93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
