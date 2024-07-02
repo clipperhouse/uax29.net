@@ -23,6 +23,8 @@ internal static partial class Sentences
             Property current = 0;
             Property lastExIgnore = 0;      // "last excluding ignored categories"
             Property lastLastExIgnore = 0;  // "last one before that"
+            Property lastExIgnoreSp = 0;
+            Property lastExIgnoreSpClose = 0;
 
             // https://unicode.org/reports/tr29/#SB1
             if (runes.MoveNext())
@@ -40,6 +42,16 @@ internal static partial class Sentences
                 {
                     lastLastExIgnore = lastExIgnore;
                     lastExIgnore = last;
+                }
+
+                if (!lastExIgnore.Is(Sp))
+                {
+                    lastExIgnoreSp = lastExIgnore;
+                }
+
+                if (!lastExIgnoreSp.Is(Close))
+                {
+                    lastExIgnoreSpClose = lastExIgnoreSp;
                 }
 
                 var rune = runes.Current;
@@ -88,7 +100,7 @@ internal static partial class Sentences
                 }
 
                 // Optimization: determine if SB8 can possibly apply
-                var maybeSB8 = lastExIgnore.Is(ATerm | Close | Sp);
+                var maybeSB8 = lastExIgnoreSpClose.Is(ATerm);
 
                 // https://unicode.org/reports/tr29/#SB8
                 if (maybeSB8)
@@ -132,126 +144,19 @@ internal static partial class Sentences
                     // Followed by a Lower
                     {
                         var lookup = Dict.Lookup(runesRight.Current);
-                        if (!lookup.Is(Lower))
-                        {
-                            // If we get here, SB8 doesn't apply
-                            goto exitSB8;
-                        }
-                    }
-
-                    // Start looking back
-                    var runesLeft = runes;
-
-                    // Zero or more Sp
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (lookup.Is(Sp))
-                        {
-                            continue;
-                        }
-
-                        // un-consume the rune
-                        runesLeft.MoveNext();
-                        break;
-                    }
-
-                    // Zero or more Close
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (lookup.Is(Close))
-                        {
-                            continue;
-                        }
-
-                        // un-consume the rune
-                        runesLeft.MoveNext();
-                        break;
-                    }
-
-                    // Having looked back past Sp's, Close's, and intervening Ignore,
-                    // is there an ATerm?
-                    if (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-                        if (lookup.Is(ATerm))
+                        if (lookup.Is(Lower))
                         {
                             pos += w;
                             continue;
                         }
                     }
                 }
-            exitSB8:
-
-                // Optimization: determine if SB8a can possibly apply
-                var maybeSB8a = current.Is(SContinue | SATerm) && lastExIgnore.Is(SATerm | Close | Sp);
 
                 // https://unicode.org/reports/tr29/#SB8a
-                if (maybeSB8a)
+                if (current.Is(SContinue | SATerm) && lastExIgnoreSpClose.Is(SATerm))
                 {
-                    // Start looking back
-                    var runesLeft = runes;
-
-                    // Zero or more Sp
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Sp))
-                        {
-                            // un-consume the rune
-                            runesLeft.MoveNext();
-                            break;
-                        }
-                    }
-
-                    // Zero or more Close
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Close))
-                        {
-                            // un-consume the rune
-                            runesLeft.MoveNext();
-                            break;
-                        }
-                    }
-
-                    // Having looked back past Sp's, Close's, and intervening Ignore,
-                    // is there an SATerm?
-                    if (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-                        if (lookup.Is(SATerm))
-                        {
-                            pos += w;
-                            continue;
-                        }
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if SB9 can possibly apply
@@ -296,63 +201,11 @@ internal static partial class Sentences
                     }
                 }
 
-
-                // Optimization: determine if SB8a can possibly apply
-                var maybeSB10 = current.Is(Sp | ParaSep) && lastExIgnore.Is(SATerm | Close | Sp);
-
                 // https://unicode.org/reports/tr29/#SB8a
-                if (maybeSB10)
+                if (current.Is(Sp | ParaSep) && lastExIgnoreSpClose.Is(SATerm))
                 {
-                    // Start looking back
-                    var runesLeft = runes;
-
-                    // Zero or more Sp
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Sp))
-                        {
-                            // un-consume the rune
-                            runesLeft.MoveNext();
-                            break;
-                        }
-                    }
-
-                    // Zero or more Close
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Close))
-                        {
-                            // un-consume the rune
-                            runesLeft.MoveNext();
-                            break;
-                        }
-                    }
-
-                    // Having looked back past Sp's, Close's, and intervening Ignore,
-                    // is there an SATerm?
-                    if (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-                        if (lookup.Is(SATerm))
-                        {
-                            pos += w;
-                            continue;
-                        }
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 var maybeSB11 = lastExIgnore.Is(SATerm | Close | Sp | ParaSep);
