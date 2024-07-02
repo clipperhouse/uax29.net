@@ -3,6 +3,9 @@ using System.Text;
 
 namespace UAX29;
 
+/// A bitmap of Unicode categories
+using Property = uint;
+
 internal static class RuneTokenizer
 {
 	internal static RuneTokenizer<char> Create(ReadOnlySpan<char> input)
@@ -187,4 +190,38 @@ public ref struct RuneTokenizer<T> where T : struct
 	{
 		return this.ToList().ToArray();
 	}
+}
+
+internal static class RuneExtensions
+{
+	/// <summary>
+	/// Seek backward until it hits a rune which matches the seek parameter.
+	/// </summary>
+	/// <param name="seek">Property to attempt to find</param>
+	/// <param name="runes">Data in which to seek</param>
+	/// <param name="intermediate">Optional, Property which needs to be found before finding seek</param>
+	/// <returns>True if found, otherwise false</returns>
+	internal static bool Subsequent<TSpan>(this RuneTokenizer<TSpan> runes, Property seek, Dict Dict, Property Ignore) where TSpan : struct
+	{
+		// N.B: runes is passed by value, i.e. is a copy, so navigating here does not affect the caller
+		while (runes.MoveNext())
+		{
+			var lookup = Dict.Lookup(runes.Current);
+
+			if (lookup.Is(Ignore))
+			{
+				continue;
+			}
+
+			if (lookup.Is(seek))
+			{
+				return true;
+			}
+
+			break;
+		}
+
+		return false;
+	}
+
 }

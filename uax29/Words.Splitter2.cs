@@ -5,18 +5,16 @@ using Property = uint;
 
 internal static partial class Words
 {
-    internal static readonly Split2<byte> Split2Utf8Bytes = new Splitter2<byte>().Split;
-    internal static readonly Split2<char> Split2Chars = new Splitter2<char>().Split;
+    internal static readonly Split2<byte> Split2Utf8Bytes = Splitter2<byte>.Split;
+    internal static readonly Split2<char> Split2Chars = Splitter2<char>.Split;
 
-    internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
+    internal static class Splitter2<TSpan> where TSpan : struct
     {
-        internal Splitter2() : base(Words.Dict, Ignore) { }
-
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
-        new const Property Ignore = Extend | Format | ZWJ;
+        const Property Ignore = Extend | Format | ZWJ;
 
-        internal override int Split(RuneTokenizer<TSpan> runes, bool atEOF = true)
+        internal static int Split(RuneTokenizer<TSpan> runes, bool atEOF = true)
         {
             // These vars are stateful across loop iterations
             int pos = 0;
@@ -30,7 +28,7 @@ internal static partial class Words
             {
                 // start of text always advances
                 var rune = runes.Current;
-                current = Dict.Lookup(rune);
+                current = Words.Dict.Lookup(rune);
                 pos += runes.CurrentWidth;
             }
 
@@ -45,7 +43,7 @@ internal static partial class Words
 
                 var rune = runes.Current;
                 var w = runes.CurrentWidth;
-                current = Dict.Lookup(rune);
+                current = Words.Dict.Lookup(rune);
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -100,7 +98,7 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB6
-                if (current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter) && Subsequent(AHLetter, runes))
+                if (current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter) && runes.Subsequent(AHLetter, Dict, Ignore))
                 {
                     pos += w;
                     continue;
@@ -121,7 +119,7 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB7b
-                if (current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter) && Subsequent(Hebrew_Letter, runes))
+                if (current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter) && runes.Subsequent(Hebrew_Letter, Dict, Ignore))
                 {
                     pos += w;
                     continue;
@@ -151,7 +149,7 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB12
-                if (current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric) && Subsequent(Numeric, runes))
+                if (current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric) && runes.Subsequent(Numeric, Dict, Ignore))
                 {
                     pos += w;
                     continue;

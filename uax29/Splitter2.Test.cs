@@ -20,42 +20,8 @@ public class TestSplitter2
     }
 
     [Test]
-    public void Hmm()
-    {
-        var words = Tokenizer.GetWords(example).ToArray();
-
-        var runes = RuneTokenizer.Create(example);
-
-        var splitter = new Words.Splitter2<char>();
-        var start = 0;
-        var end = 0;
-
-        var i = 0;
-        while (true)
-        {
-            var advance = splitter.Split(runes);
-            if (advance == 0)
-            {
-                break;
-            }
-
-            start = end;
-            end += advance;
-
-            var got = example[start..end];
-            var expected = words[i];
-
-            Assert.That(got, Is.EqualTo(expected));
-            runes.Consume(advance);
-
-            i++;
-        }
-    }
-
-    [Test]
     public void Static()
     {
-        var example = Encoding.UTF8.GetBytes(this.example);
         var words = Tokenizer.GetWords(this.example).ToArray();
         var words2 = Tokenizer2.GetWords(this.example).ToArray();
 
