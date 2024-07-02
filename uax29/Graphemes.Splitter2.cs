@@ -5,16 +5,14 @@ using Property = uint;
 
 internal static partial class Graphemes
 {
-    internal static readonly Split2<byte> Split2Utf8Bytes = new Splitter2<byte>().Split;
-    internal static readonly Split2<char> Split2Chars = new Splitter2<char>().Split;
+    internal static readonly Split2<byte> Split2Utf8Bytes = Splitter2<byte>.Split;
+    internal static readonly Split2<char> Split2Chars = Splitter2<char>.Split;
 
-    internal sealed class Splitter2<TSpan> : SplitterBase2<TSpan> where TSpan : struct
+    internal static class Splitter2<TSpan> where TSpan : struct
     {
-        internal Splitter2() : base(Graphemes.Dict, Ignore) { }
+        const Property Ignore = Extend;
 
-        new const Property Ignore = Extend;
-
-        internal override int Split(RuneTokenizer<TSpan> runes, bool atEOF = true)
+        internal static int Split(RuneTokenizer<TSpan> runes, bool atEOF = true)
         {
             // These vars are stateful across loop iterations
             int pos = 0;
