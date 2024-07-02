@@ -12,7 +12,7 @@ public static partial class Tokenizer2
     public static Tokenizer2<byte> GetWords(byte[] input)
     {
         var runes = RuneTokenizer.Create(input);
-        return new Tokenizer2<byte>(runes, Words.Split2Utf8Bytes);
+        return new Tokenizer2<byte>(runes, Words.Split);
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public static partial class Tokenizer2
     public static Tokenizer2<byte> GetWords(ReadOnlySpan<byte> input)
     {
         var runes = RuneTokenizer.Create(input);
-        return new Tokenizer2<byte>(runes, Words.Split2Utf8Bytes);
+        return new Tokenizer2<byte>(runes, Words.Split);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public static partial class Tokenizer2
     public static Tokenizer2<byte> GetWords(ReadOnlyMemory<byte> input)
     {
         var runes = RuneTokenizer.Create(input.Span);
-        return new Tokenizer2<byte>(runes, Words.Split2Utf8Bytes);
+        return new Tokenizer2<byte>(runes, Words.Split);
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public static partial class Tokenizer2
     public static Tokenizer2<char> GetWords(ReadOnlySpan<char> input)
     {
         var runes = RuneTokenizer.Create(input);
-        return new Tokenizer2<char>(runes, Words.Split2Chars);
+        return new Tokenizer2<char>(runes, Words.Split);
     }
 
     /// <summary>
@@ -64,6 +64,6 @@ public static partial class Tokenizer2
     public static Tokenizer2<char> GetWords(ReadOnlyMemory<char> input)
     {
         var runes = RuneTokenizer.Create(input.Span);
-        return new Tokenizer2<char>(runes, Words.Split2Chars);
+        return new Tokenizer2<char>(runes, Words.Split);
     }
 }
