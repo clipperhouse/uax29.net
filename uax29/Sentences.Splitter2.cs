@@ -24,6 +24,7 @@ internal static partial class Sentences
             Property lastExIgnore = 0;      // "last excluding ignored categories"
             Property lastLastExIgnore = 0;  // "last one before that"
             Property lastExIgnoreSp = 0;
+            Property lastExIgnoreClose = 0;
             Property lastExIgnoreSpClose = 0;
 
             // https://unicode.org/reports/tr29/#SB1
@@ -47,6 +48,11 @@ internal static partial class Sentences
                 if (!lastExIgnore.Is(Sp))
                 {
                     lastExIgnoreSp = lastExIgnore;
+                }
+
+                if (!lastExIgnore.Is(Close))
+                {
+                    lastExIgnoreClose = lastExIgnore;
                 }
 
                 if (!lastExIgnoreSp.Is(Close))
@@ -159,46 +165,11 @@ internal static partial class Sentences
                     continue;
                 }
 
-                // Optimization: determine if SB9 can possibly apply
-                var maybeSB9 = current.Is(Close | Sp | ParaSep) && lastExIgnore.Is(SATerm | Close);
-
                 // https://unicode.org/reports/tr29/#SB9
-                if (maybeSB9)
+                if (current.Is(Close | Sp | ParaSep) && lastExIgnoreClose.Is(SATerm))
                 {
-                    // Start looking back
-                    var runesLeft = runes;
-
-                    // Zero or more Close
-                    while (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (lookup.Is(Close))
-                        {
-                            continue;
-                        }
-
-                        // un-consume the rune
-                        runesLeft.MoveNext();
-                        break;
-                    }
-
-                    // Having looked back past Close's and intervening Ignore,
-                    // is there an SATerm?
-                    if (runesLeft.MovePrevious())
-                    {
-                        var lookup = Dict.Lookup(runesLeft.Current);
-                        if (lookup.Is(SATerm))
-                        {
-                            pos += w;
-                            continue;
-                        }
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#SB8a
