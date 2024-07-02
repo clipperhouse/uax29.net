@@ -30,7 +30,6 @@ internal static partial class Sentences
 
             // These vars are stateful across loop iterations
             var pos = 0;
-            var w = 0;
             Property current = 0;
 
             while (true)
@@ -62,7 +61,7 @@ internal static partial class Sentences
 
                 var last = current;
 
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = DecodeFirstRune(input[pos..], out Rune rune, out int w);
 
                 if (status != OperationStatus.Done)
                 {
@@ -123,7 +122,7 @@ internal static partial class Sentences
                 // The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
                 // Optimization: determine if SB6 can possibly apply
-                var maybeSB6 = (current.Is(Numeric) && last.Is(ATerm | Ignore));
+                var maybeSB6 = current.Is(Numeric) && last.Is(ATerm | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB6
                 if (maybeSB6)
