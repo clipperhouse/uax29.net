@@ -6,8 +6,6 @@ using System.Text;
 /// A bitmap of Unicode categories
 using Property = uint;
 
-internal delegate OperationStatus Decoder<TSpan>(ReadOnlySpan<TSpan> input, out Rune result, out int consumed);
-
 internal abstract class SplitterBase<TSpan>
 {
     readonly internal Dict Dict;
