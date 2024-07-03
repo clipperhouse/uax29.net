@@ -195,20 +195,20 @@ public ref struct RuneTokenizer<T> where T : struct
 internal static class RuneExtensions
 {
 	/// <summary>
-	/// Seek backward until it hits a rune which matches the seek parameter.
+	/// Seek forward until hitting a rune which matches the seek parameter.
 	/// </summary>
 	/// <param name="seek">Property to attempt to find</param>
-	/// <param name="runes">Data in which to seek</param>
-	/// <param name="intermediate">Optional, Property which needs to be found before finding seek</param>
+	/// <param name="dict">Dict for lookups</param>
+	/// <param name="ignore">Property to skip over</param>
 	/// <returns>True if found, otherwise false</returns>
-	internal static bool Subsequent<TSpan>(this RuneTokenizer<TSpan> runes, Property seek, Dict Dict, Property Ignore) where TSpan : struct
+	internal static bool Subsequent<TSpan>(this RuneTokenizer<TSpan> runes, Property seek, Dict dict, Property ignore) where TSpan : struct
 	{
 		// N.B: runes is passed by value, i.e. is a copy, so navigating here does not affect the caller
 		while (runes.MoveNext())
 		{
-			var lookup = Dict.Lookup(runes.Current);
+			var lookup = dict.Lookup(runes.Current);
 
-			if (lookup.Is(Ignore))
+			if (lookup.Is(ignore))
 			{
 				continue;
 			}
