@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
@@ -89,6 +90,20 @@ public class Benchmark
 		foreach (var token in tokens)
 		{
 		}
+	}
+
+	readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
+
+	[Benchmark]
+	public void Tokenize2StreamPool()
+	{
+		var stream = new MemoryStream(sample);
+		var storage = pool.Rent(2048);
+		var tokens = Tokenizer2.GetWords(stream, 1024, storage);
+		foreach (var token in tokens)
+		{
+		}
+		pool.Return(storage);
 	}
 
 	// [Benchmark]

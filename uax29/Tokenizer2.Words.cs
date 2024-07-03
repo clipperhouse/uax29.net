@@ -48,6 +48,19 @@ public static partial class Tokenizer2
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    public static Tokenizer2<char> GetWords(char[] input)
+    {
+        var runes = RuneTokenizer.Create(input);
+        return new Tokenizer2<char>(runes, Words.Split);
+    }
+
+    /// <summary>
+    /// Split the words in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+    /// </summary>
+    /// <param name="input">The chars to tokenize.</param>
+    /// <returns>
+    /// An enumerator of words. Use foreach (var word in words).
+    /// </returns>
     public static Tokenizer2<char> GetWords(ReadOnlySpan<char> input)
     {
         var runes = RuneTokenizer.Create(input);

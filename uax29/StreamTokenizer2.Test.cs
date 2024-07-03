@@ -1,5 +1,6 @@
 ﻿namespace Tests;
 
+using System.Buffers;
 using System.Text;
 using UAX29;
 
@@ -245,5 +246,43 @@ public class TestStreamTokenizer2
             threw = true;
         }
         Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
+    }
+
+    readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
+
+    [Test]
+    public void StreamArrayPool()
+    {
+        var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+        var examples = new List<string>()
+        {
+            example,											// smaller than the buffer
+			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
+		};
+
+        foreach (var input in examples)
+        {
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var staticTokens = Tokenizer2.GetWords(bytes);
+
+            using var stream = new MemoryStream(bytes);
+            var storage = pool.Rent(2048);
+            var streamTokens = Tokenizer2.GetWords(stream, 1024, bufferStorage: storage);
+
+            foreach (var streamToken in streamTokens)
+            {
+                staticTokens.MoveNext();
+
+                var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+                var streamCurrent = Encoding.UTF8.GetString(streamToken);
+
+                Assert.That(staticCurrent, Is.EqualTo(streamCurrent));
+            }
+
+            pool.Return(storage);
+
+            Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
+            Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
+        }
     }
 }

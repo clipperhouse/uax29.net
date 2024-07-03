@@ -48,6 +48,20 @@ public static partial class Tokenizer2
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    public static Tokenizer2<char> GetGraphemes(char[] input)
+    {
+        var runes = RuneTokenizer.Create(input);
+        return new Tokenizer2<char>(runes, Graphemes.Split);
+    }
+
+    /// <summary>
+    /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
+    /// </summary>
+    /// <param name="input">The chars to tokenize.</param>
+    /// <returns>
+    /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
+    /// </returns>
+    /// 
     public static Tokenizer2<char> GetGraphemes(ReadOnlySpan<char> input)
     {
         var runes = RuneTokenizer.Create(input);
