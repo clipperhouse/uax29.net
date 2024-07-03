@@ -8,15 +8,9 @@ using Property = uint;
 
 internal static class RuneTokenizer
 {
-	internal static RuneTokenizer<char> Create(ReadOnlySpan<char> input)
-	{
-		return new RuneTokenizer<char>(input, Decoders.Char);
-	}
+	internal static RuneTokenizer<char> Create(ReadOnlySpan<char> input) => new(input, Decoders.Char);
 
-	internal static RuneTokenizer<byte> Create(ReadOnlySpan<byte> input)
-	{
-		return new RuneTokenizer<byte>(input, Decoders.Utf8);
-	}
+	internal static RuneTokenizer<byte> Create(ReadOnlySpan<byte> input) => new(input, Decoders.Utf8);
 }
 
 /// <summary>

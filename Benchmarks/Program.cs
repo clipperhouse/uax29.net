@@ -71,11 +71,21 @@ public class Benchmark
 	}
 
 
-	// [Benchmark]
+	[Benchmark]
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
 		var tokens = Tokenizer.GetWords(stream);
+		foreach (var token in tokens)
+		{
+		}
+	}
+
+	[Benchmark]
+	public void Tokenize2Stream()
+	{
+		var stream = new MemoryStream(sample);
+		var tokens = Tokenizer2.GetWords(stream);
 		foreach (var token in tokens)
 		{
 		}
