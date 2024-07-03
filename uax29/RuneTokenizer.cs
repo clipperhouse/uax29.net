@@ -22,12 +22,12 @@ internal static class RuneTokenizer
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
-/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-public ref struct RuneTokenizer<T> where T : struct
+/// <typeparam name="TSpan">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
+public ref struct RuneTokenizer<TSpan> where TSpan : struct
 {
-	internal readonly ReadOnlySpan<T> input;
+	internal readonly ReadOnlySpan<TSpan> input;
 
-	readonly Decoders<T> Decode;
+	readonly Decoders<TSpan> Decode;
 
 	int start = 0;
 	int end = 0;
@@ -37,7 +37,7 @@ public ref struct RuneTokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal RuneTokenizer(ReadOnlySpan<T> input, Decoders<T> decoders)
+	internal RuneTokenizer(ReadOnlySpan<TSpan> input, Decoders<TSpan> decoders)
 	{
 		this.input = input;
 		this.Decode = decoders;
