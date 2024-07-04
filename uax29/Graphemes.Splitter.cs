@@ -2,6 +2,7 @@
 namespace UAX29;
 
 using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 /// A bitmap of Unicode categories
@@ -22,14 +23,12 @@ internal static partial class Graphemes
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
-            if (input.Length == 0)
-            {
-                return 0;
-            }
+            Debug.Assert(input.Length > 0);
 
             // These vars are stateful across loop iterations
             var pos = 0;
-            var w = 0;
+            int w;
+
             Property current = 0;
             Property lastExIgnore = 0;      // "last excluding ignored categories"
             Property lastLastExIgnore = 0;  // "last one before that"
@@ -39,6 +38,7 @@ internal static partial class Graphemes
                 // https://unicode.org/reports/tr29/#GB1
                 // start of text always advances
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -49,14 +49,9 @@ internal static partial class Graphemes
                 pos += w;
             }
 
+            // https://unicode.org/reports/tr29/#GB2
             while (pos < input.Length)
             {
-                /*
-                    We've switched the evaluation order of GB1↓ and GB2↑. It's ok:
-                    because we've checked for len(data) at the top of this function,
-                    sot and eot are mutually exclusive, order doesn't matter.
-                */
-
                 var last = current;
                 var lastWidth = w;
                 if (!last.Is(Ignore))
@@ -69,22 +64,12 @@ internal static partial class Graphemes
                 // to the right of the × or ÷, from which we look back or forward
 
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
                     pos += w;
                     break;
-                }
-                if (w == 0)
-                {
-                    if (atEOF)
-                    {
-                        // Just return the bytes, we can't do anything with them
-                        pos = input.Length;
-                        break;
-                    }
-                    // Rune extends past current data, request more
-                    return 0;
                 }
 
                 current = Dict.Lookup(rune.Value);

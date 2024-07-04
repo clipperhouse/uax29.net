@@ -1,6 +1,7 @@
 ﻿namespace UAX29;
 
 using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 /// A bitmap of Unicode categories
@@ -23,10 +24,7 @@ internal static partial class Sentences
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
-            if (input.Length == 0)
-            {
-                return 0;
-            }
+            Debug.Assert(input.Length > 0);
 
             // These vars are stateful across loop iterations
             var pos = 0;
@@ -42,6 +40,7 @@ internal static partial class Sentences
                 // https://unicode.org/reports/tr29/#SB1
                 // start of text always advances
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -82,7 +81,7 @@ internal static partial class Sentences
                 }
 
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
-
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -150,21 +149,11 @@ internal static partial class Sentences
                     while (p < input.Length)
                     {
                         status = DecodeFirstRune(input[p..], out Rune rune2, out int w2);
+                        Debug.Assert(w2 > 0);
                         if (status != OperationStatus.Done)
                         {
                             // Garbage in, garbage out
                             break;
-                        }
-                        if (w2 == 0)
-                        {
-                            if (atEOF)
-                            {
-                                // Just return the bytes, we can't do anything with them
-                                pos = input.Length;
-                                goto getout;    // i'd prefer a labeled break, I guess that's not thing? 
-                            }
-                            // Rune extends past current data, request more
-                            return 0; // TODO
                         }
 
                         var lookup = Dict.Lookup(rune2.Value);
@@ -331,13 +320,10 @@ internal static partial class Sentences
                 while (i < input.Length)
                 {
                     var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
+                    Debug.Assert(w > 0);
                     if (status != OperationStatus.Done)
                     {
                         // Garbage in, garbage out
-                        break;
-                    }
-                    if (w == 0)
-                    {
                         break;
                     }
 

@@ -1,6 +1,7 @@
 ﻿namespace UAX29;
 
 using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 /// A bitmap of Unicode categories
@@ -23,11 +24,7 @@ internal static partial class Words
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
-            var len = input.Length;
-            if (len == 0)
-            {
-                return 0;
-            }
+            Debug.Assert(input.Length > 0);
 
             // These vars are stateful across loop iterations
             int pos = 0;
@@ -38,8 +35,10 @@ internal static partial class Words
             int regionalIndicatorCount = 0;
 
             {
+                // https://unicode.org/reports/tr29/#WB1
                 // start of text always advances
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -50,7 +49,8 @@ internal static partial class Words
                 pos += w;
             }
 
-            while (pos < len)
+            // https://unicode.org/reports/tr29/#WB2
+            while (pos < input.Length)
             {
                 var last = current;
                 if (!last.Is(Ignore))
@@ -60,6 +60,7 @@ internal static partial class Words
                 }
 
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
@@ -255,13 +256,10 @@ internal static partial class Words
                 while (i < input.Length)
                 {
                     var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
+                    Debug.Assert(w > 0);
                     if (status != OperationStatus.Done)
                     {
                         // Garbage in, garbage out
-                        break;
-                    }
-                    if (w == 0)
-                    {
                         break;
                     }
 
