@@ -1848,19 +1848,4 @@ public class WordsTests
 		var tokens = Tokenizer.GetWords(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
 	}
-
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Bytes2(UnicodeTest test)
-	{
-		var tokens = Tokenizer2.GetWords(test.input);
-		TestUnicode.TestTokenizer2Bytes(tokens, test);
-	}
-	[Test, TestCaseSource(nameof(Tests))]
-	public void String2(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer2.GetWords(s);
-		TestUnicode.TestTokenizer2Chars(tokens, test);
-	}
 }

@@ -44,32 +44,6 @@ public class TestUnicode
 		}
 	}
 
-
-	internal static void TestTokenizer2Bytes(Tokenizer2<byte> tokens, UnicodeTest test)
-	{
-		var i = 0;
-		foreach (var token in tokens)
-		{
-			var got = Encoding.UTF8.GetString(token);
-			var expected = Encoding.UTF8.GetString(test.expected[i]);
-			Assert.That(got, Is.EqualTo(expected), $"{test.comment}");
-			i++;
-		}
-	}
-
-	internal static void TestTokenizer2Chars(Tokenizer2<char> tokens, UnicodeTest test)
-	{
-		var i = 0;
-		foreach (var token in tokens)
-		{
-			var got = token.ToString();
-			var expected = test.expected[i];
-			var s = Encoding.UTF8.GetString(expected);
-			Assert.That(got, Is.EqualTo(s), $"{test.comment}");
-			i++;
-		}
-	}
-
 	private delegate Tokenizer<byte> ByteMethod(byte[] input);
 	static readonly ByteMethod[] byteMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 

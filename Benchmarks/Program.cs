@@ -53,16 +53,6 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void Tokenize2Bytes()
-	{
-		var tokens = Tokenizer2.GetWords(sample);
-		foreach (var token in tokens)
-		{
-		}
-	}
-
-
-	// [Benchmark]
 	public void TokenizeString()
 	{
 		var tokens = Tokenizer.GetWords(sampleStr);
@@ -71,8 +61,7 @@ public class Benchmark
 		}
 	}
 
-
-	// [Benchmark]
+	[Benchmark]
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
@@ -82,31 +71,7 @@ public class Benchmark
 		}
 	}
 
-	// [Benchmark]
-	public void Tokenize2Stream()
-	{
-		var stream = new MemoryStream(sample);
-		var tokens = Tokenizer2.GetWords(stream);
-		foreach (var token in tokens)
-		{
-		}
-	}
-
-	readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
-
-	// [Benchmark]
-	public void Tokenize2StreamPool()
-	{
-		var stream = new MemoryStream(sample);
-		var storage = pool.Rent(2048);
-		var tokens = Tokenizer2.GetWords(stream, 1024, storage);
-		foreach (var token in tokens)
-		{
-		}
-		pool.Return(storage);
-	}
-
-	// [Benchmark]
+	[Benchmark]
 	public void TokenizeSetStream()
 	{
 		// This is to test to observe allocations.
@@ -127,7 +92,7 @@ public class Benchmark
 		}
 	}
 
-	// [Benchmark]
+	[Benchmark]
 	public void StringInfoGraphemes()
 	{
 		var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(sampleStr);
@@ -136,7 +101,7 @@ public class Benchmark
 		}
 	}
 
-	// [Benchmark]
+	[Benchmark]
 	public void TokenizerGraphemes()
 	{
 		var tokens = Tokenizer.GetGraphemes(sample);
