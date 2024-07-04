@@ -1,33 +1,15 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
-using System.Text;
-
 /// A bitmap of Unicode categories
 using Property = uint;
 
-internal abstract class SplitterBase<TSpan>
-{
-    readonly internal Decoder<TSpan> DecodeFirstRune;
-    readonly internal Decoder<TSpan> DecodeLastRune;
-
-    public SplitterBase(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune)
-    {
-        this.DecodeFirstRune = decodeFirstRune;
-        this.DecodeLastRune = decodeLastRune;
-    }
-
-    /// <summary>
-    /// Reads input until a token break
-    /// </summary>
-    /// <param name="input">Data to split</param>
-    /// <param name="atEOF">
-    /// Indicates whether the current input is all that is coming.
-    /// (Always true in the current implementation, we may implement streaming in the future.)
-    /// </param>
-    /// <returns></returns>
-    internal abstract int Split(ReadOnlySpan<TSpan> input);
-}
+/// <summary>
+/// The function that splits a string or UTF-8 byte array into tokens.
+/// </summary>
+/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
+/// <param name="input">The string to split/tokenize.</param>
+/// <returns>How many bytes/chars were consumed from the input.</returns>
+internal delegate int Split<T>(ReadOnlySpan<T> input);
 
 internal static class Extensions
 {

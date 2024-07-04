@@ -9,7 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(Span<byte> input) => new(input, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(Span<byte> input) => new(input, Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -18,7 +18,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(ReadOnlySpan<byte> input) => new(input, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(ReadOnlySpan<byte> input) => new(input, Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -27,7 +27,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(Memory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(Memory<byte> input) => new(input.Span, Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -36,7 +36,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(ReadOnlyMemory<byte> input) => new(input.Span, Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(ReadOnlyMemory<byte> input) => new(input.Span, Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given array of UTF-8 encoded bytes.
@@ -45,7 +45,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    public static Tokenizer<byte> GetSentences(byte[] input) => new(input.AsSpan(), Sentences.SplitUtf8Bytes);
+    public static Tokenizer<byte> GetSentences(byte[] input) => new(input.AsSpan(), Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given string.
@@ -131,7 +131,7 @@ public static partial class Tokenizer
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamTokenizer<byte>(buffer, Sentences.SplitUtf8Bytes);
+        return new StreamTokenizer<byte>(buffer, Sentences.SplitBytes);
     }
 
     /// <summary>

@@ -9,20 +9,22 @@ using Property = uint;
 
 internal static partial class Words
 {
-    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
-    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
+    internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
-    internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
+    internal sealed class Splitter<TSpan>
     {
-        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(decodeFirstRune, decodeLastRune)
-        { }
+        internal readonly Decoders<TSpan> Decode;
+        internal Splitter(Decoders<TSpan> decoders)
+        {
+            this.Decode = decoders;
+        }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
         const Property Ignore = Extend | Format | ZWJ;
 
-        internal override int Split(ReadOnlySpan<TSpan> input)
+        internal int Split(ReadOnlySpan<TSpan> input)
         {
             Debug.Assert(input.Length > 0);
 
@@ -37,7 +39,7 @@ internal static partial class Words
             {
                 // https://unicode.org/reports/tr29/#WB1
                 // start of text always advances
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
                 Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
@@ -59,7 +61,7 @@ internal static partial class Words
                     lastExIgnore = last;
                 }
 
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
                 Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
@@ -255,7 +257,7 @@ internal static partial class Words
                 var i = 0;
                 while (i < input.Length)
                 {
-                    var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
+                    var status = Decode.FirstRune(input[i..], out Rune rune, out int w);
                     Debug.Assert(w > 0);
                     if (status != OperationStatus.Done)
                     {

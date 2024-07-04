@@ -10,18 +10,20 @@ using Property = uint;
 
 internal static partial class Graphemes
 {
-    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
-    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
+    internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
-    internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
+    internal sealed class Splitter<TSpan>
     {
-        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(decodeFirstRune, decodeLastRune)
-        { }
+        internal readonly Decoders<TSpan> Decode;
+        internal Splitter(Decoders<TSpan> decoders)
+        {
+            this.Decode = decoders;
+        }
 
         const Property Ignore = Extend;
 
-        internal override int Split(ReadOnlySpan<TSpan> input)
+        internal int Split(ReadOnlySpan<TSpan> input)
         {
             Debug.Assert(input.Length > 0);
 
@@ -37,7 +39,7 @@ internal static partial class Graphemes
             {
                 // https://unicode.org/reports/tr29/#GB1
                 // start of text always advances
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
                 Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
@@ -63,7 +65,7 @@ internal static partial class Graphemes
                 // Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
                 // to the right of the × or ÷, from which we look back or forward
 
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
                 Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
