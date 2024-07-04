@@ -72,7 +72,7 @@ public class Benchmark
 	}
 
 
-	[Benchmark]
+	// [Benchmark]
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
@@ -82,7 +82,7 @@ public class Benchmark
 		}
 	}
 
-	[Benchmark]
+	// [Benchmark]
 	public void Tokenize2Stream()
 	{
 		var stream = new MemoryStream(sample);
@@ -94,7 +94,7 @@ public class Benchmark
 
 	readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
-	[Benchmark]
+	// [Benchmark]
 	public void Tokenize2StreamPool()
 	{
 		var stream = new MemoryStream(sample);

@@ -31,6 +31,9 @@ internal static partial class Graphemes
             var pos = 0;
             var w = 0;
             Property current = 0;
+            Property lastExIgnore = 0;      // "last excluding ignored categories"
+            Property lastLastExIgnore = 0;  // "last one before that"
+            int regionalIndicatorCount = 0;
 
             while (true)
             {
@@ -58,6 +61,11 @@ internal static partial class Graphemes
 
                 var last = current;
                 var lastWidth = w;
+                if (!last.Is(Ignore))
+                {
+                    lastLastExIgnore = lastExIgnore;
+                    lastExIgnore = last;
+                }
 
                 // Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
                 // to the right of the × or ÷, from which we look back or forward
@@ -153,49 +161,20 @@ internal static partial class Graphemes
                 }
 
                 // https://unicode.org/reports/tr29/#GB11
-                if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && Previous(Extended_Pictographic, input[..(pos - lastWidth)]))
+                if (current.Is(Extended_Pictographic) && last.Is(ZWJ) && lastLastExIgnore.Is(Extended_Pictographic))
                 {
                     pos += w;
                     continue;
                 }
 
 
-                // https://unicode.org/reports/tr29/#GB12 and
+                // https://unicode.org/reports/tr29/#GB12
                 // https://unicode.org/reports/tr29/#GB13
                 if ((current & last).Is(Regional_Indicator))
                 {
-                    var i = pos;
-                    var count = 0;
+                    regionalIndicatorCount++;
 
-                    while (i > 0)
-                    {
-                        status = DecodeLastRune(input[..i], out Rune rune2, out int w2);
-                        if (status != OperationStatus.Done)
-                        {
-                            // Garbage in, garbage out
-                            break;
-                        }
-                        if (w2 == 0)
-                        {
-                            break;
-                        }
-
-                        i -= w2;
-
-                        var lookup = Dict.Lookup(rune2.Value);
-
-                        if (!lookup.Is(Regional_Indicator))
-                        {
-                            // It's GB13
-                            break;
-                        }
-
-                        count++;
-                    }
-
-                    // If i == 0, we fell through and hit sot (start of text), so GB12 applies
-                    // If i > 0, we hit a non-RI, so GB13 applies
-                    var odd = count % 2 == 1;
+                    var odd = regionalIndicatorCount % 2 == 1;
                     if (odd)
                     {
                         pos += w;

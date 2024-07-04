@@ -23,7 +23,8 @@ internal static partial class Words
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
-            if (input.Length == 0)
+            var len = input.Length;
+            if (len == 0)
             {
                 return 0;
             }
@@ -36,23 +37,22 @@ internal static partial class Words
             Property lastLastExIgnore = 0;  // "the last one before that"
             int regionalIndicatorCount = 0;
 
-            while (true)
+
             {
-                var sot = pos == 0;             // "start of text"
-                var eot = pos == input.Length;   // "end of text"
-
-                if (eot)
+                // start of text always advances
+                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                if (status != OperationStatus.Done)
                 {
-                    if (!atEOF)
-                    {
-                        // TODO Token extends past current data, request more
-                        return 0;
-                    }
-
-                    // https://unicode.org/reports/tr29/#WB2
-                    break;
+                    // Garbage in, garbage out
+                    pos += w;
+                    return pos;
                 }
+                current = Words.Dict.Lookup(rune.Value);
+                pos += w;
+            }
 
+            while (pos < len)
+            {
                 var last = current;
                 if (!last.Is(Ignore))
                 {
@@ -80,13 +80,6 @@ internal static partial class Words
                 }
 
                 current = Dict.Lookup(rune.Value);
-
-                // https://unicode.org/reports/tr29/#WB1
-                if (sot)
-                {
-                    pos += w;
-                    continue;
-                }
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)

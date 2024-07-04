@@ -165,7 +165,7 @@ internal static partial class Sentences
                 continue;
             }
 
-            // https://unicode.org/reports/tr29/#SB8a
+            // https://unicode.org/reports/tr29/#SB10
             if (current.Is(Sp | ParaSep) && lastExIgnoreSpClose.Is(SATerm))
             {
                 pos += w;

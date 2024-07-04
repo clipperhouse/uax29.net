@@ -31,6 +31,11 @@ internal static partial class Sentences
             // These vars are stateful across loop iterations
             var pos = 0;
             Property current = 0;
+            Property lastExIgnore = 0;      // "last excluding ignored categories"
+            Property lastLastExIgnore = 0;  // "last one before that"
+            Property lastExIgnoreSp = 0;
+            Property lastExIgnoreClose = 0;
+            Property lastExIgnoreSpClose = 0;
 
             while (true)
             {
@@ -60,6 +65,27 @@ internal static partial class Sentences
                 // to the right of the ×, from which we look back or forward
 
                 var last = current;
+
+                if (!last.Is(Ignore))
+                {
+                    lastLastExIgnore = lastExIgnore;
+                    lastExIgnore = last;
+                }
+
+                if (!lastExIgnore.Is(Sp))
+                {
+                    lastExIgnoreSp = lastExIgnore;
+                }
+
+                if (!lastExIgnore.Is(Close))
+                {
+                    lastExIgnoreClose = lastExIgnore;
+                }
+
+                if (!lastExIgnoreSp.Is(Close))
+                {
+                    lastExIgnoreSpClose = lastExIgnoreSp;
+                }
 
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out int w);
 
@@ -121,35 +147,22 @@ internal static partial class Sentences
                 // https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
                 // The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
-                // Optimization: determine if SB6 can possibly apply
-                var maybeSB6 = current.Is(Numeric) && last.Is(ATerm | Ignore);
-
                 // https://unicode.org/reports/tr29/#SB6
-                if (maybeSB6)
+                if (current.Is(Numeric) && lastExIgnore.Is(ATerm))
                 {
-                    if (Previous(ATerm, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
-                // Optimization: determine if SB7 can possibly apply
-                var maybeSB7 = current.Is(Upper) && last.Is(ATerm | Ignore);
-
                 // https://unicode.org/reports/tr29/#SB7
-                if (maybeSB7)
+                if (current.Is(Upper) && lastExIgnore.Is(ATerm) && lastLastExIgnore.Is(Upper | Lower))
                 {
-                    var pi = PreviousIndex(ATerm, input[..pos]);
-                    if (pi >= 0 && Previous(Upper | Lower, input[..pi]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if SB8 can possibly apply
-                var maybeSB8 = last.Is(ATerm | Close | Sp | Ignore);
+                var maybeSB8 = lastExIgnoreSpClose.Is(ATerm);
 
                 // https://unicode.org/reports/tr29/#SB8
                 if (maybeSB8)
@@ -190,155 +203,40 @@ internal static partial class Sentences
 
                     if (Subsequent(Lower, input[p..]))
                     {
-                        var p2 = pos;
-
-                        // Zero or more Sp
-                        var sp = pos;
-                        while (true)
-                        {
-                            sp = PreviousIndex(Sp, input[..sp]);
-                            if (sp < 0)
-                            {
-                                break;
-                            }
-                            p2 = sp;
-                        }
-
-                        // Zero or more Close
-                        var close = p2;
-                        while (true)
-                        {
-                            close = PreviousIndex(Close, input[..close]);
-                            if (close < 0)
-                            {
-                                break;
-                            }
-                            p2 = close;
-                        }
-
-                        // Having looked back past Sp's, Close's, and intervening Extend|Format,
-                        // is there an ATerm?
-                        if (Previous(ATerm, input[..p2]))
-                        {
-                            pos += w;
-                            continue;
-                        }
-                    }
-                }
-
-                // Optimization: determine if SB8a can possibly apply
-                var maybeSB8a = current.Is(SContinue | SATerm) && last.Is(SATerm | Close | Sp | Ignore);
-
-                // https://unicode.org/reports/tr29/#SB8a
-                if (maybeSB8a)
-                {
-                    var p = pos;
-
-                    // Zero or more Sp
-                    var sp = p;
-                    while (true)
-                    {
-                        sp = PreviousIndex(Sp, input[..sp]);
-                        if (sp < 0)
-                        {
-                            break;
-                        }
-                        p = sp;
-                    }
-
-                    // Zero or more Close
-                    var close = p;
-                    while (true)
-                    {
-                        close = PreviousIndex(Close, input[..close]);
-                        if (close < 0)
-                        {
-                            break;
-                        }
-                        p = close;
-                    }
-
-                    // Having looked back past Sp, Close, and intervening Extend|Format,
-                    // is there an SATerm?
-                    if (Previous(SATerm, input[..p]))
-                    {
                         pos += w;
                         continue;
                     }
+                }
+
+                // https://unicode.org/reports/tr29/#SB8a
+                if (current.Is(SContinue | SATerm) && lastExIgnoreSpClose.Is(SATerm))
+                {
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if SB9 can possibly apply
                 var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB9
-                if (maybeSB9)
+                if (current.Is(Close | Sp | ParaSep) && lastExIgnoreClose.Is(SATerm))
                 {
-                    var p = pos;
-
-                    // Zero or more Close's
-                    var close = p;
-                    while (true)
-                    {
-                        close = PreviousIndex(Close, input[..close]);
-                        if (close < 0)
-                        {
-                            break;
-                        }
-                        p = close;
-                    }
-
-                    // Having looked back past Close's and intervening Extend|Format,
-                    // is there an SATerm?
-                    if (Previous(SATerm, input[..p]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if SB10 can possibly apply
                 var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB10
-                if (maybeSB10)
+                if (current.Is(Sp | ParaSep) && lastExIgnoreSpClose.Is(SATerm))
                 {
-                    var p = pos;
-
-                    // Zero or more Sp's
-                    var sp = p;
-                    while (true)
-                    {
-                        sp = PreviousIndex(Sp, input[..sp]);
-                        if (sp < 0)
-                        {
-                            break;
-                        }
-                        p = sp;
-                    }
-
-                    // Zero or more Close's
-                    var close = p;
-                    while (true)
-                    {
-                        close = PreviousIndex(Close, input[..close]);
-                        if (close < 0)
-                        {
-                            break;
-                        }
-                        p = close;
-                    }
-
-                    // Having looked back past Sp's, Close's, and intervening Extend|Format,
-                    // is there an SATerm?
-                    if (Previous(SATerm, input[..p]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if SB11 can possibly apply
-                var maybeSB11 = last.Is(SATerm | Close | Sp | ParaSep | Ignore);
+                var maybeSB11 = lastExIgnore.Is(SATerm | Close | Sp | ParaSep);
 
                 // https://unicode.org/reports/tr29/#SB11
                 if (maybeSB11)
