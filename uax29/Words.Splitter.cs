@@ -46,7 +46,7 @@ internal static partial class Words
                     pos += w;
                     return pos;
                 }
-                current = Words.Dict.Lookup(rune.Value);
+                current = Dict.Lookup(rune.Value);
                 pos += w;
             }
 
@@ -78,7 +78,7 @@ internal static partial class Words
                     return 0;
                 }
 
-                current = Words.Dict.Lookup(rune.Value);
+                current = Dict.Lookup(rune.Value);
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -276,7 +276,7 @@ internal static partial class Words
                         break;
                     }
 
-                    var lookup = Words.Dict.Lookup(rune.Value);
+                    var lookup = Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {

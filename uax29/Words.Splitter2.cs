@@ -23,7 +23,7 @@ internal static partial class Words
         {
             // start of text always advances
             var rune = runes.Current;
-            current = Words.Dict.Lookup(rune);
+            current = Dict.Lookup(rune);
             pos += runes.CurrentWidth;
         }
 
@@ -38,7 +38,7 @@ internal static partial class Words
 
             var rune = runes.Current;
             var w = runes.CurrentWidth;
-            current = Words.Dict.Lookup(rune);
+            current = Dict.Lookup(rune);
 
             // Optimization: no rule can possibly apply
             if ((current | last) == 0)

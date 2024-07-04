@@ -107,7 +107,7 @@ internal static partial class Sentences
                     return 0;
                 }
 
-                current = Sentences.Dict.Lookup(rune.Value);
+                current = Dict.Lookup(rune.Value);
 
                 // https://unicode.org/reports/tr29/#SB1
                 if (sot)
@@ -191,7 +191,7 @@ internal static partial class Sentences
                             return 0; // TODO
                         }
 
-                        var lookup = Sentences.Dict.Lookup(rune2.Value);
+                        var lookup = Dict.Lookup(rune2.Value);
 
                         if (lookup.Is(OLetter | Upper | Lower | ParaSep | SATerm))
                         {
@@ -314,7 +314,7 @@ internal static partial class Sentences
                     }
 
                     i -= w;
-                    var lookup = Sentences.Dict.Lookup(rune.Value);
+                    var lookup = Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {
@@ -365,7 +365,7 @@ internal static partial class Sentences
                         break;
                     }
 
-                    var lookup = Sentences.Dict.Lookup(rune.Value);
+                    var lookup = Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {

@@ -89,7 +89,7 @@ internal static partial class Graphemes
                     return 0;
                 }
 
-                current = Graphemes.Dict.Lookup(rune.Value);
+                current = Dict.Lookup(rune.Value);
 
                 // https://unicode.org/reports/tr29/#GB1
                 if (sot)
