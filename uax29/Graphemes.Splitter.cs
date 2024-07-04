@@ -15,7 +15,7 @@ internal static partial class Graphemes
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Graphemes.Dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         new const Property Ignore = Extend;
@@ -89,7 +89,7 @@ internal static partial class Graphemes
                     return 0;
                 }
 
-                current = Dict.Lookup(rune.Value);
+                current = Graphemes.Dict.Lookup(rune.Value);
 
                 // https://unicode.org/reports/tr29/#GB1
                 if (sot)

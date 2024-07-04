@@ -14,7 +14,7 @@ internal static partial class Words
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
@@ -78,7 +78,7 @@ internal static partial class Words
                     return 0;
                 }
 
-                current = Dict.Lookup(rune.Value);
+                current = Words.Dict.Lookup(rune.Value);
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -276,7 +276,7 @@ internal static partial class Words
                         break;
                     }
 
-                    var lookup = Dict.Lookup(rune.Value);
+                    var lookup = Words.Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {

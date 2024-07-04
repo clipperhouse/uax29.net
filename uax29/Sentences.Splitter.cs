@@ -14,7 +14,7 @@ internal static partial class Sentences
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Sentences.Dict, Ignore, decodeFirstRune, decodeLastRune)
+            base(Ignore, decodeFirstRune, decodeLastRune)
         { }
 
         const Property SATerm = STerm | ATerm;
@@ -107,7 +107,7 @@ internal static partial class Sentences
                     return 0;
                 }
 
-                current = Dict.Lookup(rune.Value);
+                current = Sentences.Dict.Lookup(rune.Value);
 
                 // https://unicode.org/reports/tr29/#SB1
                 if (sot)
@@ -191,7 +191,7 @@ internal static partial class Sentences
                             return 0; // TODO
                         }
 
-                        var lookup = Dict.Lookup(rune2.Value);
+                        var lookup = Sentences.Dict.Lookup(rune2.Value);
 
                         if (lookup.Is(OLetter | Upper | Lower | ParaSep | SATerm))
                         {
@@ -314,7 +314,7 @@ internal static partial class Sentences
                     }
 
                     i -= w;
-                    var lookup = Dict.Lookup(rune.Value);
+                    var lookup = Sentences.Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {
@@ -365,7 +365,7 @@ internal static partial class Sentences
                         break;
                     }
 
-                    var lookup = Dict.Lookup(rune.Value);
+                    var lookup = Sentences.Dict.Lookup(rune.Value);
 
                     if (lookup.Is(Ignore))
                     {
