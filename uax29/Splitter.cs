@@ -26,7 +26,7 @@ internal abstract class SplitterBase<TSpan>
     /// (Always true in the current implementation, we may implement streaming in the future.)
     /// </param>
     /// <returns></returns>
-    internal abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF);
+    internal abstract int Split(ReadOnlySpan<TSpan> input);
 }
 
 internal static class Extensions

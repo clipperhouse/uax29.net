@@ -36,7 +36,7 @@ public ref struct RangeTokenizer<T> where T : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..], true);
+			var advance = this.split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{

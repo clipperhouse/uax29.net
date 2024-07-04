@@ -22,7 +22,7 @@ internal static partial class Words
         const Property MidNumLetQ = MidNumLet | Single_Quote;
         const Property Ignore = Extend | Format | ZWJ;
 
-        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal override int Split(ReadOnlySpan<TSpan> input)
         {
             Debug.Assert(input.Length > 0);
 

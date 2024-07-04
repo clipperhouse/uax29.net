@@ -22,7 +22,7 @@ internal static partial class Sentences
         const Property ParaSep = Sep | CR | LF;
         const Property Ignore = Extend | Format;
 
-        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal override int Split(ReadOnlySpan<TSpan> input)
         {
             Debug.Assert(input.Length > 0);
 
@@ -251,7 +251,6 @@ internal static partial class Sentences
                 pos += w;
             }
 
-        getout:
             return pos;
 
 

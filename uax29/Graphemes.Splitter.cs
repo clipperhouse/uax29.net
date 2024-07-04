@@ -21,7 +21,7 @@ internal static partial class Graphemes
 
         const Property Ignore = Extend;
 
-        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal override int Split(ReadOnlySpan<TSpan> input)
         {
             Debug.Assert(input.Length > 0);
 
