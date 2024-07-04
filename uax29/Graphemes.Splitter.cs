@@ -35,24 +35,22 @@ internal static partial class Graphemes
             Property lastLastExIgnore = 0;  // "last one before that"
             int regionalIndicatorCount = 0;
 
-            while (true)
             {
-                var sot = pos == 0;             // "start of text"
-                var eot = pos == input.Length;   // "end of text"
-
-
-                if (eot)
+                // https://unicode.org/reports/tr29/#GB1
+                // start of text always advances
+                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                if (status != OperationStatus.Done)
                 {
-                    if (!atEOF)
-                    {
-                        // Token extends past current data, request more
-                        return 0; // TODO
-                    }
-
-                    // https://unicode.org/reports/tr29/#GB2
-                    break;
+                    // Garbage in, garbage out
+                    pos += w;
+                    return pos;
                 }
+                current = Dict.Lookup(rune.Value);
+                pos += w;
+            }
 
+            while (pos < input.Length)
+            {
                 /*
                     We've switched the evaluation order of GB1↓ and GB2↑. It's ok:
                     because we've checked for len(data) at the top of this function,
@@ -90,13 +88,6 @@ internal static partial class Graphemes
                 }
 
                 current = Dict.Lookup(rune.Value);
-
-                // https://unicode.org/reports/tr29/#GB1
-                if (sot)
-                {
-                    pos += w;
-                    continue;
-                }
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)  // i.e. both are zero

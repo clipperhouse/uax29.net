@@ -66,17 +66,6 @@ internal static partial class Words
                     pos += w;
                     break;
                 }
-                if (w == 0)
-                {
-                    if (atEOF)
-                    {
-                        // Just return the bytes, we can't do anything with them
-                        pos = input.Length;
-                        break;
-                    }
-                    // Rune extends past current data, request more
-                    return 0;
-                }
 
                 current = Dict.Lookup(rune.Value);
 
