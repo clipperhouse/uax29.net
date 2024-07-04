@@ -12,9 +12,9 @@ internal static partial class Words
     internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
     internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
-    internal sealed class Splitter<TSpan>
+    sealed class Splitter<TSpan>
     {
-        internal readonly Decoders<TSpan> Decode;
+        readonly Decoders<TSpan> Decode;
         internal Splitter(Decoders<TSpan> decoders)
         {
             this.Decode = decoders;

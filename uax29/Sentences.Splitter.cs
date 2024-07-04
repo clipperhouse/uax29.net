@@ -12,9 +12,9 @@ internal static partial class Sentences
     internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
     internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
-    internal sealed class Splitter<TSpan>
+    sealed class Splitter<TSpan>
     {
-        internal readonly Decoders<TSpan> Decode;
+        readonly Decoders<TSpan> Decode;
         internal Splitter(Decoders<TSpan> decoders)
         {
             this.Decode = decoders;
@@ -309,6 +309,7 @@ internal static partial class Sentences
             {
                 return PreviousIndex(property, input) != -1;
             }
+
             /// <summary>
             /// Seek forward until it hits a rune which matches property.
             /// </summary>
