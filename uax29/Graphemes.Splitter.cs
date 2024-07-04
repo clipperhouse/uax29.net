@@ -15,10 +15,10 @@ internal static partial class Graphemes
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Ignore, decodeFirstRune, decodeLastRune)
+            base(decodeFirstRune, decodeLastRune)
         { }
 
-        new const Property Ignore = Extend;
+        const Property Ignore = Extend;
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {

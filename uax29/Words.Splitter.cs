@@ -14,12 +14,12 @@ internal static partial class Words
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Ignore, decodeFirstRune, decodeLastRune)
+            base(decodeFirstRune, decodeLastRune)
         { }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
-        new const Property Ignore = Extend | Format | ZWJ;
+        const Property Ignore = Extend | Format | ZWJ;
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {

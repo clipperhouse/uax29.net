@@ -8,13 +8,11 @@ using Property = uint;
 
 internal abstract class SplitterBase<TSpan>
 {
-    readonly internal Property Ignore;
     readonly internal Decoder<TSpan> DecodeFirstRune;
     readonly internal Decoder<TSpan> DecodeLastRune;
 
-    public SplitterBase(Property ignore, Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune)
+    public SplitterBase(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune)
     {
-        this.Ignore = ignore;
         this.DecodeFirstRune = decodeFirstRune;
         this.DecodeLastRune = decodeLastRune;
     }

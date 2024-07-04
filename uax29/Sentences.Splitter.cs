@@ -14,12 +14,12 @@ internal static partial class Sentences
     internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
     {
         internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Ignore, decodeFirstRune, decodeLastRune)
+            base(decodeFirstRune, decodeLastRune)
         { }
 
         const Property SATerm = STerm | ATerm;
         const Property ParaSep = Sep | CR | LF;
-        new const Property Ignore = Extend | Format;
+        const Property Ignore = Extend | Format;
 
         internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
         {
