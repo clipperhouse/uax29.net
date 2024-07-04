@@ -37,7 +37,6 @@ internal static partial class Words
             Property lastLastExIgnore = 0;  // "the last one before that"
             int regionalIndicatorCount = 0;
 
-
             {
                 // start of text always advances
                 var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
@@ -253,6 +252,49 @@ internal static partial class Words
             }
 
             return pos;
+
+
+            /// <summary>
+            /// Seek forward until it hits a rune which matches property.
+            /// </summary>
+            /// <param name="property">Property to attempt to find</param>
+            /// <param name="input">Data in which to seek</param>
+            /// <returns>True if found, otherwise false</returns>
+            bool Subsequent(Property property, ReadOnlySpan<TSpan> input)
+            {
+                var i = 0;
+                while (i < input.Length)
+                {
+                    var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
+                    if (status != OperationStatus.Done)
+                    {
+                        // Garbage in, garbage out
+                        break;
+                    }
+                    if (w == 0)
+                    {
+                        break;
+                    }
+
+                    var lookup = Dict.Lookup(rune.Value);
+
+                    if (lookup.Is(Ignore))
+                    {
+                        i += w;
+                        continue;
+                    }
+
+                    if (lookup.Is(property))
+                    {
+                        return true;
+                    }
+
+                    // If we get this far, it's not there
+                    break;
+                }
+
+                return false;
+            }
         }
     }
 }

@@ -8,16 +8,16 @@ using BenchmarkDotNet.Running;
 
 using UAX29;
 
-var summary = BenchmarkRunner.Run<Benchmark>();
+// var summary = BenchmarkRunner.Run<Benchmark>();
 
-// var benchmark = new Benchmark();
-// benchmark.Setup();
-// var throughput = benchmark.Throughput();
-// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
+var benchmark = new Benchmark();
+benchmark.Setup();
+var throughput = benchmark.Throughput();
+Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 
-// [MemoryDiagnoser]
 // [Config(typeof(Config))]
+[MemoryDiagnoser]
 public class Benchmark
 {
 	private class Config : ManualConfig
@@ -150,7 +150,7 @@ public class Benchmark
 		const int runs = 1000;
 
 		// warmup
-		for (var i = 0; i < runs; i++)
+		for (var i = 0; i < 2 * runs; i++)
 		{
 			var tokens = Tokenizer.GetWords(sample);
 			foreach (var token in tokens)
