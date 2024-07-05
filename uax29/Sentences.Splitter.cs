@@ -1,6 +1,5 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 
@@ -41,16 +40,17 @@ internal static partial class Sentences
             {
                 // https://unicode.org/reports/tr29/#SB1
                 // start of text always advances
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
                 Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    return pos;
-                }
-                current = Dict.Lookup(rune.Value);
+
                 pos += w;
+                current = Dict.Lookup(rune.Value);
             }
 
             // https://unicode.org/reports/tr29/#SB2
@@ -82,14 +82,13 @@ internal static partial class Sentences
                     lastExIgnoreSpClose = lastExIgnoreSp;
                 }
 
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
                 Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    break;
-                }
 
                 current = Dict.Lookup(rune.Value);
 
@@ -138,7 +137,6 @@ internal static partial class Sentences
                     continue;
                 }
 
-                // Optimization: determine if SB8 can possibly apply
                 var maybeSB8 = lastExIgnoreSpClose.Is(ATerm);
 
                 // https://unicode.org/reports/tr29/#SB8
@@ -150,13 +148,13 @@ internal static partial class Sentences
                     // Zero or more of not-the-above properties
                     while (p < input.Length)
                     {
-                        status = Decode.FirstRune(input[p..], out Rune rune2, out int w2);
+                        _ = Decode.FirstRune(input[p..], out Rune rune2, out int w2);
+                        /*
+                        We are not doing anything about invalid runes. The decoders,
+                        if I am reading correctly, will return a width regardless,
+                        so we just pass over it. Garbage in, garbage out.
+                        */
                         Debug.Assert(w2 > 0);
-                        if (status != OperationStatus.Done)
-                        {
-                            // Garbage in, garbage out
-                            break;
-                        }
 
                         var lookup = Dict.Lookup(rune2.Value);
 
@@ -182,18 +180,12 @@ internal static partial class Sentences
                     continue;
                 }
 
-                // Optimization: determine if SB9 can possibly apply
-                var maybeSB9 = current.Is(Close | Sp | ParaSep) && last.Is(SATerm | Close | Ignore);
-
                 // https://unicode.org/reports/tr29/#SB9
                 if (current.Is(Close | Sp | ParaSep) && lastExIgnoreClose.Is(SATerm))
                 {
                     pos += w;
                     continue;
                 }
-
-                // Optimization: determine if SB10 can possibly apply
-                var maybeSB10 = current.Is(Sp | ParaSep) && last.Is(SATerm | Close | Sp | Ignore);
 
                 // https://unicode.org/reports/tr29/#SB10
                 if (current.Is(Sp | ParaSep) && lastExIgnoreSpClose.Is(SATerm))
@@ -202,7 +194,6 @@ internal static partial class Sentences
                     continue;
                 }
 
-                // Optimization: determine if SB11 can possibly apply
                 var maybeSB11 = lastExIgnore.Is(SATerm | Close | Sp | ParaSep);
 
                 // https://unicode.org/reports/tr29/#SB11
@@ -268,16 +259,13 @@ internal static partial class Sentences
                 var i = input.Length;
                 while (i > 0)
                 {
-                    var status = Decode.LastRune(input[..i], out Rune rune, out int w);
-                    if (status != OperationStatus.Done)
-                    {
-                        // Garbage in, garbage out
-                        break;
-                    }
-                    if (w == 0)
-                    {
-                        break;
-                    }
+                    var _ = Decode.LastRune(input[..i], out Rune rune, out int w);
+                    /*
+                    We are not doing anything about invalid runes. The decoders,
+                    if I am reading correctly, will return a width regardless,
+                    so we just pass over it. Garbage in, garbage out.
+                    */
+                    Debug.Assert(w > 0);
 
                     i -= w;
                     var lookup = Dict.Lookup(rune.Value);
@@ -321,13 +309,13 @@ internal static partial class Sentences
                 var i = 0;
                 while (i < input.Length)
                 {
-                    var status = Decode.FirstRune(input[i..], out Rune rune, out int w);
+                    var _ = Decode.FirstRune(input[i..], out Rune rune, out int w);
+                    /*
+                    We are not doing anything about invalid runes. The decoders,
+                    if I am reading correctly, will return a width regardless,
+                    so we just pass over it. Garbage in, garbage out.
+                    */
                     Debug.Assert(w > 0);
-                    if (status != OperationStatus.Done)
-                    {
-                        // Garbage in, garbage out
-                        break;
-                    }
 
                     var lookup = Dict.Lookup(rune.Value);
 

@@ -1,7 +1,5 @@
-﻿
-namespace UAX29;
+﻿namespace UAX29;
 
-using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 
@@ -39,16 +37,17 @@ internal static partial class Graphemes
             {
                 // https://unicode.org/reports/tr29/#GB1
                 // start of text always advances
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
                 Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    return pos;
-                }
-                current = Dict.Lookup(rune.Value);
+
                 pos += w;
+                current = Dict.Lookup(rune.Value);
             }
 
             // https://unicode.org/reports/tr29/#GB2
@@ -62,17 +61,13 @@ internal static partial class Graphemes
                     lastExIgnore = last;
                 }
 
-                // Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
-                // to the right of the × or ÷, from which we look back or forward
-
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
                 Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    break;
-                }
 
                 current = Dict.Lookup(rune.Value);
 

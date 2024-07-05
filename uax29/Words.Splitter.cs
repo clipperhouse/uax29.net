@@ -1,6 +1,5 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 
@@ -39,35 +38,35 @@ internal static partial class Words
             {
                 // https://unicode.org/reports/tr29/#WB1
                 // start of text always advances
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
                 Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    return pos;
-                }
-                current = Dict.Lookup(rune.Value);
+
                 pos += w;
+                current = Dict.Lookup(rune.Value);
             }
 
             // https://unicode.org/reports/tr29/#WB2
             while (pos < input.Length)
             {
+                var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                /*
+                We are not doing anything about invalid runes. The decoders,
+                if I am reading correctly, will return a width regardless,
+                so we just pass over it. Garbage in, garbage out.
+                */
+                Debug.Assert(w > 0);
+
                 var last = current;
                 if (!last.Is(Ignore))
                 {
                     lastLastExIgnore = lastExIgnore;
                     lastExIgnore = last;
-                }
-
-                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
-                Debug.Assert(w > 0);
-                if (status != OperationStatus.Done)
-                {
-                    // Garbage in, garbage out
-                    pos += w;
-                    break;
                 }
 
                 current = Dict.Lookup(rune.Value);
@@ -107,15 +106,11 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB4
-                if (current.Is(Extend | Format | ZWJ))
+                if (current.Is(Ignore))
                 {
                     pos += w;
                     continue;
                 }
-
-                // WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
-                // https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
-                // The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
                 // https://unicode.org/reports/tr29/#WB5
                 if (current.Is(AHLetter) && lastExIgnore.Is(AHLetter))
@@ -124,11 +119,8 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB6 can possibly apply
-                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter);
-
                 // https://unicode.org/reports/tr29/#WB6
-                if (maybeWB6)
+                if (current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter))
                 {
                     if (Subsequent(AHLetter, input[(pos + w)..]))
                     {
@@ -151,11 +143,8 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB7b can possibly apply
-                var maybeWB7b = current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter);
-
                 // https://unicode.org/reports/tr29/#WB7b
-                if (maybeWB7b)
+                if (current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter))
                 {
                     if (Subsequent(Hebrew_Letter, input[(pos + w)..]))
                     {
@@ -187,11 +176,8 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB12 can possibly apply
-                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric);
-
                 // https://unicode.org/reports/tr29/#WB12
-                if (maybeWB12)
+                if (current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric))
                 {
                     if (Subsequent(Numeric, input[(pos + w)..]))
                     {
@@ -221,12 +207,9 @@ internal static partial class Words
                     continue;
                 }
 
-                // Optimization: determine if WB15 or WB16 can possibly apply
-                var maybeWB1516 = current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator);
-
                 // https://unicode.org/reports/tr29/#WB15
                 // https://unicode.org/reports/tr29/#WB16
-                if (maybeWB1516)
+                if (current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator))
                 {
                     regionalIndicatorCount++;
 
@@ -257,13 +240,13 @@ internal static partial class Words
                 var i = 0;
                 while (i < input.Length)
                 {
-                    var status = Decode.FirstRune(input[i..], out Rune rune, out int w);
+                    var _ = Decode.FirstRune(input[i..], out Rune rune, out int w);
+                    /*
+                    We are not doing anything about invalid runes. The decoders,
+                    if I am reading correctly, will return a width regardless,
+                    so we just pass over it. Garbage in, garbage out.
+                    */
                     Debug.Assert(w > 0);
-                    if (status != OperationStatus.Done)
-                    {
-                        // Garbage in, garbage out
-                        break;
-                    }
 
                     var lookup = Dict.Lookup(rune.Value);
 
