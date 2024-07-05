@@ -53,14 +53,6 @@ internal static partial class Graphemes
 			// https://unicode.org/reports/tr29/#GB2
 			while (pos < input.Length)
 			{
-				var last = current;
-				var lastWidth = w;
-				if (!last.Is(Ignore))
-				{
-					lastLastExIgnore = lastExIgnore;
-					lastExIgnore = last;
-				}
-
 				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
@@ -68,6 +60,13 @@ internal static partial class Graphemes
 				so we just pass over it. Garbage in, garbage out.
 				*/
 				Debug.Assert(w > 0);
+
+				var last = current;
+				if (!last.Is(Ignore))
+				{
+					lastLastExIgnore = lastExIgnore;
+					lastExIgnore = last;
+				}
 
 				current = Dict.Lookup(rune.Value);
 

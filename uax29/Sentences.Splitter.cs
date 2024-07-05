@@ -56,8 +56,13 @@ internal static partial class Sentences
 			// https://unicode.org/reports/tr29/#SB2
 			while (pos < input.Length)
 			{
-				// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
-				// to the right of the ×, from which we look back or forward
+				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				/*
+				We are not doing anything about invalid runes. The decoders,
+				if I am reading correctly, will return a width regardless,
+				so we just pass over it. Garbage in, garbage out.
+				*/
+				Debug.Assert(w > 0);
 
 				var last = current;
 
@@ -81,14 +86,6 @@ internal static partial class Sentences
 				{
 					lastExIgnoreSpClose = lastExIgnoreSp;
 				}
-
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
-				/*
-				We are not doing anything about invalid runes. The decoders,
-				if I am reading correctly, will return a width regardless,
-				so we just pass over it. Garbage in, garbage out.
-				*/
-				Debug.Assert(w > 0);
 
 				current = Dict.Lookup(rune.Value);
 
