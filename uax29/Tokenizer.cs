@@ -1,15 +1,4 @@
-using System.Collections.Immutable;
-
 namespace UAX29;
-
-/// <summary>
-/// The function that splits a string or UTF-8 byte array into tokens.
-/// </summary>
-/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-/// <param name="input">The string to split/tokenize.</param>
-/// <param name="atEOF">The split may need to know if further data to be expected, such as from a stream.</param>
-/// <returns>How many bytes/chars were consumed from the input.</returns>
-internal delegate int Split<T>(ReadOnlySpan<T> input, bool atEOF = true);
 
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
@@ -47,7 +36,7 @@ public ref struct Tokenizer<T> where T : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..], true);
+			var advance = this.split(input[end..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{

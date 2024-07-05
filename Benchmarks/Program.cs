@@ -1,7 +1,11 @@
+using System.Buffers;
 using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
+
 using UAX29;
 
 var summary = BenchmarkRunner.Run<Benchmark>();
@@ -11,9 +15,22 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 // var throughput = benchmark.Throughput();
 // Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
+
+// [Config(typeof(Config))]
 [MemoryDiagnoser]
 public class Benchmark
 {
+	private class Config : ManualConfig
+	{
+		public Config()
+		{
+			AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
+			// You can also use other profilers like:
+			// AddDiagnoser(new EtwProfiler());
+			// AddDiagnoser(new PerfCollectProfiler()); // for Linux
+		}
+	}
+
 	static byte[] sample = [];
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
@@ -43,7 +60,6 @@ public class Benchmark
 		{
 		}
 	}
-
 
 	[Benchmark]
 	public void TokenizeStream()
@@ -99,7 +115,7 @@ public class Benchmark
 		const int runs = 1000;
 
 		// warmup
-		for (var i = 0; i < runs; i++)
+		for (var i = 0; i < 2 * runs; i++)
 		{
 			var tokens = Tokenizer.GetWords(sample);
 			foreach (var token in tokens)

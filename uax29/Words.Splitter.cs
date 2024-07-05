@@ -1,6 +1,7 @@
 ﻿namespace UAX29;
 
 using System.Buffers;
+using System.Diagnostics;
 using System.Text;
 
 /// A bitmap of Unicode categories
@@ -8,77 +9,68 @@ using Property = uint;
 
 internal static partial class Words
 {
-    internal static readonly Split<byte> SplitUtf8Bytes = new Splitter<byte>(Rune.DecodeFromUtf8, Rune.DecodeLastFromUtf8).Split;
-    internal static readonly Split<char> SplitChars = new Splitter<char>(Rune.DecodeFromUtf16, Rune.DecodeLastFromUtf16).Split;
+    internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
+    internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
-    internal sealed class Splitter<TSpan> : SplitterBase<TSpan>
+    sealed class Splitter<TSpan>
     {
-        internal Splitter(Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune) :
-            base(Words.Dict, Ignore, decodeFirstRune, decodeLastRune)
-        { }
+        readonly Decoders<TSpan> Decode;
+        internal Splitter(Decoders<TSpan> decoders)
+        {
+            this.Decode = decoders;
+        }
 
         const Property AHLetter = ALetter | Hebrew_Letter;
         const Property MidNumLetQ = MidNumLet | Single_Quote;
-        new const Property Ignore = Extend | Format | ZWJ;
+        const Property Ignore = Extend | Format | ZWJ;
 
-        internal override int Split(ReadOnlySpan<TSpan> input, bool atEOF = true)
+        internal int Split(ReadOnlySpan<TSpan> input)
         {
-            if (input.Length == 0)
-            {
-                return 0;
-            }
+            Debug.Assert(input.Length > 0);
 
             // These vars are stateful across loop iterations
             int pos = 0;
             int w;
             Property current = 0;
+            Property lastExIgnore = 0;      // "last excluding ignored categories"
+            Property lastLastExIgnore = 0;  // "the last one before that"
+            int regionalIndicatorCount = 0;
 
-            while (true)
             {
-                var sot = pos == 0;             // "start of text"
-                var eot = pos == input.Length;   // "end of text"
-
-                if (eot)
+                // https://unicode.org/reports/tr29/#WB1
+                // start of text always advances
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
+                if (status != OperationStatus.Done)
                 {
-                    if (!atEOF)
-                    {
-                        // TODO Token extends past current data, request more
-                        return 0;
-                    }
+                    // Garbage in, garbage out
+                    pos += w;
+                    return pos;
+                }
+                current = Dict.Lookup(rune.Value);
+                pos += w;
+            }
 
-                    // https://unicode.org/reports/tr29/#WB2
-                    break;
+            // https://unicode.org/reports/tr29/#WB2
+            while (pos < input.Length)
+            {
+                var last = current;
+                if (!last.Is(Ignore))
+                {
+                    lastLastExIgnore = lastExIgnore;
+                    lastExIgnore = last;
                 }
 
-                var last = current;
-
-                var status = DecodeFirstRune(input[pos..], out Rune rune, out w);
+                var status = Decode.FirstRune(input[pos..], out Rune rune, out w);
+                Debug.Assert(w > 0);
                 if (status != OperationStatus.Done)
                 {
                     // Garbage in, garbage out
                     pos += w;
                     break;
                 }
-                if (w == 0)
-                {
-                    if (atEOF)
-                    {
-                        // Just return the bytes, we can't do anything with them
-                        pos = input.Length;
-                        break;
-                    }
-                    // Rune extends past current data, request more
-                    return 0;
-                }
 
                 current = Dict.Lookup(rune.Value);
-
-                // https://unicode.org/reports/tr29/#WB1
-                if (sot)
-                {
-                    pos += w;
-                    continue;
-                }
 
                 // Optimization: no rule can possibly apply
                 if ((current | last) == 0)
@@ -126,189 +118,82 @@ internal static partial class Words
                 // The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
                 // https://unicode.org/reports/tr29/#WB5
-                if (current.Is(AHLetter) && last.Is(AHLetter | Ignore))
+                if (current.Is(AHLetter) && lastExIgnore.Is(AHLetter))
                 {
-                    // Optimization: maybe a run without ignored characters
-                    if (last.Is(AHLetter))
-                    {
-                        pos += w;
-                        while (pos < input.Length)
-                        {
-                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
-                            if (status != OperationStatus.Done)
-                            {
-                                // Garbage in, garbage out
-                                break;
-                            }
-                            if (w2 == 0)
-                            {
-                                break;
-                            }
-
-                            var lookup = Dict.Lookup(rune2.Value);
-                            if (!lookup.Is(AHLetter))
-                            {
-                                break;
-                            }
-
-                            // Update stateful vars
-                            current = lookup;
-                            w = w2;
-
-                            pos += w;
-                        }
-                        continue;
-                    }
-
-                    // Otherwise, do proper look back per WB4
-                    if (Previous(AHLetter, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if WB6 can possibly apply
-                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && last.Is(AHLetter | Ignore);
+                var maybeWB6 = current.Is(MidLetter | MidNumLetQ) && lastExIgnore.Is(AHLetter);
 
                 // https://unicode.org/reports/tr29/#WB6
                 if (maybeWB6)
                 {
-                    if (Subsequent(AHLetter, input[(pos + w)..]) && Previous(AHLetter, input[..pos]))
+                    if (Subsequent(AHLetter, input[(pos + w)..]))
                     {
                         pos += w;
                         continue;
                     }
                 }
-
-                // Optimization: determine if WB7 can possibly apply
-                var maybeWB7 = current.Is(AHLetter) && last.Is(MidLetter | MidNumLetQ | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB7
-                if (maybeWB7)
+                if (current.Is(AHLetter) && lastExIgnore.Is(MidLetter | MidNumLetQ) && lastLastExIgnore.Is(AHLetter))
                 {
-                    var i = PreviousIndex(MidLetter | MidNumLetQ, input[..pos]);
-                    if (i > 0 && Previous(AHLetter, input[..i]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
-                // Optimization: determine if WB7a can possibly apply
-                var maybeWB7a = current.Is(Single_Quote) && last.Is(Hebrew_Letter | Ignore);
-
                 // https://unicode.org/reports/tr29/#WB7a
-                if (maybeWB7a)
+                if (current.Is(Single_Quote) && lastExIgnore.Is(Hebrew_Letter))
                 {
-                    if (Previous(Hebrew_Letter, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if WB7b can possibly apply
-                var maybeWB7b = current.Is(Double_Quote) && last.Is(Hebrew_Letter | Ignore);
+                var maybeWB7b = current.Is(Double_Quote) && lastExIgnore.Is(Hebrew_Letter);
 
                 // https://unicode.org/reports/tr29/#WB7b
                 if (maybeWB7b)
                 {
-                    if (Subsequent(Hebrew_Letter, input[(pos + w)..]) && Previous(Hebrew_Letter, input[..pos]))
+                    if (Subsequent(Hebrew_Letter, input[(pos + w)..]))
                     {
                         pos += w;
                         continue;
                     }
                 }
 
-                // Optimization: determine if WB7c can possibly apply
-                var maybeWB7c = current.Is(Hebrew_Letter) && last.Is(Double_Quote | Ignore);
-
                 // https://unicode.org/reports/tr29/#WB7c
-                if (maybeWB7c)
+                if (current.Is(Hebrew_Letter) && lastExIgnore.Is(Double_Quote) && lastLastExIgnore.Is(Hebrew_Letter))
                 {
-                    var i = PreviousIndex(Double_Quote, input[..pos]);
-                    if (i > 0 && Previous(Hebrew_Letter, input[..i]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // https://unicode.org/reports/tr29/#WB8
                 // https://unicode.org/reports/tr29/#WB9
                 // https://unicode.org/reports/tr29/#WB10
-                if (current.Is(Numeric | AHLetter) && last.Is(Numeric | AHLetter | Ignore))
+                if (current.Is(Numeric | AHLetter) && lastExIgnore.Is(Numeric | AHLetter))
                 {
-                    // Note: this logic de facto expresses WB5 as well, but harmless since WB5
-                    // was already tested above
-
-                    // Optimization: maybe a run without ignored characters
-                    if (last.Is(Numeric | AHLetter))
-                    {
-                        pos += w;
-                        while (pos < input.Length)
-                        {
-                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
-                            if (status != OperationStatus.Done)
-                            {
-                                // Garbage in, garbage out
-                                break;
-                            }
-                            if (w2 == 0)
-                            {
-                                break;
-                            }
-
-                            var lookup = Dict.Lookup(rune2.Value);
-
-                            if (!lookup.Is(Numeric | AHLetter))
-                            {
-                                break;
-                            }
-                            if (w2 == 0)
-                            {
-                                break;
-                            }
-
-                            // Update stateful vars
-                            current = lookup;
-                            w = w2;
-
-                            pos += w;
-                        }
-                        continue;
-                    }
-
-                    // Otherwise, do proper lookback per WB4
-                    if (Previous(Numeric | AHLetter, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
-                // Optimization: determine if WB11 can possibly apply
-                var maybeWB11 = current.Is(Numeric) && last.Is(MidNum | MidNumLetQ | Ignore);
-
                 // https://unicode.org/reports/tr29/#WB11
-                if (maybeWB11)
+                if (current.Is(Numeric) && lastExIgnore.Is(MidNum | MidNumLetQ) && lastLastExIgnore.Is(Numeric))
                 {
-                    var i = PreviousIndex(MidNum | MidNumLetQ, input[..pos]);
-                    if (i > 0 && Previous(Numeric, input[..i]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if WB12 can possibly apply
-                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && last.Is(Numeric | Ignore);
+                var maybeWB12 = current.Is(MidNum | MidNumLetQ) && lastExIgnore.Is(Numeric);
 
                 // https://unicode.org/reports/tr29/#WB12
                 if (maybeWB12)
                 {
-                    if (Subsequent(Numeric, input[(pos + w)..]) && Previous(Numeric, input[..pos]))
+                    if (Subsequent(Numeric, input[(pos + w)..]))
                     {
                         pos += w;
                         continue;
@@ -316,127 +201,36 @@ internal static partial class Words
                 }
 
                 // https://unicode.org/reports/tr29/#WB13
-                if (current.Is(Katakana) && last.Is(Katakana | Ignore))
+                if (current.Is(Katakana) && lastExIgnore.Is(Katakana | Ignore))
                 {
-                    // Optimization: maybe a run without ignored characters
-                    if (last.Is(Katakana))
-                    {
-                        pos += w;
-                        while (pos < input.Length)
-                        {
-                            status = DecodeFirstRune(input[pos..], out Rune rune2, out int w2);
-                            if (status != OperationStatus.Done)
-                            {
-                                // Garbage in, garbage out
-                                break;
-                            }
-                            if (w2 == 0)
-                            {
-                                break;
-                            }
-
-                            var lookup = Dict.Lookup(rune2.Value);
-                            if (!lookup.Is(Katakana))
-                            {
-                                break;
-                            }
-
-                            // Update stateful vars
-                            current = lookup;
-                            w = w2;
-
-                            pos += w;
-                        }
-                        continue;
-                    }
-
-                    // Otherwise, do proper lookback per WB4
-                    if (Previous(Katakana, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
-
-                // Optimization: determine if WB13a can possibly apply
-                var maybeWB13a = current.Is(ExtendNumLet) && last.Is(AHLetter | Numeric | Katakana | ExtendNumLet | Ignore);
 
                 // https://unicode.org/reports/tr29/#WB13a
-                if (maybeWB13a)
+                if (current.Is(ExtendNumLet) && lastExIgnore.Is(AHLetter | Numeric | Katakana | ExtendNumLet))
                 {
-                    if (Previous(AHLetter | Numeric | Katakana | ExtendNumLet, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
-                // Optimization: determine if WB13b can possibly apply
-                var maybeWB13b = current.Is(AHLetter | Numeric | Katakana) && last.Is(ExtendNumLet | Ignore);
-
                 // https://unicode.org/reports/tr29/#WB13b
-                if (maybeWB13b)
+                if (current.Is(AHLetter | Numeric | Katakana) && lastExIgnore.Is(ExtendNumLet))
                 {
-                    if (Previous(ExtendNumLet, input[..pos]))
-                    {
-                        pos += w;
-                        continue;
-                    }
+                    pos += w;
+                    continue;
                 }
 
                 // Optimization: determine if WB15 or WB16 can possibly apply
-                var maybeWB1516 = current.Is(Regional_Indicator) && last.Is(Regional_Indicator | Ignore);
+                var maybeWB1516 = current.Is(Regional_Indicator) && lastExIgnore.Is(Regional_Indicator);
 
-                // https://unicode.org/reports/tr29/#WB15 and
+                // https://unicode.org/reports/tr29/#WB15
                 // https://unicode.org/reports/tr29/#WB16
                 if (maybeWB1516)
                 {
-                    // WB15: Odd number of RI before hitting start of text
-                    // WB16: Odd number of RI before hitting [^RI], aka "not RI"
+                    regionalIndicatorCount++;
 
-                    var i = pos;
-                    var count = 0;
-
-                    while (i > 0)
-                    {
-                        status = DecodeLastRune(input[..i], out Rune rune2, out int w2);
-                        if (status != OperationStatus.Done)
-                        {
-                            // Garbage in, garbage out
-                            break;
-                        }
-                        if (w2 == 0)
-                        {
-                            break;
-                        }
-
-                        i -= w2;
-
-                        var lookup = Dict.Lookup(rune2.Value);
-                        if (status != OperationStatus.Done)
-                        {
-                            // Garbage in, garbage out
-                            break;
-                        }
-
-                        if (lookup.Is(Ignore))
-                        {
-                            continue;
-                        }
-
-                        if (!lookup.Is(Regional_Indicator))
-                        {
-                            // It's WB16
-                            break;
-                        }
-
-                        count++;
-                    }
-
-                    // If i == 0, we fell through and hit sot (start of text), so WB15 applies
-                    // If i > 0, we hit a non-RI, so WB16 applies
-
-                    var odd = count % 2 == 1;
+                    var odd = regionalIndicatorCount % 2 == 1;
                     if (odd)
                     {
                         pos += w;
@@ -450,6 +244,46 @@ internal static partial class Words
             }
 
             return pos;
+
+
+            /// <summary>
+            /// Seek forward until it hits a rune which matches property.
+            /// </summary>
+            /// <param name="property">Property to attempt to find</param>
+            /// <param name="input">Data in which to seek</param>
+            /// <returns>True if found, otherwise false</returns>
+            bool Subsequent(Property property, ReadOnlySpan<TSpan> input)
+            {
+                var i = 0;
+                while (i < input.Length)
+                {
+                    var status = Decode.FirstRune(input[i..], out Rune rune, out int w);
+                    Debug.Assert(w > 0);
+                    if (status != OperationStatus.Done)
+                    {
+                        // Garbage in, garbage out
+                        break;
+                    }
+
+                    var lookup = Dict.Lookup(rune.Value);
+
+                    if (lookup.Is(Ignore))
+                    {
+                        i += w;
+                        continue;
+                    }
+
+                    if (lookup.Is(property))
+                    {
+                        return true;
+                    }
+
+                    // If we get this far, it's not there
+                    break;
+                }
+
+                return false;
+            }
         }
     }
 }

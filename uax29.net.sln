@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{AB02171B-4ADB-4728-8679-D1CA40EDA798}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{AB02171B-4ADB-4728-8679-D1CA40EDA798}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uax29", "uax29\uax29.csproj", "{901775A9-006B-4627-9B57-92EC4C921738}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uax29", "uax29\uax29.csproj", "{901775A9-006B-4627-9B57-92EC4C921738}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codegen", "Codegen\Codegen.csproj", "{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codegen", "Codegen\Codegen.csproj", "{C5D56C4E-7E06-4FD8-B7F8-FE29667A08F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {77B7CAB7-7556-4E93-A268-79EE0E9B39B7}
 	EndGlobalSection
 EndGlobal

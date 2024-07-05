@@ -1,135 +1,15 @@
 ﻿namespace UAX29;
 
-using System.Buffers;
-using System.Text;
-
 /// A bitmap of Unicode categories
 using Property = uint;
 
-internal delegate OperationStatus Decoder<TSpan>(ReadOnlySpan<TSpan> input, out Rune result, out int consumed);
-
-internal abstract class SplitterBase<TSpan>
-{
-    readonly internal Dict Dict;
-    readonly internal Property Ignore;
-    readonly internal Decoder<TSpan> DecodeFirstRune;
-    readonly internal Decoder<TSpan> DecodeLastRune;
-
-    public SplitterBase(Dict dict, Property ignore, Decoder<TSpan> decodeFirstRune, Decoder<TSpan> decodeLastRune)
-    {
-        this.Dict = dict;
-        this.Ignore = ignore;
-        this.DecodeFirstRune = decodeFirstRune;
-        this.DecodeLastRune = decodeLastRune;
-    }
-
-    /// <summary>
-    /// Reads input until a token break
-    /// </summary>
-    /// <param name="input">Data to split</param>
-    /// <param name="atEOF">
-    /// Indicates whether the current input is all that is coming.
-    /// (Always true in the current implementation, we may implement streaming in the future.)
-    /// </param>
-    /// <returns></returns>
-    internal abstract int Split(ReadOnlySpan<TSpan> input, bool atEOF);
-
-    /// <summary>
-    /// Seek backward until it hits a rune which matches property.
-    /// </summary>
-    /// <param name="property">Property to attempt to find</param>
-    /// <param name="input">Data in which to seek</param>
-    /// <returns>The index if found, or -1 if not</returns>
-    internal int PreviousIndex(Property property, ReadOnlySpan<TSpan> input)
-    {
-        // Start at the end of the buffer and move backwards
-        var i = input.Length;
-        while (i > 0)
-        {
-            var status = DecodeLastRune(input[..i], out Rune rune, out int w);
-            if (status != OperationStatus.Done)
-            {
-                // Garbage in, garbage out
-                break;
-            }
-            if (w == 0)
-            {
-                break;
-            }
-
-            i -= w;
-            var lookup = Dict.Lookup(rune.Value);
-
-            if (lookup.Is(Ignore))
-            {
-                continue;
-            }
-
-            if (lookup.Is(property))
-            {
-                return i;
-            }
-
-            // If we get this far, it's not there
-            break;
-        }
-
-        return -1;
-    }
-
-    /// <summary>
-    /// Seek backward until it hits a rune which matches property.
-    /// </summary>
-    /// <param name="property">Property to attempt to find</param>
-    /// <param name="input">Data in which to seek</param>
-    /// <returns>True if found, otherwise false</returns>
-    internal bool Previous(Property property, ReadOnlySpan<TSpan> input)
-    {
-        return PreviousIndex(property, input) != -1;
-    }
-
-    /// <summary>
-    /// Seek forward until it hits a rune which matches property.
-    /// </summary>
-    /// <param name="property">Property to attempt to find</param>
-    /// <param name="input">Data in which to seek</param>
-    /// <returns>True if found, otherwise false</returns>
-    internal bool Subsequent(Property property, ReadOnlySpan<TSpan> input)
-    {
-        var i = 0;
-        while (i < input.Length)
-        {
-            var status = DecodeFirstRune(input[i..], out Rune rune, out int w);
-            if (status != OperationStatus.Done)
-            {
-                // Garbage in, garbage out
-                break;
-            }
-            if (w == 0)
-            {
-                break;
-            }
-
-            var lookup = Dict.Lookup(rune.Value);
-
-            if (lookup.Is(Ignore))
-            {
-                i += w;
-                continue;
-            }
-
-            if (lookup.Is(property))
-            {
-                return true;
-            }
-
-            // If we get this far, it's not there
-            break;
-        }
-
-        return false;
-    }
-}
+/// <summary>
+/// The function that splits a string or UTF-8 byte array into tokens.
+/// </summary>
+/// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
+/// <param name="input">The string to split/tokenize.</param>
+/// <returns>How many bytes/chars were consumed from the input.</returns>
+internal delegate int Split<T>(ReadOnlySpan<T> input);
 
 internal static class Extensions
 {

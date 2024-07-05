@@ -7,7 +7,7 @@ using Property = uint;
 
 internal class Dict
 {
-	FrozenDictionary<int, Property> lookups;
+	readonly FrozenDictionary<int, Property> lookups;
 	internal Dict(Dictionary<int, Property> lookups)
 	{
 		this.lookups = lookups.ToFrozenDictionary();
