@@ -3,6 +3,7 @@ namespace Tests;
 using UAX29;
 using System.Linq;
 using System.Text;
+using System.Security.Cryptography;
 
 public class UnicodeTest(byte[] input, byte[][] expected, string comment)
 {
@@ -51,8 +52,10 @@ public class TestUnicode
 	static readonly CharMethod[] charMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 
 	[Test]
-	public void InvalidUTF8()
+	public void InvalidEncoding()
 	{
+		// All bytes and char that go into the tokenizer should come back out, even if invalid
+
 		byte[] invalidUtf8Bytes =
 		[
 			0xE2, 0x28, 0xA1, 					// Invalid sequence: 0xE2 should be followed by two bytes in the range 0x80 to 0xBF
@@ -95,6 +98,40 @@ public class TestUnicode
 			}
 
 			Assert.That(results.SequenceEqual(invalidChars));
+		}
+
+		using var rng = RandomNumberGenerator.Create();
+		foreach (var i in Enumerable.Range(1, 100))
+		{
+			var bytes = new byte[i];
+			rng.GetBytes(bytes);
+			var s = Encoding.UTF8.GetString(bytes);
+
+			foreach (var method in byteMethods)
+			{
+				{
+					var tokens = method(bytes);
+
+					var results = new List<byte>();
+					foreach (var token in tokens)
+					{
+						results.AddRange(token);
+					}
+					Assert.That(results.SequenceEqual(bytes));
+				}
+			}
+
+			foreach (var method in charMethods)
+			{
+				var tokens = method(s.ToCharArray());
+
+				var results = new List<char>();
+				foreach (var token in tokens)
+				{
+					results.AddRange(token);
+				}
+				Assert.That(results.SequenceEqual(s));
+			}
 		}
 	}
 }
