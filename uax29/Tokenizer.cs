@@ -10,8 +10,18 @@ public ref struct Tokenizer<T> where T : struct
 
 	readonly Split<T> split;
 
+	/// <summary>
+	/// Start index of the token in the input string
+	/// </summary>
 	internal int start = 0;
+	/// <summary>
+	/// End index of the token in the input string
+	/// </summary>
 	internal int end = 0;
+	/// <summary>
+	/// Position cursor in the input string
+	/// </summary>
+	internal int pos = 0;
 
 	bool begun = false;
 
@@ -36,15 +46,16 @@ public ref struct Tokenizer<T> where T : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..]);
+			var (start, end, advance) = this.split(input[this.pos..]);
 			// Interpret as EOF
 			if (advance == 0)
 			{
 				return false;
 			}
 
-			start = end;
-			end = start + advance;
+			this.start = this.pos + start;
+			this.end = this.pos + end;
+			this.pos += advance;
 
 			return true;
 		}
@@ -127,7 +138,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// Get the ranges (boundaries) of the tokens.
 	/// </summary>
 	/// <returns>
-	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input 
+	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input
 	/// using [range] or .AsSpan(range) to get the tokens.
 	/// </returns>
 	public RangeTokenizer<T> Ranges

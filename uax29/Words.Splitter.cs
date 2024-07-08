@@ -23,7 +23,7 @@ internal static partial class Words
 		const Property MidNumLetQ = MidNumLet | Single_Quote;
 		const Property Ignore = Extend | Format | ZWJ;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		internal (int start, int end, int advance) Split(ReadOnlySpan<TSpan> input)
 		{
 			Debug.Assert(input.Length > 0);
 
@@ -226,7 +226,7 @@ internal static partial class Words
 				break;
 			}
 
-			return pos;
+			return (0, pos, pos);
 
 
 			/// <summary>

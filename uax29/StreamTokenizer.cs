@@ -8,8 +8,18 @@ public ref struct StreamTokenizer<T> where T : struct
 	internal Buffer<T> buffer;
 	readonly Split<T> split;
 
-	internal const int start = 0;   // with buffer, it's always 0
+	/// <summary>
+	/// Start index of the token in the input string
+	/// </summary>
+	internal int start = 0;   // with buffer, it's always 0
+	/// <summary>
+	/// End index of the token in the input string
+	/// </summary>
 	internal int end = 0;
+	/// <summary>
+	/// Position cursor in the input stream
+	/// </summary>
+	internal int advance;
 
 	bool begun = false;
 
@@ -30,16 +40,18 @@ public ref struct StreamTokenizer<T> where T : struct
 
 		if (end < buffer.Contents.Length)
 		{
-			buffer.Consume(this.Current.Length);    // previous token
+			buffer.Consume(this.advance);    // previous token
 
-			var advance = this.split(buffer.Contents);
+			var (start, end, advance) = this.split(buffer.Contents);
 			// Interpret as EOF
 			if (advance == 0)
 			{
 				return false;
 			}
 
-			end = advance;
+			this.start = start;
+			this.end = end;
+			this.advance = advance;
 
 			return true;
 		}

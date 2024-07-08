@@ -21,7 +21,7 @@ internal static partial class Graphemes
 
 		const Property Ignore = Extend;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		internal (int start, int end, int advance) Split(ReadOnlySpan<TSpan> input)
 		{
 			Debug.Assert(input.Length > 0);
 
@@ -158,7 +158,7 @@ internal static partial class Graphemes
 				break;
 			}
 
-			return pos;
+			return (0, pos, pos);
 		}
 	}
 }
