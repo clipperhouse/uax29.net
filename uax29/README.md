@@ -49,7 +49,7 @@ world
 var utf8bytes = Encoding.UTF8.GetBytes(example);
 var graphemes = Tokenizer.GetGraphemes(utf8bytes);
 
-// Iterate over the tokens		
+// Iterate over the tokens
 foreach (var grapheme in graphemes)
 {
     // grapheme is a ReadOnlySpan<byte> of UTF-8 bytes
@@ -98,6 +98,20 @@ We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-
 
 This is the same algorithm that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
 
+### Performance
+
+When tokenizing words, I get around 120MB/s on my Macbook M2. For typical text, that's around 30 million tokens/s. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
+
+The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
+
+Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
+
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
+
+### Invalid inputs
+
+The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L42-L67) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
+
 ### Major version changes
 
 If you are using v1.x of this package, v2 has been renamed:
@@ -111,20 +125,6 @@ We now use extension methods:
 `Tokenizer.Create(input)` → `Tokenizer.GetWords(input)`
 
 `Tokenizer.Create(input, TokenType.Graphemes)` → `Tokenizer.GetGraphemes(input)`
-
-### Performance
-
-When tokenizing words, I get around 100MB/s on my Macbook M2. For typical text, that's around 25MM tokens/s. [Benchmarks](https://github.com/clipperhouse/uax29.net/tree/main/Benchmarks)
-
-The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
-
-Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
-
-For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.   
-
-### Invalid inputs
-
-The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L42-L67) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
 
 ### Prior art
 
