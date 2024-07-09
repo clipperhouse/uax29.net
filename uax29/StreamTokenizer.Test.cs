@@ -246,4 +246,28 @@ public class TestStreamTokenizer
         }
         Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
     }
+
+    [Test]
+    public void Position()
+    {
+        var example = "abcdefghi jklmnopqr stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
+        var bytes = Encoding.UTF8.GetBytes(example);
+        using var stream = new MemoryStream(bytes);
+
+        {
+            var tokens = Tokenizer.GetWords(stream, 8);
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(0));
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(9));
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(10));
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(19));
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(20));
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(23));
+        }
+    }
 }

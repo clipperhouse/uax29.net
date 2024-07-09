@@ -11,6 +11,12 @@ public ref struct Tokenizer<T> where T : struct
 	readonly Split<T> split;
 
 	internal int start = 0;
+
+	/// <summary>
+	/// The byte or char position of the current token in the original string.
+	/// </summary>
+	public readonly int Position => start;
+
 	internal int end = 0;
 
 	bool begun = false;
@@ -127,7 +133,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// Get the ranges (boundaries) of the tokens.
 	/// </summary>
 	/// <returns>
-	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input 
+	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input
 	/// using [range] or .AsSpan(range) to get the tokens.
 	/// </returns>
 	public RangeTokenizer<T> Ranges

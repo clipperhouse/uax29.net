@@ -11,6 +11,13 @@ public ref struct StreamTokenizer<T> where T : struct
 	internal const int start = 0;   // with buffer, it's always 0
 	internal int end = 0;
 
+	/// <summary>
+	/// The byte or char position of the current token in the stream.
+	/// </summary>
+	public readonly int Position => count;
+
+	internal int count = 0;
+
 	bool begun = false;
 
 	/// <summary>
@@ -27,6 +34,7 @@ public ref struct StreamTokenizer<T> where T : struct
 	public bool MoveNext()
 	{
 		begun = true;
+		count += end;
 
 		if (end < buffer.Contents.Length)
 		{
