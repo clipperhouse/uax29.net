@@ -255,7 +255,7 @@ public class TestTokenizer
 			var s = tokens.Current.ToString();
 			first.Add(s);
 		}
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing		
+		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
 		var tokens2 = Tokenizer.GetWords(input);
 		var second = new List<string>();
@@ -331,5 +331,48 @@ public class TestTokenizer
 			threw = true;
 		}
 		Assert.That(threw, Is.True, "Calling ToArray after iteration has begun should throw");
+	}
+
+	[Test]
+	public void Position()
+	{
+		var example = "Hello, how are you?";
+
+		{
+			var tokens = Tokenizer.GetWords(example);
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(0));
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(5));
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(6));
+
+			tokens.Reset();
+			var ranges = tokens.Ranges;
+			foreach (var range in ranges)
+			{
+				tokens.MoveNext();
+				Assert.That(tokens.Position, Is.EqualTo(range.Start.Value));
+			}
+		}
+
+		var bytes = Encoding.UTF8.GetBytes(example);
+		{
+			var tokens = Tokenizer.GetWords(bytes);
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(0));
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(5));
+			tokens.MoveNext();
+			Assert.That(tokens.Position, Is.EqualTo(6));
+
+			tokens.Reset();
+			var ranges = tokens.Ranges;
+			foreach (var range in ranges)
+			{
+				tokens.MoveNext();
+				Assert.That(tokens.Position, Is.EqualTo(range.Start.Value));
+			}
+		}
 	}
 }
