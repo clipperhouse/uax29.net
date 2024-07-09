@@ -36,7 +36,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>UAX29</PackageId>
-    <Version>2.1.0</Version>
+    <Version>2.2.0-beta</Version>
     <Authors>clipperhouse</Authors>
     <Description>Tokenizes (split) words, graphemes and sentences, based on Unicode text segmentation (UAX #29). https://unicode.org/reports/tr29/</Description>
     <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression>
