@@ -8,6 +8,8 @@ using Property = uint;
 
 internal static partial class Words
 {
+	internal const Property Whitespace = CR | LF | WSegSpace | Tab;
+
 	internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
 	internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
@@ -50,6 +52,7 @@ internal static partial class Words
 
 				pos += w;
 				current = Dict.Lookup(rune.Value);
+				seen |= current;
 			}
 
 			// https://unicode.org/reports/tr29/#WB2

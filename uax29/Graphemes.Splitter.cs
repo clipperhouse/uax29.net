@@ -21,14 +21,13 @@ internal static partial class Graphemes
 
 		const Property Ignore = Extend;
 
-		internal int Split(ReadOnlySpan<TSpan> input, out Property seen)
+		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);
 
 			// These vars are stateful across loop iterations
 			var pos = 0;
 			int w;
-			seen = 0;
 			Property current = 0;
 			Property lastExIgnore = 0;      // "last excluding ignored categories"
 			Property lastLastExIgnore = 0;  // "last one before that"
@@ -38,7 +37,7 @@ internal static partial class Graphemes
 				// https://unicode.org/reports/tr29/#GB1
 				// start of text always advances
 
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -53,7 +52,7 @@ internal static partial class Graphemes
 			// https://unicode.org/reports/tr29/#GB2
 			while (pos < input.Length)
 			{
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -67,8 +66,6 @@ internal static partial class Graphemes
 					lastLastExIgnore = lastExIgnore;
 					lastExIgnore = last;
 				}
-
-				seen |= last;
 
 				current = Dict.Lookup(rune.Value);
 
@@ -160,6 +157,7 @@ internal static partial class Graphemes
 				break;
 			}
 
+			_ = 0;  // see the Property out parameter at tops
 			return pos;
 		}
 	}

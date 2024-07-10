@@ -25,6 +25,7 @@ internal static partial class Words
 	const Property ZWJ = 65536;
 	const Property WSegSpace = 131072;
 	const Property Extended_Pictographic = 262144;
+	const Property Tab = 524288;
 
 	internal static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
@@ -36853,5 +36854,6 @@ internal static partial class Words
 		{0x1FFFB, Extended_Pictographic},
 		{0x1FFFC, Extended_Pictographic},
 		{0x1FFFD, Extended_Pictographic},
+		{0x0009, Tab},
 	};	// end dict
 };	// end class

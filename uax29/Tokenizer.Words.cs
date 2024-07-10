@@ -9,7 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(Span<byte> input) => new(input, Words.SplitBytes);
+    public static Tokenizer<byte> GetWords(Span<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -18,7 +18,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(ReadOnlySpan<byte> input) => new(input, Words.SplitBytes);
+    public static Tokenizer<byte> GetWords(ReadOnlySpan<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -27,7 +27,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(Memory<byte> input) => new(input.Span, Words.SplitBytes);
+    public static Tokenizer<byte> GetWords(Memory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -36,7 +36,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(ReadOnlyMemory<byte> input) => new(input.Span, Words.SplitBytes);
+    public static Tokenizer<byte> GetWords(ReadOnlyMemory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given array of UTF-8 encoded bytes.
@@ -45,7 +45,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(byte[] input) => new(input.AsSpan(), Words.SplitBytes);
+    public static Tokenizer<byte> GetWords(byte[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given string.
@@ -54,7 +54,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(string input) => new(input.AsSpan(), Words.SplitChars);
+    public static Tokenizer<char> GetWords(string input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given string.
@@ -63,7 +63,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(char[] input) => new(input.AsSpan(), Words.SplitChars);
+    public static Tokenizer<char> GetWords(char[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Span"/> of <see cref="char"/>.
@@ -72,8 +72,8 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    /// 
-    public static Tokenizer<char> GetWords(Span<char> input) => new(input, Words.SplitChars);
+    ///
+    public static Tokenizer<char> GetWords(Span<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -82,7 +82,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(ReadOnlySpan<char> input) => new(input, Words.SplitChars);
+    public static Tokenizer<char> GetWords(ReadOnlySpan<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -91,7 +91,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(Memory<char> input) => new(input.Span, Words.SplitChars);
+    public static Tokenizer<char> GetWords(Memory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -100,7 +100,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(ReadOnlyMemory<char> input) => new(input.Span, Words.SplitChars);
+    public static Tokenizer<char> GetWords(ReadOnlyMemory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Stream"/> of UTF-8 encoded bytes.
@@ -109,17 +109,17 @@ public static partial class Tokenizer
     /// <param name="minBufferBytes">
     /// Optional, the minimum bytes to buffer from the Stream. This determines the maximum word token size. Tokens that exceed the bytes in the buffer
     /// will simply be cut off at this length, no error will occur.
-    /// 
+    ///
     /// Default is 1024 bytes. The tokenizer is intended for natural language, so we don't expect you'll find text with a word beyond a couple of dozen bytes.
     /// </param>
     /// <param name="bufferStorage">
     /// Optional, a byte array for underlying buffer storage. It must be at least as large at minBufferBytes.
-    /// 
+    ///
     /// If not provided, storage of 2 * minBufferBytes will be allocated by default.
-    /// 
-    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferBytes allows fewer, larger reads the stream, 
+    ///
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferBytes allows fewer, larger reads the stream,
     /// which is more efficient, but will increase memory usage.
-    /// 
+    ///
     /// You might also wish to use ArrayPool<byte> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>
@@ -139,17 +139,17 @@ public static partial class Tokenizer
     /// <param name="minBufferChars">
     /// Optional, the minimum chars to buffer from the reader. This determines the maximum word token size. Tokens that exceed the chars in the buffer
     /// will simply be cut off at this length, no error will occur.
-    /// 
+    ///
     /// Default is 1024 chars. The tokenizer is intended for natural language, so we don't expect you'll find text with a word beyond a few dozen chars.
     /// </param>
     /// <param name="bufferStorage">
     /// Optional, a char array for underlying buffer storage. It must be at least as large at minBufferChars.
-    /// 
+    ///
     /// If not provided, storage of 2 * minBufferChars will be allocated by default.
-    /// 
-    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferChars allows fewer, larger reads the reader, 
+    ///
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferChars allows fewer, larger reads the reader,
     /// which is more efficient, but will increase memory usage.
-    /// 
+    ///
     /// You might also wish to use ArrayPool<char> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>

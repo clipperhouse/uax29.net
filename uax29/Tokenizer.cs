@@ -30,6 +30,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
+	/// <param name="options">Options for handling the input text.</param>
 	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
 	{
 		this.input = input;
@@ -45,6 +46,7 @@ public ref struct Tokenizer<T> where T : struct
 	{
 		begun = true;
 
+	again:
 		if (end < input.Length)
 		{
 			var advance = this.split(input[end..], out var seen);
@@ -52,6 +54,12 @@ public ref struct Tokenizer<T> where T : struct
 
 			start = end;
 			end = start + advance;
+
+			// This option is only supported for words; prevent it at the static API level
+			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
+			{
+				goto again;
+			}
 
 			return true;
 		}
