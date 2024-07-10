@@ -45,11 +45,14 @@ public class TestUnicode
 		}
 	}
 
+
 	private delegate Tokenizer<byte> ByteMethod(byte[] input);
-	static readonly ByteMethod[] byteMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	static readonly ByteMethod byteWords = (byte[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
+	static readonly ByteMethod[] byteMethods = [byteWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 
 	private delegate Tokenizer<char> CharMethod(char[] input);
-	static readonly CharMethod[] charMethods = [Tokenizer.GetWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	static readonly CharMethod charWords = (char[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
+	static readonly CharMethod[] charMethods = [charWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 
 	[Test]
 	public void InvalidEncoding()

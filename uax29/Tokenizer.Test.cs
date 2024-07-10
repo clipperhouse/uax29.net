@@ -375,4 +375,36 @@ public class TestTokenizer
 			}
 		}
 	}
+
+	[Test]
+	public void OmitWhitespace()
+	{
+		// This is not exhaustive, but covers the basics
+
+		var example = "Hello, \nhow\r are\tyou?\n";
+
+		{
+			// Options.None should be lossless
+			var expected = example;
+			var got = string.Concat(
+				Tokenizer.GetWords(example, Options.None)
+				.ToList()
+				.SelectMany(c => c)
+			);
+
+			Assert.That(got, Is.EqualTo(expected));
+		}
+
+		{
+			// Options.OmitWhitespace should have no whitespace
+			var expected = new string(example.Where(c => !char.IsWhiteSpace(c)).ToArray());
+			var got = string.Concat(
+				Tokenizer.GetWords(example, Options.OmitWhitespace)
+				.ToList()
+				.SelectMany(c => c)
+			);
+
+			Assert.That(got, Is.EqualTo(expected));
+		}
+	}
 }

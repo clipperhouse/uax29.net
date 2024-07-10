@@ -113,6 +113,15 @@ internal class Program
 				}
 			}
 
+			if (typ == "Word")
+			{
+				// hack in a Tab category that the spec doesn't use, be we do
+				const string tab = "Tab";
+				currentCat <<= 1;
+				cats.Add(tab, currentCat);
+				catsByRune.Add(0x09, tab);
+			}
+
 			// write the file
 			using var dict = new StreamWriter($"../uax29/{typ}s.Dict.cs");
 
