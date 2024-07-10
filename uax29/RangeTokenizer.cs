@@ -1,5 +1,8 @@
 namespace UAX29;
 
+/// A bitmap of Unicode categories
+using Property = uint;
+
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
@@ -13,6 +16,8 @@ public ref struct RangeTokenizer<T> where T : struct
 	internal int start = 0;
 	internal int end = 0;
 
+	readonly Options options;
+
 	bool begun = false;
 
 	/// <summary>
@@ -20,10 +25,11 @@ public ref struct RangeTokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal RangeTokenizer(ReadOnlySpan<T> input, Split<T> split)
+	internal RangeTokenizer(Tokenizer<T> tok)
 	{
-		this.input = input;
-		this.split = split;
+		this.input = tok.input;
+		this.split = tok.split;
+		this.options = tok.options;
 	}
 
 	/// <summary>
@@ -36,7 +42,7 @@ public ref struct RangeTokenizer<T> where T : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..]);
+			var advance = this.split(input[end..], out Property _);
 			// Interpret as EOF
 			if (advance == 0)
 			{
