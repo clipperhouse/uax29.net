@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace UAX29;
 
 /// <summary>
@@ -6,9 +8,9 @@ namespace UAX29;
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 public ref struct Tokenizer<T> where T : struct
 {
-	ReadOnlySpan<T> input;
+	internal ReadOnlySpan<T> input;
 
-	readonly Split<T> split;
+	internal readonly Split<T> split;
 
 	internal int start = 0;
 
@@ -19,6 +21,8 @@ public ref struct Tokenizer<T> where T : struct
 
 	internal int end = 0;
 
+	internal readonly Options options;
+
 	bool begun = false;
 
 	/// <summary>
@@ -26,10 +30,11 @@ public ref struct Tokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
-	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split)
+	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
 	{
 		this.input = input;
 		this.split = split;
+		this.options = options;
 	}
 
 	/// <summary>
@@ -42,12 +47,8 @@ public ref struct Tokenizer<T> where T : struct
 
 		if (end < input.Length)
 		{
-			var advance = this.split(input[end..]);
-			// Interpret as EOF
-			if (advance == 0)
-			{
-				return false;
-			}
+			var advance = this.split(input[end..], out var seen);
+			Debug.Assert(advance > 0);
 
 			start = end;
 			end = start + advance;
@@ -140,7 +141,7 @@ public ref struct Tokenizer<T> where T : struct
 	{
 		get
 		{
-			return new RangeTokenizer<T>(input, split);
+			return new RangeTokenizer<T>(this);
 		}
 	}
 }

@@ -23,13 +23,14 @@ internal static partial class Words
 		const Property MidNumLetQ = MidNumLet | Single_Quote;
 		const Property Ignore = Extend | Format | ZWJ;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		internal int Split(ReadOnlySpan<TSpan> input, out Property seen)
 		{
 			Debug.Assert(input.Length > 0);
 
 			// These vars are stateful across loop iterations
 			int pos = 0;
 			int w;
+			seen = 0;
 			Property current = 0;
 			Property lastExIgnore = 0;      // "last excluding ignored categories"
 			Property lastLastExIgnore = 0;  // "the last one before that"
@@ -68,6 +69,8 @@ internal static partial class Words
 					lastLastExIgnore = lastExIgnore;
 					lastExIgnore = last;
 				}
+
+				seen |= last;
 
 				current = Dict.Lookup(rune.Value);
 

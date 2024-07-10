@@ -23,13 +23,14 @@ internal static partial class Sentences
 		const Property ParaSep = Sep | CR | LF;
 		const Property Ignore = Extend | Format;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		internal int Split(ReadOnlySpan<TSpan> input, out Property seen)
 		{
 			Debug.Assert(input.Length > 0);
 
 			// These vars are stateful across loop iterations
 			var pos = 0;
 			int w;
+			seen = 0;
 			Property current = 0;
 			Property lastExIgnore = 0;      // "last excluding ignored categories"
 			Property lastLastExIgnore = 0;  // "last one before that"
@@ -86,6 +87,8 @@ internal static partial class Sentences
 				{
 					lastExIgnoreSpClose = lastExIgnoreSp;
 				}
+
+				seen |= last;
 
 				current = Dict.Lookup(rune.Value);
 

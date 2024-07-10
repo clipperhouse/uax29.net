@@ -1,5 +1,8 @@
 ﻿namespace UAX29;
 
+/// A bitmap of Unicode categories
+using Property = uint;
+
 /// <summary>
 /// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>
@@ -40,7 +43,7 @@ public ref struct StreamTokenizer<T> where T : struct
 		{
 			buffer.Consume(this.Current.Length);    // previous token
 
-			var advance = this.split(buffer.Contents);
+			var advance = this.split(buffer.Contents, out Property _);
 			// Interpret as EOF
 			if (advance == 0)
 			{
