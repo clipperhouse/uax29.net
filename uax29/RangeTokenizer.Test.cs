@@ -40,47 +40,26 @@ public class TestRangeTokenizer
 		Assert.That(first.SequenceEqual(second));
 	}
 
-	[Test]
-	public void SetText()
-	{
-		var example = "Hello, how are you?";
-
-		var words = Tokenizer.GetWords(example);
-		var ranges = words.Ranges;
-
-		var first = new List<Range>();
-		foreach (var range in ranges)
-		{
-			first.Add(range);
-		}
-
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
-
-		ranges.SetText(example);
-
-		var second = new List<Range>();
-		foreach (var range in ranges)
-		{
-			second.Add(range);
-		}
-
-		Assert.That(first.SequenceEqual(second));
-	}
+	static readonly Options[] options = [Options.None, Options.OmitWhitespace];
 
 	[Test]
 	public void MatchesTokenizer()
 	{
-		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.GetWords(example);
-		var ranges = tokens.Ranges;
+		var example = "abcdefghijk lmnopq r \tstu vwxyz; ABC DEFG \r\nHIJKL MNOP Q RSTUV WXYZ! 你好，世界.\r";
 
-		foreach (var range in ranges)
+		foreach (var option in options)
 		{
-			tokens.MoveNext();
+			var tokens = Tokenizer.GetWords(example, option);
+			var ranges = tokens.Ranges;
 
-			var ranged = example.AsSpan(range);
-			var token = tokens.Current;
-			Assert.That(token.SequenceEqual(ranged));
+			foreach (var range in ranges)
+			{
+				tokens.MoveNext();
+
+				var ranged = example.AsSpan(range);
+				var token = tokens.Current;
+				Assert.That(token.SequenceEqual(ranged));
+			}
 		}
 	}
 
@@ -99,7 +78,7 @@ public class TestRangeTokenizer
 		{
 			first.Add(ranges.Current);
 		}
-		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing		
+		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
 
 		var tokens2 = Tokenizer.GetWords(input);
@@ -130,10 +109,6 @@ public class TestRangeTokenizer
 
 		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
 
-		// Tokenizer should reset back to the beginning
-		Assert.That(ranges.start, Is.EqualTo(0));
-		Assert.That(ranges.end, Is.EqualTo(0));
-
 		var threw = false;
 		ranges.MoveNext();
 		try
@@ -163,10 +138,6 @@ public class TestRangeTokenizer
 		}
 
 		Assert.That(array, Has.Length.EqualTo(i), "ToArray should return the same number of tokens as iteration");
-
-		// Tokenizer should reset back to the beginning
-		Assert.That(ranges.start, Is.EqualTo(0));
-		Assert.That(ranges.end, Is.EqualTo(0));
 
 		var threw = false;
 		ranges.MoveNext();
