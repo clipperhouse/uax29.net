@@ -108,6 +108,10 @@ Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-to
 
 For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
 
+### Options
+
+Pass `Options.OmitWhitespace` if you would like whitespace-only tokens not to be returned.
+
 ### Invalid inputs
 
 The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/uax29/Unicode.Test.cs#L55) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
@@ -120,7 +124,7 @@ If you are using v1.x of this package, v2 has been renamed:
 
 `using uax29` → `using UAX29`
 
-We now use extension methods:
+We renamed the methods:
 
 `Tokenizer.Create(input)` → `Tokenizer.GetWords(input)`
 
