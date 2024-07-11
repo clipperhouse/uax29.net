@@ -18,3 +18,11 @@ public enum Options : byte
     /// </summary>
     OmitWhitespace = 1,
 }
+
+internal static class OptionsExtensions
+{
+    internal static bool Includes(this Options options, Options compare)
+    {
+        return (options & compare) != 0;
+    }
+}

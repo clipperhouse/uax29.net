@@ -53,7 +53,7 @@ public ref struct StreamTokenizer<T> where T : struct
 			end = advance;
 
 			// This option is only supported for words; prevent it at the static API level
-			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
+			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
 			{
 				continue;
 			}
