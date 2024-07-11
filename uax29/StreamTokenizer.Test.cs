@@ -11,11 +11,13 @@ public class TestStreamTokenizer
     {
     }
 
+    static readonly Options[] options = [Options.None, Options.OmitWhitespace];
+
     /// <summary>
     /// Ensure that streamed text and static text return identical results.
     /// </summary>
     [Test]
-    public void Stream()
+    public void StreamMatchesStatic()
     {
         var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
         var examples = new List<string>()
@@ -23,27 +25,30 @@ public class TestStreamTokenizer
             example,											// smaller than the buffer
 			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
 		};
-
-        foreach (var input in examples)
+        foreach (var option in options)
         {
-            var bytes = Encoding.UTF8.GetBytes(input);
-            var staticTokens = Tokenizer.GetWords(bytes);
 
-            using var stream = new MemoryStream(bytes);
-            var streamTokens = Tokenizer.GetWords(stream);
-
-            foreach (var streamToken in streamTokens)
+            foreach (var input in examples)
             {
-                staticTokens.MoveNext();
+                var bytes = Encoding.UTF8.GetBytes(input);
+                var staticTokens = Tokenizer.GetWords(bytes, Options.OmitWhitespace);
 
-                var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
-                var streamCurrent = Encoding.UTF8.GetString(streamToken);
+                using var stream = new MemoryStream(bytes);
+                var streamTokens = Tokenizer.GetWords(stream, Options.OmitWhitespace);
 
-                Assert.That(staticCurrent, Is.EqualTo(streamCurrent));
+                foreach (var streamToken in streamTokens)
+                {
+                    staticTokens.MoveNext();
+
+                    var expected = Encoding.UTF8.GetString(staticTokens.Current);
+                    var got = Encoding.UTF8.GetString(streamToken);
+
+                    Assert.That(got, Is.EqualTo(expected));
+                }
+
+                Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
+                Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
             }
-
-            Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
-            Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
         }
     }
 
@@ -51,7 +56,7 @@ public class TestStreamTokenizer
     /// Ensure that streamed text and static text return identical results.
     /// </summary>
     [Test]
-    public void StreamReader()
+    public void StreamReaderMatchesStatic()
     {
         var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
         var examples = new List<string>()
@@ -60,25 +65,28 @@ public class TestStreamTokenizer
 			string.Concat(Enumerable.Repeat(example, 999))		// larger than the buffer
 		};
 
-        foreach (var input in examples)
+        foreach (var option in options)
         {
-            var bytes = Encoding.UTF8.GetBytes(input);
-            var staticTokens = Tokenizer.GetWords(bytes);
-
-            using var stream = new MemoryStream(bytes);
-            using var reader = new StreamReader(stream);
-            var streamTokens = Tokenizer.GetWords(reader);
-
-            foreach (var streamToken in streamTokens)
+            foreach (var input in examples)
             {
-                staticTokens.MoveNext();
-                var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+                var bytes = Encoding.UTF8.GetBytes(input);
+                var staticTokens = Tokenizer.GetWords(bytes, option);
 
-                Assert.That(staticCurrent, Is.EqualTo(streamToken.ToString()));
+                using var stream = new MemoryStream(bytes);
+                using var reader = new StreamReader(stream);
+                var streamTokens = Tokenizer.GetWords(reader, option);
+
+                foreach (var streamToken in streamTokens)
+                {
+                    staticTokens.MoveNext();
+                    var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+
+                    Assert.That(staticCurrent, Is.EqualTo(streamToken.ToString()));
+                }
+
+                Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
+                Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
             }
-
-            Assert.That(staticTokens.MoveNext(), Is.False, "Static tokens should have been consumed");
-            Assert.That(streamTokens.MoveNext(), Is.False, "Stream tokens should have been consumed");
         }
     }
 
@@ -255,7 +263,7 @@ public class TestStreamTokenizer
         using var stream = new MemoryStream(bytes);
 
         {
-            var tokens = Tokenizer.GetWords(stream, 8);
+            var tokens = Tokenizer.GetWords(stream, minBufferBytes: 8);
             tokens.MoveNext();
             Assert.That(tokens.Position, Is.EqualTo(0));
             tokens.MoveNext();
