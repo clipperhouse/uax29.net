@@ -23,6 +23,12 @@ internal static partial class Sentences
 		const Property ParaSep = Sep | CR | LF;
 		const Property Ignore = Extend | Format;
 
+		/// <summary>
+		/// Splits the first sentence in the input.
+		/// </summary>
+		/// <param name="input">The string in which to split sentences.</param>
+		/// <param name="seen">Ignore, only applicable to splitting words, not sentences.</param>
+		/// <returns>The number of bytes/chars that comprise the sentence.</returns>
 		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);

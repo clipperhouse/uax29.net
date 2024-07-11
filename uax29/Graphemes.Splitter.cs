@@ -21,6 +21,12 @@ internal static partial class Graphemes
 
 		const Property Ignore = Extend;
 
+		/// <summary>
+		/// Splits the first grapheme in the input.
+		/// </summary>
+		/// <param name="input">The string in which to split graphemes.</param>
+		/// <param name="seen">Ignore, only applicable to splitting words, not graphemes.</param>
+		/// <returns>The number of bytes/chars that comprise the grapheme.</returns>
 		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);

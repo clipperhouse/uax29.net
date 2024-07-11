@@ -25,6 +25,12 @@ internal static partial class Words
 		const Property MidNumLetQ = MidNumLet | Single_Quote;
 		const Property Ignore = Extend | Format | ZWJ;
 
+		/// <summary>
+		/// Splits the first word in the input.
+		/// </summary>
+		/// <param name="input">The string in which to split words.</param>
+		/// <param name="seen">Categories that were seen in the first word.</param>
+		/// <returns>The number of bytes/chars that comprise the word.</returns>
 		internal int Split(ReadOnlySpan<TSpan> input, out Property seen)
 		{
 			Debug.Assert(input.Length > 0);
