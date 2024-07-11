@@ -110,7 +110,7 @@ For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behi
 
 ### Invalid inputs
 
-The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/Tests/Unicode.cs#L42-L67) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
+The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/uax29/Unicode.Test.cs#L55) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
 
 ### Major version changes
 
