@@ -2,6 +2,9 @@ using System.Diagnostics;
 
 namespace UAX29;
 
+/// A bitmap of Unicode categories
+using Property = uint;
+
 /// <summary>
 /// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
@@ -55,7 +58,7 @@ public ref struct Tokenizer<T> where T : struct
 			end += advance;
 
 			// This option is only supported for words; prevent it at the static API level
-			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
+			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
 			{
 				continue;
 			}
