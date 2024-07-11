@@ -57,7 +57,7 @@ public ref struct Tokenizer<T> where T : struct
 			start = end;
 			end += advance;
 
-			// This option is only supported for words; prevent it at the static API level
+			// This option is only supported for words; prevent other uses at the static API level
 			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
 			{
 				continue;
