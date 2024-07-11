@@ -53,7 +53,7 @@ public ref struct Tokenizer<T> where T : struct
 			Debug.Assert(advance > 0);
 
 			start = end;
-			end = start + advance;
+			end += advance;
 
 			// This option is only supported for words; prevent it at the static API level
 			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
