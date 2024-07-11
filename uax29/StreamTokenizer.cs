@@ -42,10 +42,9 @@ public ref struct StreamTokenizer<T> where T : struct
 	{
 		begun = true;
 
-	again:
-		count += end;
-		if (end < buffer.Contents.Length)
+		while (end < buffer.Contents.Length)
 		{
+			count += end;
 			buffer.Consume(this.Current.Length);    // previous token
 
 			var advance = this.split(buffer.Contents, out Property seen);
@@ -56,7 +55,7 @@ public ref struct StreamTokenizer<T> where T : struct
 			// This option is only supported for words; prevent it at the static API level
 			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
 			{
-				goto again;
+				continue;
 			}
 
 			return true;

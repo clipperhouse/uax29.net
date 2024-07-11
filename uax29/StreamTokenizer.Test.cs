@@ -260,22 +260,43 @@ public class TestStreamTokenizer
     {
         var example = "abcdefghi jklmnopqr stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
         var bytes = Encoding.UTF8.GetBytes(example);
-        using var stream = new MemoryStream(bytes);
 
         {
+            using var stream = new MemoryStream(bytes);
             var tokens = Tokenizer.GetWords(stream, minBufferBytes: 8);
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(0));
+            Assert.That(tokens.Position, Is.EqualTo(0));    // ab...
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(9));
+            Assert.That(tokens.Position, Is.EqualTo(9));    // <space>
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(10));
+            Assert.That(tokens.Position, Is.EqualTo(10));   // jk...
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(19));
+            Assert.That(tokens.Position, Is.EqualTo(19));   // <space>
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(20));
+            Assert.That(tokens.Position, Is.EqualTo(20));   // stu...
             tokens.MoveNext();
-            Assert.That(tokens.Position, Is.EqualTo(23));
+            Assert.That(tokens.Position, Is.EqualTo(23));   // <space>
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(24));   // vw...
+        }
+
+        {
+            using var stream = new MemoryStream(bytes);
+            var tokens = Tokenizer.GetWords(stream, minBufferBytes: 8, options: Options.OmitWhitespace);
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(0));        // ab...
+            // tokens.MoveNext();
+            // Assert.That(tokens.Position, Is.EqualTo(9));     // <space>
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(10));       // jk...
+            // tokens.MoveNext();
+            // Assert.That(tokens.Position, Is.EqualTo(19));    // <space>
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(20));       // stu...
+            // tokens.MoveNext();
+            // Assert.That(tokens.Position, Is.EqualTo(23));    // <space>
+            tokens.MoveNext();
+            Assert.That(tokens.Position, Is.EqualTo(24));       // vw...
         }
     }
 }

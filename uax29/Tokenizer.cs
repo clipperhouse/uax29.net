@@ -46,8 +46,7 @@ public ref struct Tokenizer<T> where T : struct
 	{
 		begun = true;
 
-	again:
-		if (end < input.Length)
+		while (end < input.Length)
 		{
 			var advance = this.split(input[end..], out var seen);
 			Debug.Assert(advance > 0);
@@ -58,7 +57,7 @@ public ref struct Tokenizer<T> where T : struct
 			// This option is only supported for words; prevent it at the static API level
 			if ((options & Options.OmitWhitespace) != 0 && seen.IsExclusively(Words.Whitespace))
 			{
-				goto again;
+				continue;
 			}
 
 			return true;
