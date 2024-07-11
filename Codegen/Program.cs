@@ -243,18 +243,37 @@ public class {typ}sTests
 	];
 
 	static readonly UnicodeTest[] Tests = UnicodeTests;
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{{
 		var tokens = Tokenizer.Get{typ}s(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}}
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void String(UnicodeTest test)
 	{{
 		var s = Encoding.UTF8.GetString(test.input);
 		var tokens = Tokenizer.Get{typ}s(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
+	}}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Tokenizer.Get{typ}s(stream);
+		TestUnicode.TestTokenizerStream(tokens, test);
+	}}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Tokenizer.Get{typ}s(reader);
+		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}}
 }}
 ");

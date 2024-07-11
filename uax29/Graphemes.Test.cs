@@ -614,17 +614,36 @@ public class GraphemesTests
 	];
 
 	static readonly UnicodeTest[] Tests = UnicodeTests;
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{
 		var tokens = Tokenizer.GetGraphemes(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
 		var tokens = Tokenizer.GetGraphemes(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Tokenizer.GetGraphemes(stream);
+		TestUnicode.TestTokenizerStream(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Tokenizer.GetGraphemes(reader);
+		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}
 }
