@@ -27,7 +27,19 @@ public class TestUnicode
 		{
 			var got = token;
 			var expected = test.expected[i];
-			Assert.That(expected.AsSpan().SequenceEqual(got), $"{test.comment}");
+			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
+			i++;
+		}
+	}
+
+	internal static void TestTokenizerStream(StreamTokenizer<byte> tokens, UnicodeTest test)
+	{
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			var got = token;
+			var expected = test.expected[i];
+			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
 			i++;
 		}
 	}
@@ -38,13 +50,23 @@ public class TestUnicode
 		foreach (var token in tokens)
 		{
 			var got = token;
-			var expected = test.expected[i];
-			var s = Encoding.UTF8.GetString(expected).AsSpan();
-			Assert.That(s.SequenceEqual(got), $"{test.comment}");
+			var expected = Encoding.UTF8.GetString(test.expected[i]);
+			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
 			i++;
 		}
 	}
 
+	internal static void TestTokenizerTextReader(StreamTokenizer<char> tokens, UnicodeTest test)
+	{
+		var i = 0;
+		foreach (var token in tokens)
+		{
+			var got = token;
+			var expected = Encoding.UTF8.GetString(test.expected[i]);
+			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
+			i++;
+		}
+	}
 
 	private delegate Tokenizer<byte> ByteMethod(byte[] input);
 	static readonly ByteMethod byteWords = (byte[] input) => Tokenizer.GetWords(input);     // because of the optional parameter

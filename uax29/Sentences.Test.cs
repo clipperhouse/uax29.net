@@ -514,17 +514,36 @@ public class SentencesTests
 	];
 
 	static readonly UnicodeTest[] Tests = UnicodeTests;
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{
 		var tokens = Tokenizer.GetSentences(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}
+
 	[Test, TestCaseSource(nameof(Tests))]
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
 		var tokens = Tokenizer.GetSentences(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Tokenizer.GetSentences(stream);
+		TestUnicode.TestTokenizerStream(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Tokenizer.GetSentences(reader);
+		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}
 }
