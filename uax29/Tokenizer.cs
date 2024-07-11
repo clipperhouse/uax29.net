@@ -147,7 +147,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input
 	/// using [range] or .AsSpan(range) to get the tokens.
 	/// </returns>
-	public RangeTokenizer<T> Ranges
+	public readonly RangeTokenizer<T> Ranges
 	{
 		get
 		{
