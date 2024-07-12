@@ -5,8 +5,10 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
-
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Reports;
 using UAX29;
+
 
 var summary = BenchmarkRunner.Run<Benchmark>();
 
@@ -16,14 +18,44 @@ var summary = BenchmarkRunner.Run<Benchmark>();
 // Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
 
 
+public class Speed : IColumn
+{
+	public string GetValue(Summary summary, BenchmarkCase benchmarkCase)
+	{
+		if (summary is null || benchmarkCase is null || benchmarkCase.Parameters is null)
+		{
+			return "N/A";
+		}
+		var ourReport = summary.Reports.First(x => x.BenchmarkCase.Equals(benchmarkCase));
+		long length = new System.IO.FileInfo("sample.txt").Length;
+		var mean = ourReport.ResultStatistics.Mean;
+		return $"{(length / ourReport.ResultStatistics.Mean):#####.00}";
+	}
+
+	public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
+	public bool IsDefault(Summary summary, BenchmarkCase benchmarkCase) => false;
+	public bool IsAvailable(Summary summary) => true;
+
+	public string Id { get; } = nameof(Speed);
+	public string ColumnName { get; } = "Speed (GB/s)";
+	public bool AlwaysShow { get; } = true;
+	public ColumnCategory Category { get; } = ColumnCategory.Custom;
+	public int PriorityInCategory { get; }
+	public bool IsNumeric { get; }
+	public UnitType UnitType { get; } = UnitType.Dimensionless;
+	public string Legend { get; } = "The speed in gigabytes per second";
+}
 // [Config(typeof(Config))]
-[MemoryDiagnoser]
+[SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 3)]
+[Config(typeof(Config))]
+//[MemoryDiagnoser]
 public class Benchmark
 {
 	private class Config : ManualConfig
 	{
 		public Config()
 		{
+			AddColumn(new Speed());
 			AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
 			// You can also use other profilers like:
 			// AddDiagnoser(new EtwProfiler());
@@ -35,10 +67,12 @@ public class Benchmark
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
 
+	public string FileName = "sample.txt";
+
 	[GlobalSetup]
 	public void Setup()
 	{
-		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
+		sample = File.ReadAllBytes("sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
 		sampleStream = new MemoryStream(sample);
 	}
