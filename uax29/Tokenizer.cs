@@ -2,18 +2,15 @@ using System.Diagnostics;
 
 namespace UAX29;
 
-/// A bitmap of Unicode categories
-using Property = uint;
-
 /// <summary>
-/// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
+/// Splits an input string (UTF-8 or UTF-16) and provides an enumerator over the splits.
 /// </summary>
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 public ref struct Tokenizer<T> where T : struct
 {
-	internal ReadOnlySpan<T> input;
+	ReadOnlySpan<T> input;
 
-	internal readonly Split<T> split;
+	readonly Split<T> split;
 
 	internal int start = 0;
 
@@ -24,7 +21,7 @@ public ref struct Tokenizer<T> where T : struct
 
 	internal int end = 0;
 
-	internal readonly Options options;
+	readonly Options options;
 
 	bool begun = false;
 
@@ -32,7 +29,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
-	/// <param name="tokenType">Choose to split words, graphemes or sentences. Default is words.</param>
+	/// <param name="split">A func/method meeting the Split delegate signature.</param>
 	/// <param name="options">Options for handling the input text.</param>
 	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
 	{
@@ -106,7 +103,7 @@ public ref struct Tokenizer<T> where T : struct
 	}
 
 	/// <summary>
-	/// Iterates over all tokens and collects them into a list, allocating a new array for each token.
+	/// Iterate over all tokens and collects them into a list, allocating a new array for each token.
 	/// </summary>
 	/// <returns>List<byte[]> or List<char[]>, depending on the input</returns>
 	public List<T[]> ToList()
