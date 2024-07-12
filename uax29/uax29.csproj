@@ -49,9 +49,4 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(Configuration)' != 'Release'">
-    <EmbeddedResource Include="sample.txt" />
-  </ItemGroup>
-
 </Project>
