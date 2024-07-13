@@ -1,22 +1,14 @@
-using System.Buffers;
-using System.Diagnostics;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
-
 using UAX29;
 
-var summary = BenchmarkRunner.Run<Benchmark>();
+BenchmarkRunner.Run<Benchmark>();
 
-// var benchmark = new Benchmark();
-// benchmark.Setup();
-// var throughput = benchmark.Throughput();
-// Console.WriteLine($"Throughput: {Math.Round(throughput, 1)} MB/s");
-
-
-// [Config(typeof(Config))]
+[SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 3)]
+[Config(typeof(Config))]
 [MemoryDiagnoser]
 public class Benchmark
 {
@@ -24,7 +16,8 @@ public class Benchmark
 	{
 		public Config()
 		{
-			AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
+			AddColumn(new Speed());
+			// AddDiagnoser(new EventPipeProfiler(EventPipeProfile.CpuSampling));
 			// You can also use other profilers like:
 			// AddDiagnoser(new EtwProfiler());
 			// AddDiagnoser(new PerfCollectProfiler()); // for Linux
@@ -35,10 +28,12 @@ public class Benchmark
 	static string sampleStr = "";
 	Stream sampleStream = Stream.Null;
 
+	public string FileName = "sample.txt";
+
 	[GlobalSetup]
 	public void Setup()
 	{
-		sample = File.ReadAllBytes("/Users/msherman/Documents/code/src/github.com/clipperhouse/uax29.net/Benchmarks/sample.txt");
+		sample = File.ReadAllBytes("sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
 		sampleStream = new MemoryStream(sample);
 	}
@@ -108,41 +103,5 @@ public class Benchmark
 		foreach (var token in tokens)
 		{
 		}
-	}
-
-	public double Throughput()
-	{
-		const int runs = 1000;
-
-		// warmup
-		for (var i = 0; i < 2 * runs; i++)
-		{
-			var tokens = Tokenizer.GetWords(sample);
-			foreach (var token in tokens)
-			{
-
-			}
-		}
-		Thread.Sleep(100);
-
-		var stopwatch = Stopwatch.StartNew();
-		double bytes = 0;
-
-		for (var i = 0; i < runs; i++)
-		{
-			var tokens = Tokenizer.GetWords(sample);
-			foreach (var token in tokens)
-			{
-
-			}
-			bytes += sample.Length;
-		}
-
-		stopwatch.Stop();
-
-		double elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-		var megabytes = bytes / (1024.0 * 1024.0);
-
-		return megabytes / elapsedSeconds;
 	}
 }

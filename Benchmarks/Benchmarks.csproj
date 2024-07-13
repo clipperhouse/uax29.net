@@ -14,5 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\uax29\uax29.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+  <None Update="sample.txt">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  </ItemGroup>
 </Project>
