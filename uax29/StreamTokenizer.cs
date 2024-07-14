@@ -1,5 +1,10 @@
 ﻿namespace UAX29;
 
+using System.Diagnostics;
+
+/// A bitmap of Unicode categories
+using Property = uint;
+
 /// <summary>
 /// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>
@@ -7,16 +12,17 @@ public ref struct StreamTokenizer<T> where T : struct
 {
 	internal Buffer<T> buffer;
 	readonly Split<T> split;
+	readonly Options options;
 
-	internal const int start = 0;   // with buffer, it's always 0
-	internal int end = 0;
+	const int start = 0;   // with buffer, it's always 0
+	int end = 0;
 
 	/// <summary>
 	/// The byte or char position of the current token in the stream.
 	/// </summary>
 	public readonly int Position => count;
 
-	internal int count = 0;
+	int count = 0;
 
 	bool begun = false;
 
@@ -25,29 +31,32 @@ public ref struct StreamTokenizer<T> where T : struct
 	/// </summary>
 	/// <param name="buffer">For backing storage, typically created from a Stream or TextReader.</param>
 	/// <param name="split">A delegate that does the tokenizing. See Split<T> for details.</param>
-	internal StreamTokenizer(Buffer<T> buffer, Split<T> split)
+	internal StreamTokenizer(Buffer<T> buffer, Split<T> split, Options options = Options.None)
 	{
 		this.buffer = buffer;
 		this.split = split;
+		this.options = options;
 	}
 
 	public bool MoveNext()
 	{
 		begun = true;
-		count += end;
 
-		if (end < buffer.Contents.Length)
+		while (end < buffer.Contents.Length)
 		{
+			count += end;
 			buffer.Consume(this.Current.Length);    // previous token
 
-			var advance = this.split(buffer.Contents);
-			// Interpret as EOF
-			if (advance == 0)
-			{
-				return false;
-			}
+			var advance = this.split(buffer.Contents, out Property seen);
+			Debug.Assert(advance > 0);
 
 			end = advance;
+
+			// This option is only supported for words; prevent other uses at the static API level
+			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
+			{
+				continue;
+			}
 
 			return true;
 		}

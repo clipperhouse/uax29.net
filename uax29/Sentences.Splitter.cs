@@ -23,7 +23,13 @@ internal static partial class Sentences
 		const Property ParaSep = Sep | CR | LF;
 		const Property Ignore = Extend | Format;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		/// <summary>
+		/// Splits the first sentence in the input.
+		/// </summary>
+		/// <param name="input">The string in which to split sentences.</param>
+		/// <param name="seen">Ignore, only applicable to splitting words, not sentences.</param>
+		/// <returns>The number of bytes/chars that comprise the sentence.</returns>
+		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);
 
@@ -41,7 +47,7 @@ internal static partial class Sentences
 				// https://unicode.org/reports/tr29/#SB1
 				// start of text always advances
 
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -56,7 +62,7 @@ internal static partial class Sentences
 			// https://unicode.org/reports/tr29/#SB2
 			while (pos < input.Length)
 			{
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -145,7 +151,7 @@ internal static partial class Sentences
 					// Zero or more of not-the-above properties
 					while (p < input.Length)
 					{
-						_ = Decode.FirstRune(input[p..], out Rune rune2, out int w2);
+						Decode.FirstRune(input[p..], out Rune rune2, out int w2);
 						/*
 						We are not doing anything about invalid runes. The decoders,
 						if I am reading correctly, will return a width regardless,
@@ -240,6 +246,8 @@ internal static partial class Sentences
 				// https://unicode.org/reports/tr29/#SB998
 				pos += w;
 			}
+
+			_ = 0;  // see the out Property parameter at top
 
 			return pos;
 

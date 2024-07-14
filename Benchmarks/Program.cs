@@ -48,9 +48,27 @@ public class Benchmark
 	}
 
 	[Benchmark]
+	public void TokenizeBytesOmitWhitespace()
+	{
+		var tokens = Tokenizer.GetWords(sample, Options.OmitWhitespace);
+		foreach (var token in tokens)
+		{
+		}
+	}
+
+	[Benchmark]
 	public void TokenizeString()
 	{
 		var tokens = Tokenizer.GetWords(sampleStr);
+		foreach (var token in tokens)
+		{
+		}
+	}
+
+	[Benchmark]
+	public void TokenizeStringOmitWhitespace()
+	{
+		var tokens = Tokenizer.GetWords(sampleStr, Options.OmitWhitespace);
 		foreach (var token in tokens)
 		{
 		}

@@ -21,14 +21,19 @@ internal static partial class Graphemes
 
 		const Property Ignore = Extend;
 
-		internal int Split(ReadOnlySpan<TSpan> input)
+		/// <summary>
+		/// Splits the first grapheme in the input.
+		/// </summary>
+		/// <param name="input">The string in which to split graphemes.</param>
+		/// <param name="seen">Ignore, only applicable to splitting words, not graphemes.</param>
+		/// <returns>The number of bytes/chars that comprise the grapheme.</returns>
+		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);
 
 			// These vars are stateful across loop iterations
 			var pos = 0;
 			int w;
-
 			Property current = 0;
 			Property lastExIgnore = 0;      // "last excluding ignored categories"
 			Property lastLastExIgnore = 0;  // "last one before that"
@@ -38,7 +43,7 @@ internal static partial class Graphemes
 				// https://unicode.org/reports/tr29/#GB1
 				// start of text always advances
 
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -53,7 +58,7 @@ internal static partial class Graphemes
 			// https://unicode.org/reports/tr29/#GB2
 			while (pos < input.Length)
 			{
-				var _ = Decode.FirstRune(input[pos..], out Rune rune, out w);
+				Decode.FirstRune(input[pos..], out Rune rune, out w);
 				/*
 				We are not doing anything about invalid runes. The decoders,
 				if I am reading correctly, will return a width regardless,
@@ -158,6 +163,7 @@ internal static partial class Graphemes
 				break;
 			}
 
+			_ = 0;  // see the Property out parameter at tops
 			return pos;
 		}
 	}
