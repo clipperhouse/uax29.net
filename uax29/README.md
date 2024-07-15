@@ -98,7 +98,7 @@ For UTF-8 bytes, pass `byte[]`, `Span<byte>` or `Stream`; the resulting tokens w
 
 For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`; the resulting tokens will be `ReadOnlySpan<char>`.
 
-If you have `Memory<byte|char>`, use `Memory.Span`.
+If you have `Memory<byte|char>`, pass `Memory.Span`.
 
 ### Conformance
 

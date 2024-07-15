@@ -50,6 +50,7 @@ public class TestExtensions
         using var stream = new MemoryStream(bytes);
         using var reader = new StreamReader(stream);
 
+        // Chars
         {
             // string
             input.SplitWords(); got++;
@@ -68,16 +69,13 @@ public class TestExtensions
             var mem = new Memory<char>(input.ToCharArray());
             mem.SplitWords(); got++;
 
-            // ReadOnlyMemoryMemory<char>
+            // ReadOnlyMemory<char>
             ReadOnlyMemory<char> rmem = input.AsMemory();
             rmem.SplitWords(); got++;
 
             reader.SplitWords(); got++;
         }
-
         {
-            // chars
-
             input.SplitGraphemes(); got++;
 
             var array = input.ToCharArray();
@@ -97,11 +95,7 @@ public class TestExtensions
 
             reader.SplitGraphemes(); got++;
         }
-
-
         {
-            // chars
-
             input.SplitSentences(); got++;
 
             var array = input.ToCharArray();
@@ -122,9 +116,8 @@ public class TestExtensions
             reader.SplitSentences(); got++;
         }
 
+        // Bytes
         {
-            // bytes
-
             bytes.SplitWords(); got++;
 
             Span<byte> span = bytes.AsSpan();
@@ -141,11 +134,7 @@ public class TestExtensions
 
             stream.SplitWords(); got++;
         }
-
-
         {
-            // bytes
-
             bytes.SplitGraphemes(); got++;
 
             Span<byte> span = bytes.AsSpan();
