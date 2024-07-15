@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -77,32 +78,24 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeStream()
 	{
-		var stream = new MemoryStream(sample);
-		var tokens = Split.Words(stream);
-		foreach (var token in tokens)
-		{
-		}
+		sampleStream.Seek(0, SeekOrigin.Begin);
+		var tokens = Split.Words(sampleStream);
+		foreach (var token in tokens) { }
 	}
 
+	static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
+
 	[Benchmark]
-	public void TokenizeSetStream()
+	public void TokenizeStreamArrayPool()
 	{
-		// This is to test to observe allocations.
+		var storage = pool.Rent(2048);
 
-		// The creation will allocate a buffer of 1024 bytes
-		var tokens = Split.Words(sampleStream);
+		sampleStream.Seek(0, SeekOrigin.Begin);
+		var tokens = Split.Words(sampleStream, minBufferBytes: 1024, bufferStorage: storage);
+		tokens.SetStream(sampleStream);
+		foreach (var token in tokens) { }
 
-		var runs = 10;
-		// keep in mind the 10 runs when interpreting the benchmark
-		for (var i = 0; i < runs; i++)
-		{
-			// subsequent runs should allocate less by using SetStream
-			sampleStream.Seek(0, SeekOrigin.Begin);
-			tokens.SetStream(sampleStream);
-			foreach (var token in tokens)
-			{
-			}
-		}
+		pool.Return(storage);
 	}
 
 	[Benchmark]
