@@ -116,7 +116,7 @@ The tokenizer is implemented as a `ref struct`, so you should see zero allocatio
 
 Calling `Split.Words` returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
 
-For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `Split.Words`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
 
 ### Options
 
