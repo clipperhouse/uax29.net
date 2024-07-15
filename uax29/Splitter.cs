@@ -13,7 +13,7 @@ using Property = uint;
 /// <returns>How many bytes/chars were consumed from the input.</returns>
 internal delegate int Split<T>(ReadOnlySpan<T> input, out Property seen);
 
-internal static class Extensions
+internal static class PropertyExtensions
 {
 	/// <summary>
 	/// Determines whether two properties (bitstrings) match, i.e. intersect, i.e. share at least one bit.
