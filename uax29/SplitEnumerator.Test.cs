@@ -18,7 +18,7 @@ public class TestTokenizer
 		var example = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(example);
 
-		var tokens = Tokenizer.GetWords(example);
+		var tokens = Split.Words(example);
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -44,7 +44,7 @@ public class TestTokenizer
 	{
 		var example = "Hello, how are you?";
 
-		var tokens = Tokenizer.GetWords(example);
+		var tokens = Split.Words(example);
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -107,134 +107,134 @@ public class TestTokenizer
 		{
 			// chars
 
-			Tokenizer.GetWords(input); got++;
+			Split.Words(input); got++;
 
 			var array = input.ToCharArray();
-			Tokenizer.GetWords(array); got++;
+			Split.Words(array); got++;
 
 			var span = new Span<char>(array);
-			Tokenizer.GetWords(span); got++;
+			Split.Words(span); got++;
 
 			ReadOnlySpan<char> rspan = input.AsSpan();
-			Tokenizer.GetWords(rspan); got++;
+			Split.Words(rspan); got++;
 
 			var mem = new Memory<char>(array);
-			Tokenizer.GetWords(mem); got++;
+			Split.Words(mem); got++;
 
 			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Tokenizer.GetWords(rmem); got++;
+			Split.Words(rmem); got++;
 
-			Tokenizer.GetWords(reader); got++;
+			Split.Words(reader); got++;
 		}
 
 
 		{
 			// chars
 
-			Tokenizer.GetGraphemes(input); got++;
+			Split.Graphemes(input); got++;
 
 			var array = input.ToCharArray();
-			Tokenizer.GetGraphemes(array); got++;
+			Split.Graphemes(array); got++;
 
 			var span = new Span<char>(array);
-			Tokenizer.GetGraphemes(span); got++;
+			Split.Graphemes(span); got++;
 
 			ReadOnlySpan<char> rspan = input.AsSpan();
-			Tokenizer.GetGraphemes(rspan); got++;
+			Split.Graphemes(rspan); got++;
 
 			var mem = new Memory<char>(array);
-			Tokenizer.GetGraphemes(mem); got++;
+			Split.Graphemes(mem); got++;
 
 			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Tokenizer.GetGraphemes(rmem); got++;
+			Split.Graphemes(rmem); got++;
 
-			Tokenizer.GetGraphemes(reader); got++;
+			Split.Graphemes(reader); got++;
 		}
 
 
 		{
 			// chars
 
-			Tokenizer.GetSentences(input); got++;
+			Split.Sentences(input); got++;
 
 			var array = input.ToCharArray();
-			Tokenizer.GetSentences(array); got++;
+			Split.Sentences(array); got++;
 
 			var span = new Span<char>(array);
-			Tokenizer.GetSentences(span); got++;
+			Split.Sentences(span); got++;
 
 			ReadOnlySpan<char> rspan = input.AsSpan();
-			Tokenizer.GetSentences(rspan); got++;
+			Split.Sentences(rspan); got++;
 
 			var mem = new Memory<char>(array);
-			Tokenizer.GetSentences(mem); got++;
+			Split.Sentences(mem); got++;
 
 			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Tokenizer.GetSentences(rmem); got++;
+			Split.Sentences(rmem); got++;
 
-			Tokenizer.GetSentences(reader); got++;
+			Split.Sentences(reader); got++;
 		}
 
 		{
 			// bytes
 
-			Tokenizer.GetWords(bytes); got++;
+			Split.Words(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
-			Tokenizer.GetWords(span); got++;
+			Split.Words(span); got++;
 
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
-			Tokenizer.GetWords(rspan); got++;
+			Split.Words(rspan); got++;
 
 			Memory<byte> mem = bytes.AsMemory();
-			Tokenizer.GetWords(mem); got++;
+			Split.Words(mem); got++;
 
 			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Tokenizer.GetWords(rmem); got++;
+			Split.Words(rmem); got++;
 
-			Tokenizer.GetWords(stream); got++;
-		}
-
-
-		{
-			// bytes
-
-			Tokenizer.GetGraphemes(bytes); got++;
-
-			Span<byte> span = bytes.AsSpan();
-			Tokenizer.GetGraphemes(span); got++;
-
-			ReadOnlySpan<byte> rspan = bytes.AsSpan();
-			Tokenizer.GetGraphemes(rspan); got++;
-
-			Memory<byte> mem = bytes.AsMemory();
-			Tokenizer.GetGraphemes(mem); got++;
-
-			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Tokenizer.GetGraphemes(rmem); got++;
-
-			Tokenizer.GetGraphemes(stream); got++;
+			Split.Words(stream); got++;
 		}
 
 
 		{
 			// bytes
 
-			Tokenizer.GetSentences(bytes); got++;
+			Split.Graphemes(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
-			Tokenizer.GetSentences(span); got++;
+			Split.Graphemes(span); got++;
 
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
-			Tokenizer.GetSentences(rspan); got++;
+			Split.Graphemes(rspan); got++;
 
 			Memory<byte> mem = bytes.AsMemory();
-			Tokenizer.GetSentences(mem); got++;
+			Split.Graphemes(mem); got++;
 
 			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Tokenizer.GetSentences(rmem); got++;
+			Split.Graphemes(rmem); got++;
 
-			Tokenizer.GetSentences(stream); got++;
+			Split.Graphemes(stream); got++;
+		}
+
+
+		{
+			// bytes
+
+			Split.Sentences(bytes); got++;
+
+			Span<byte> span = bytes.AsSpan();
+			Split.Sentences(span); got++;
+
+			ReadOnlySpan<byte> rspan = bytes.AsSpan();
+			Split.Sentences(rspan); got++;
+
+			Memory<byte> mem = bytes.AsMemory();
+			Split.Sentences(mem); got++;
+
+			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
+			Split.Sentences(rmem); got++;
+
+			Split.Sentences(stream); got++;
 		}
 
 		Assert.That(got, Is.EqualTo(expected));
@@ -246,9 +246,9 @@ public class TestTokenizer
 		var input = "Hello, how are you?";
 		var mem = input.AsMemory();
 		var bytes = Encoding.UTF8.GetBytes(input);
-		Tokenizer.GetWords(mem);
+		Split.Words(mem);
 
-		var tokens = Tokenizer.GetWords(input);
+		var tokens = Split.Words(input);
 		var first = new List<string>();
 		while (tokens.MoveNext())
 		{
@@ -257,7 +257,7 @@ public class TestTokenizer
 		}
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
-		var tokens2 = Tokenizer.GetWords(input);
+		var tokens2 = Split.Words(input);
 		var second = new List<string>();
 		foreach (var token in tokens2)
 		{
@@ -271,7 +271,7 @@ public class TestTokenizer
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.GetWords(example);
+		var tokens = Split.Words(example);
 		var list = tokens.ToList();
 
 		var i = 0;
@@ -304,7 +304,7 @@ public class TestTokenizer
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Tokenizer.GetWords(example);
+		var tokens = Split.Words(example);
 		var array = tokens.ToArray();
 
 		var i = 0;
@@ -339,7 +339,7 @@ public class TestTokenizer
 		var example = "Hello, how are you?";
 
 		{
-			var tokens = Tokenizer.GetWords(example);
+			var tokens = Split.Words(example);
 			tokens.MoveNext();
 			Assert.That(tokens.Position, Is.EqualTo(0));
 			tokens.MoveNext();
@@ -358,7 +358,7 @@ public class TestTokenizer
 
 		var bytes = Encoding.UTF8.GetBytes(example);
 		{
-			var tokens = Tokenizer.GetWords(bytes);
+			var tokens = Split.Words(bytes);
 			tokens.MoveNext();
 			Assert.That(tokens.Position, Is.EqualTo(0));
 			tokens.MoveNext();
@@ -387,7 +387,7 @@ public class TestTokenizer
 			// Options.None should be lossless
 			var expected = example;
 			var got = string.Concat(
-				Tokenizer.GetWords(example, Options.None)
+				Split.Words(example, Options.None)
 				.ToList()
 				.SelectMany(c => c)
 			);
@@ -399,7 +399,7 @@ public class TestTokenizer
 			// Options.OmitWhitespace should have no whitespace
 			var expected = new string(example.Where(c => !char.IsWhiteSpace(c)).ToArray());
 			var got = string.Concat(
-				Tokenizer.GetWords(example, Options.OmitWhitespace)
+				Split.Words(example, Options.OmitWhitespace)
 				.ToList()
 				.SelectMany(c => c)
 			);

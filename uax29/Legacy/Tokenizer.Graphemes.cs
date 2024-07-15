@@ -9,6 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<byte> GetGraphemes(Span<byte> input) => new(input, Graphemes.SplitBytes);
 
     /// <summary>
@@ -18,6 +19,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<byte> GetGraphemes(ReadOnlySpan<byte> input) => new(input, Graphemes.SplitBytes);
 
     /// <summary>
@@ -27,6 +29,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<byte> GetGraphemes(Memory<byte> input) => new(input.Span, Graphemes.SplitBytes);
 
     /// <summary>
@@ -36,6 +39,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<byte> GetGraphemes(ReadOnlyMemory<byte> input) => new(input.Span, Graphemes.SplitBytes);
 
     /// <summary>
@@ -45,6 +49,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<byte> GetGraphemes(byte[] input) => new(input.AsSpan(), Graphemes.SplitBytes);
 
     /// <summary>
@@ -54,6 +59,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(string input) => new(input.AsSpan(), Graphemes.SplitChars);
 
     /// <summary>
@@ -63,6 +69,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(char[] input) => new(input.AsSpan(), Graphemes.SplitChars);
 
     /// <summary>
@@ -73,6 +80,7 @@ public static partial class Tokenizer
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
     ///
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(Span<char> input) => new(input, Graphemes.SplitChars);
 
     /// <summary>
@@ -82,6 +90,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(ReadOnlySpan<char> input) => new(input, Graphemes.SplitChars);
 
     /// <summary>
@@ -91,6 +100,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(Memory<char> input) => new(input.Span, Graphemes.SplitChars);
 
     /// <summary>
@@ -100,6 +110,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(input) or input.SplitGraphemes()")]
     public static SplitEnumerator<char> GetGraphemes(ReadOnlyMemory<char> input) => new(input.Span, Graphemes.SplitChars);
 
     /// <summary>
@@ -125,6 +136,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(stream) or stream.SplitGraphemes()")]
     public static StreamEnumerator<byte> GetGraphemes(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
@@ -155,6 +167,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
+    [Obsolete("Use Split.Graphemes(stream) or stream.SplitGraphemes()")]
     public static StreamEnumerator<char> GetGraphemes(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];

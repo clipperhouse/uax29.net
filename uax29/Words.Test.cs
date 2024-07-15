@@ -1839,7 +1839,7 @@ public class WordsTests
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.GetWords(test.input);
+		var tokens = Split.Words(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}
 
@@ -1847,7 +1847,7 @@ public class WordsTests
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetWords(s);
+		var tokens = Split.Words(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
 	}
 
@@ -1855,7 +1855,7 @@ public class WordsTests
 	public void Stream(UnicodeTest test)
 	{
 		using var stream = new MemoryStream(test.input);
-		var tokens = Tokenizer.GetWords(stream);
+		var tokens = Split.Words(stream);
 		TestUnicode.TestTokenizerStream(tokens, test);
 	}
 
@@ -1864,7 +1864,7 @@ public class WordsTests
 	{
 		using var stream = new MemoryStream(test.input);
 		using var reader = new StreamReader(stream);
-		var tokens = Tokenizer.GetWords(reader);
+		var tokens = Split.Words(reader);
 		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}
 }

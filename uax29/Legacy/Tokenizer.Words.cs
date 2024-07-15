@@ -9,6 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<byte> GetWords(Span<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
@@ -18,6 +19,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<byte> GetWords(ReadOnlySpan<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
@@ -27,6 +29,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<byte> GetWords(Memory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
@@ -36,6 +39,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<byte> GetWords(ReadOnlyMemory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
@@ -45,6 +49,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<byte> GetWords(byte[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitBytes, options);
 
     /// <summary>
@@ -54,6 +59,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(string input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
@@ -63,6 +69,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(char[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
@@ -72,7 +79,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    ///
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(Span<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
@@ -82,6 +89,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(ReadOnlySpan<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
@@ -91,6 +99,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(Memory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
@@ -100,6 +109,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(input) or input.SplitWords()")]
     public static SplitEnumerator<char> GetWords(ReadOnlyMemory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
@@ -125,6 +135,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(stream) or stream.SplitWords()")]
     public static StreamEnumerator<byte> GetWords(Stream stream, Options options = Options.None, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
@@ -155,6 +166,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
+    [Obsolete("Use Split.Words(stream) or stream.SplitWords()")]
     public static StreamEnumerator<char> GetWords(TextReader stream, Options options = Options.None, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];

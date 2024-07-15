@@ -618,7 +618,7 @@ public class GraphemesTests
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.GetGraphemes(test.input);
+		var tokens = Split.Graphemes(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}
 
@@ -626,7 +626,7 @@ public class GraphemesTests
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetGraphemes(s);
+		var tokens = Split.Graphemes(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
 	}
 
@@ -634,7 +634,7 @@ public class GraphemesTests
 	public void Stream(UnicodeTest test)
 	{
 		using var stream = new MemoryStream(test.input);
-		var tokens = Tokenizer.GetGraphemes(stream);
+		var tokens = Split.Graphemes(stream);
 		TestUnicode.TestTokenizerStream(tokens, test);
 	}
 
@@ -643,7 +643,7 @@ public class GraphemesTests
 	{
 		using var stream = new MemoryStream(test.input);
 		using var reader = new StreamReader(stream);
-		var tokens = Tokenizer.GetGraphemes(reader);
+		var tokens = Split.Graphemes(reader);
 		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}
 }

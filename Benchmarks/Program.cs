@@ -41,7 +41,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeBytes()
 	{
-		var tokens = Tokenizer.GetWords(sample);
+		var tokens = Split.Words(sample);
 		foreach (var token in tokens)
 		{
 		}
@@ -50,7 +50,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeBytesOmitWhitespace()
 	{
-		var tokens = Tokenizer.GetWords(sample, Options.OmitWhitespace);
+		var tokens = Split.Words(sample, Options.OmitWhitespace);
 		foreach (var token in tokens)
 		{
 		}
@@ -59,7 +59,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeString()
 	{
-		var tokens = Tokenizer.GetWords(sampleStr);
+		var tokens = Split.Words(sampleStr);
 		foreach (var token in tokens)
 		{
 		}
@@ -68,7 +68,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizeStringOmitWhitespace()
 	{
-		var tokens = Tokenizer.GetWords(sampleStr, Options.OmitWhitespace);
+		var tokens = Split.Words(sampleStr, Options.OmitWhitespace);
 		foreach (var token in tokens)
 		{
 		}
@@ -78,7 +78,7 @@ public class Benchmark
 	public void TokenizeStream()
 	{
 		var stream = new MemoryStream(sample);
-		var tokens = Tokenizer.GetWords(stream);
+		var tokens = Split.Words(stream);
 		foreach (var token in tokens)
 		{
 		}
@@ -90,7 +90,7 @@ public class Benchmark
 		// This is to test to observe allocations.
 
 		// The creation will allocate a buffer of 1024 bytes
-		var tokens = Tokenizer.GetWords(sampleStream);
+		var tokens = Split.Words(sampleStream);
 
 		var runs = 10;
 		// keep in mind the 10 runs when interpreting the benchmark
@@ -117,7 +117,7 @@ public class Benchmark
 	[Benchmark]
 	public void TokenizerGraphemes()
 	{
-		var tokens = Tokenizer.GetGraphemes(sample);
+		var tokens = Split.Graphemes(sample);
 		foreach (var token in tokens)
 		{
 		}

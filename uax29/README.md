@@ -118,13 +118,23 @@ The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We
 
 ### Major version changes
 
-If you are using v1.x of this package, v2 has been renamed:
+#### v2 → v3
+
+Renamed methods:
+
+`Tokenizer.GetWords(input)` → `Split.Words(input)`
+
+or
+
+`Tokenizer.GetWords(input)` → `input.SplitWords()`
+
+#### v1 → v2
+
+Renamed package, namespace and methods:
 
 `dotnet add package uax29.net` → `dotnet add package UAX29`
 
 `using uax29` → `using UAX29`
-
-We renamed the methods:
 
 `Tokenizer.Create(input)` → `Tokenizer.GetWords(input)`
 

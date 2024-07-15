@@ -1,6 +1,6 @@
 ﻿namespace UAX29;
 
-public static partial class Tokenizer
+public static partial class Split
 {
     /// <summary>
     /// Split the sentences in the given <see cref="Span"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -9,8 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<byte> GetSentences(Span<byte> input) => new(input, Sentences.SplitBytes);
+    public static SplitEnumerator<byte> Sentences(Span<byte> input) => new(input, UAX29.Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -19,8 +18,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<byte> GetSentences(ReadOnlySpan<byte> input) => new(input, Sentences.SplitBytes);
+    public static SplitEnumerator<byte> Sentences(ReadOnlySpan<byte> input) => new(input, UAX29.Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -29,8 +27,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<byte> GetSentences(Memory<byte> input) => new(input.Span, Sentences.SplitBytes);
+    public static SplitEnumerator<byte> Sentences(Memory<byte> input) => new(input.Span, UAX29.Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -39,8 +36,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<byte> GetSentences(ReadOnlyMemory<byte> input) => new(input.Span, Sentences.SplitBytes);
+    public static SplitEnumerator<byte> Sentences(ReadOnlyMemory<byte> input) => new(input.Span, UAX29.Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given array of UTF-8 encoded bytes.
@@ -49,8 +45,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<byte> GetSentences(byte[] input) => new(input.AsSpan(), Sentences.SplitBytes);
+    public static SplitEnumerator<byte> Sentences(byte[] input) => new(input.AsSpan(), UAX29.Sentences.SplitBytes);
 
     /// <summary>
     /// Split the sentences in the given string.
@@ -59,8 +54,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(string input) => new(input.AsSpan(), Sentences.SplitChars);
+    public static SplitEnumerator<char> Sentences(string input) => new(input.AsSpan(), UAX29.Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given string.
@@ -69,8 +63,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(char[] input) => new(input.AsSpan(), Sentences.SplitChars);
+    public static SplitEnumerator<char> Sentences(char[] input) => new(input.AsSpan(), UAX29.Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Span"/> of <see cref="char"/>.
@@ -79,8 +72,8 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(Span<char> input) => new(input, Sentences.SplitChars);
+    ///
+    public static SplitEnumerator<char> Sentences(Span<char> input) => new(input, UAX29.Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -89,8 +82,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(ReadOnlySpan<char> input) => new(input, Sentences.SplitChars);
+    public static SplitEnumerator<char> Sentences(ReadOnlySpan<char> input) => new(input, UAX29.Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -99,8 +91,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(Memory<char> input) => new(input.Span, Sentences.SplitChars);
+    public static SplitEnumerator<char> Sentences(Memory<char> input) => new(input.Span, UAX29.Sentences.SplitChars);
 
     /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -109,8 +100,9 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(input) or input.SplitSentences()")]
-    public static SplitEnumerator<char> GetSentences(ReadOnlyMemory<char> input) => new(input.Span, Sentences.SplitChars);
+    public static SplitEnumerator<char> Sentences(ReadOnlyMemory<char> input) => new(input.Span, UAX29.Sentences.SplitChars);
+
+
 
     /// <summary>
     /// Split the sentences in the given <see cref="Stream"/> of UTF-8 encoded bytes.
@@ -135,12 +127,11 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(stream) or stream.SplitSentences()")]
-    public static StreamEnumerator<byte> GetSentences(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamEnumerator<byte> Sentences(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamEnumerator<byte>(buffer, Sentences.SplitBytes);
+        return new StreamEnumerator<byte>(buffer, UAX29.Sentences.SplitBytes);
     }
 
     /// <summary>
@@ -166,11 +157,10 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
-    [Obsolete("Use Split.Sentences(stream) or stream.SplitSentences()")]
-    public static StreamEnumerator<char> GetSentences(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamEnumerator<char> Sentences(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
-        return new StreamEnumerator<char>(buffer, Sentences.SplitChars);
+        return new StreamEnumerator<char>(buffer, UAX29.Sentences.SplitChars);
     }
 }

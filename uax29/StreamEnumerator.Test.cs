@@ -31,10 +31,10 @@ public class TestStreamTokenizer
             foreach (var input in examples)
             {
                 var bytes = Encoding.UTF8.GetBytes(input);
-                var staticTokens = Tokenizer.GetWords(bytes, Options.OmitWhitespace);
+                var staticTokens = Split.Words(bytes, Options.OmitWhitespace);
 
                 using var stream = new MemoryStream(bytes);
-                var streamTokens = Tokenizer.GetWords(stream, Options.OmitWhitespace);
+                var streamTokens = Split.Words(stream, Options.OmitWhitespace);
 
                 foreach (var streamToken in streamTokens)
                 {
@@ -70,11 +70,11 @@ public class TestStreamTokenizer
             foreach (var input in examples)
             {
                 var bytes = Encoding.UTF8.GetBytes(input);
-                var staticTokens = Tokenizer.GetWords(bytes, option);
+                var staticTokens = Split.Words(bytes, option);
 
                 using var stream = new MemoryStream(bytes);
                 using var reader = new StreamReader(stream);
-                var streamTokens = Tokenizer.GetWords(reader, option);
+                var streamTokens = Split.Words(reader, option);
 
                 foreach (var streamToken in streamTokens)
                 {
@@ -97,7 +97,7 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(input);
         using var stream = new MemoryStream(bytes);
 
-        var tokens = Tokenizer.GetWords(stream);
+        var tokens = Split.Words(stream);
 
         var first = new List<string>();
         foreach (var token in tokens)
@@ -130,7 +130,7 @@ public class TestStreamTokenizer
         using var stream = new MemoryStream(bytes);
         using var reader = new StreamReader(stream);
 
-        var tokens = Tokenizer.GetWords(reader);
+        var tokens = Split.Words(reader);
 
         var first = new List<string>();
         foreach (var token in tokens)
@@ -163,7 +163,7 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(input);
         using var stream = new MemoryStream(bytes);
 
-        var tokens = Tokenizer.GetWords(stream);
+        var tokens = Split.Words(stream);
 
         var first = new List<string>();
         while (tokens.MoveNext())
@@ -175,7 +175,7 @@ public class TestStreamTokenizer
         Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
         using var stream2 = new MemoryStream(bytes);
-        var tokens2 = Tokenizer.GetWords(stream2);
+        var tokens2 = Split.Words(stream2);
 
         var second = new List<string>();
         foreach (var token in tokens2)
@@ -194,10 +194,10 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(example);
         using var stream = new MemoryStream(bytes);
 
-        var list = Tokenizer.GetWords(stream).ToList();
+        var list = Split.Words(stream).ToList();
 
         stream.Seek(0, SeekOrigin.Begin);
-        var tokens = Tokenizer.GetWords(stream);
+        var tokens = Split.Words(stream);
 
         var i = 0;
         foreach (var token in tokens)
@@ -228,10 +228,10 @@ public class TestStreamTokenizer
         var bytes = Encoding.UTF8.GetBytes(example);
         using var stream = new MemoryStream(bytes);
 
-        var list = Tokenizer.GetWords(stream).ToList();
+        var list = Split.Words(stream).ToList();
 
         stream.Seek(0, SeekOrigin.Begin);
-        var tokens = Tokenizer.GetWords(stream);
+        var tokens = Split.Words(stream);
 
         var i = 0;
         foreach (var token in tokens)
@@ -263,7 +263,7 @@ public class TestStreamTokenizer
 
         {
             using var stream = new MemoryStream(bytes);
-            var tokens = Tokenizer.GetWords(stream, minBufferBytes: 8);
+            var tokens = Split.Words(stream, minBufferBytes: 8);
             tokens.MoveNext();
             Assert.That(tokens.Position, Is.EqualTo(0));    // ab...
             tokens.MoveNext();
@@ -282,7 +282,7 @@ public class TestStreamTokenizer
 
         {
             using var stream = new MemoryStream(bytes);
-            var tokens = Tokenizer.GetWords(stream, minBufferBytes: 8, options: Options.OmitWhitespace);
+            var tokens = Split.Words(stream, minBufferBytes: 8, options: Options.OmitWhitespace);
             tokens.MoveNext();
             Assert.That(tokens.Position, Is.EqualTo(0));        // ab...
             // tokens.MoveNext();

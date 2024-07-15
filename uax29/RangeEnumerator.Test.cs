@@ -18,7 +18,7 @@ public class TestRangeTokenizer
 		var example = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(example);
 
-		var words = Tokenizer.GetWords(example);
+		var words = Split.Words(example);
 		var ranges = words.Ranges;
 
 		var first = new List<Range>();
@@ -49,7 +49,7 @@ public class TestRangeTokenizer
 
 		foreach (var option in options)
 		{
-			var tokens = Tokenizer.GetWords(example, option);
+			var tokens = Split.Words(example, option);
 			var ranges = tokens.Ranges;
 
 			foreach (var range in ranges)
@@ -68,9 +68,9 @@ public class TestRangeTokenizer
 	{
 		var input = "Hello, how are you?";
 		var mem = input.AsMemory();
-		Tokenizer.GetWords(mem);
+		Split.Words(mem);
 
-		var words = Tokenizer.GetWords(input);
+		var words = Split.Words(input);
 		var ranges = words.Ranges;
 
 		var first = new List<Range>();
@@ -81,7 +81,7 @@ public class TestRangeTokenizer
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
 
-		var tokens2 = Tokenizer.GetWords(input);
+		var tokens2 = Split.Words(input);
 		var ranges2 = words.Ranges;
 
 		var second = new List<Range>();
@@ -96,7 +96,7 @@ public class TestRangeTokenizer
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var words = Tokenizer.GetWords(example);
+		var words = Split.Words(example);
 		var ranges = words.Ranges;
 		var list = ranges.ToList();
 
@@ -126,7 +126,7 @@ public class TestRangeTokenizer
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var words = Tokenizer.GetWords(example);
+		var words = Split.Words(example);
 		var ranges = words.Ranges;
 		var array = ranges.ToArray();
 

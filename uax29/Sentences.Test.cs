@@ -518,7 +518,7 @@ public class SentencesTests
 	[Test, TestCaseSource(nameof(Tests))]
 	public void Bytes(UnicodeTest test)
 	{
-		var tokens = Tokenizer.GetSentences(test.input);
+		var tokens = Split.Sentences(test.input);
 		TestUnicode.TestTokenizerBytes(tokens, test);
 	}
 
@@ -526,7 +526,7 @@ public class SentencesTests
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.GetSentences(s);
+		var tokens = Split.Sentences(s);
 		TestUnicode.TestTokenizerChars(tokens, test);
 	}
 
@@ -534,7 +534,7 @@ public class SentencesTests
 	public void Stream(UnicodeTest test)
 	{
 		using var stream = new MemoryStream(test.input);
-		var tokens = Tokenizer.GetSentences(stream);
+		var tokens = Split.Sentences(stream);
 		TestUnicode.TestTokenizerStream(tokens, test);
 	}
 
@@ -543,7 +543,7 @@ public class SentencesTests
 	{
 		using var stream = new MemoryStream(test.input);
 		using var reader = new StreamReader(stream);
-		var tokens = Tokenizer.GetSentences(reader);
+		var tokens = Split.Sentences(reader);
 		TestUnicode.TestTokenizerTextReader(tokens, test);
 	}
 }

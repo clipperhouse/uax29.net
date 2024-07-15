@@ -69,12 +69,12 @@ public class TestUnicode
 	}
 
 	private delegate SplitEnumerator<byte> ByteMethod(byte[] input);
-	static readonly ByteMethod byteWords = (byte[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
-	static readonly ByteMethod[] byteMethods = [byteWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	static readonly ByteMethod byteWords = (byte[] input) => Split.Words(input);     // because of the optional parameter
+	static readonly ByteMethod[] byteMethods = [byteWords, Split.Graphemes, Split.Graphemes];
 
 	private delegate SplitEnumerator<char> CharMethod(char[] input);
-	static readonly CharMethod charWords = (char[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
-	static readonly CharMethod[] charMethods = [charWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	static readonly CharMethod charWords = (char[] input) => Split.Words(input);     // because of the optional parameter
+	static readonly CharMethod[] charMethods = [charWords, Split.Graphemes, Split.Sentences];
 
 	[Test]
 	public void InvalidEncoding()

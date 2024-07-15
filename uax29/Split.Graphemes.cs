@@ -1,7 +1,6 @@
-﻿namespace UAX29.Extensions;
-using UAX29;
+﻿namespace UAX29;
 
-public static partial class Extensions
+public static partial class Split
 {
     /// <summary>
     /// Split the graphemes in the given <see cref="Span"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -10,7 +9,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitSentences(this Span<byte> input) => Split.Sentences(input);
+    public static SplitEnumerator<byte> Graphemes(Span<byte> input) => new(input, UAX29.Graphemes.SplitBytes);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -19,7 +18,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitSentences(this ReadOnlySpan<byte> input) => Split.Sentences(input);
+    public static SplitEnumerator<byte> Graphemes(ReadOnlySpan<byte> input) => new(input, UAX29.Graphemes.SplitBytes);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -28,7 +27,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitSentences(this Memory<byte> input) => Split.Sentences(input);
+    public static SplitEnumerator<byte> Graphemes(Memory<byte> input) => new(input.Span, UAX29.Graphemes.SplitBytes);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -37,7 +36,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitSentences(this ReadOnlyMemory<byte> input) => Split.Sentences(input);
+    public static SplitEnumerator<byte> Graphemes(ReadOnlyMemory<byte> input) => new(input.Span, UAX29.Graphemes.SplitBytes);
 
     /// <summary>
     /// Split the graphemes in the given array of UTF-8 encoded bytes.
@@ -46,7 +45,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitSentences(this byte[] input) => Split.Sentences(input);
+    public static SplitEnumerator<byte> Graphemes(byte[] input) => new(input.AsSpan(), UAX29.Graphemes.SplitBytes);
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -55,7 +54,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this string input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(string input) => new(input.AsSpan(), UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -64,7 +63,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this char[] input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(char[] input) => new(input.AsSpan(), UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Span"/> of <see cref="char"/>.
@@ -74,7 +73,7 @@ public static partial class Extensions
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
     ///
-    public static SplitEnumerator<char> SplitSentences(this Span<char> input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(Span<char> input) => new(input, UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -83,7 +82,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this ReadOnlySpan<char> input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(ReadOnlySpan<char> input) => new(input, UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -92,7 +91,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this Memory<char> input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(Memory<char> input) => new(input.Span, UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -101,7 +100,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this ReadOnlyMemory<char> input) => Split.Sentences(input);
+    public static SplitEnumerator<char> Graphemes(ReadOnlyMemory<char> input) => new(input.Span, UAX29.Graphemes.SplitChars);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Stream"/> of UTF-8 encoded bytes.
@@ -126,7 +125,12 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamEnumerator<byte> SplitSentences(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null) => Split.Sentences(stream, minBufferBytes, bufferStorage);
+    public static StreamEnumerator<byte> Graphemes(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    {
+        bufferStorage ??= new byte[minBufferBytes * 2];
+        var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
+        return new StreamEnumerator<byte>(buffer, UAX29.Graphemes.SplitBytes);
+    }
 
     /// <summary>
     /// Split the graphemes in the given <see cref="TextReader"/> / <see cref="StreamReader"/>.
@@ -151,5 +155,10 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamEnumerator<char> SplitSentences(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null) => Split.Sentences(stream, minBufferChars, bufferStorage);
+    public static StreamEnumerator<char> Graphemes(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
+    {
+        bufferStorage ??= new char[minBufferChars * 2];
+        var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
+        return new StreamEnumerator<char>(buffer, UAX29.Graphemes.SplitChars);
+    }
 }
