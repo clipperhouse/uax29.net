@@ -6,6 +6,8 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 ### Example
 
+_⚠️ This documentation on `main` refers to v3, which is not yet published on Nuget. See [v2 documentation](https://github.com/clipperhouse/uax29.net/blob/v2.2.0/README.md) until then._
+
 ```
 dotnet add package UAX29
 ```
