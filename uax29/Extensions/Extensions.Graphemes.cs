@@ -28,7 +28,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitGraphemes(this Memory<byte> input) => Split.Graphemes(input);
+    public static SplitEnumerator<byte> SplitGraphemes(this Memory<byte> input) => Split.Graphemes(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -37,7 +37,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<byte> SplitGraphemes(this ReadOnlyMemory<byte> input) => Split.Graphemes(input);
+    public static SplitEnumerator<byte> SplitGraphemes(this ReadOnlyMemory<byte> input) => Split.Graphemes(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given array of UTF-8 encoded bytes.
@@ -92,7 +92,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitGraphemes(this Memory<char> input) => Split.Graphemes(input);
+    public static SplitEnumerator<char> SplitGraphemes(this Memory<char> input) => Split.Graphemes(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -101,7 +101,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitGraphemes(this ReadOnlyMemory<char> input) => Split.Graphemes(input);
+    public static SplitEnumerator<char> SplitGraphemes(this ReadOnlyMemory<char> input) => Split.Graphemes(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Stream"/> of UTF-8 encoded bytes.

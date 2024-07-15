@@ -68,12 +68,12 @@ public class TestUnicode
 		}
 	}
 
-	private delegate SplitEnumerator<byte> ByteMethod(byte[] input);
-	static readonly ByteMethod byteWords = (byte[] input) => Split.Words(input);     // because of the optional parameter
+	private delegate SplitEnumerator<byte> ByteMethod(ReadOnlySpan<byte> input);
+	static readonly ByteMethod byteWords = (ReadOnlySpan<byte> input) => Split.Words(input);     // because of the optional parameter
 	static readonly ByteMethod[] byteMethods = [byteWords, Split.Graphemes, Split.Graphemes];
 
-	private delegate SplitEnumerator<char> CharMethod(char[] input);
-	static readonly CharMethod charWords = (char[] input) => Split.Words(input);     // because of the optional parameter
+	private delegate SplitEnumerator<char> CharMethod(ReadOnlySpan<char> input);
+	static readonly CharMethod charWords = (ReadOnlySpan<char> input) => Split.Words(input);     // because of the optional parameter
 	static readonly CharMethod[] charMethods = [charWords, Split.Graphemes, Split.Sentences];
 
 	[Test]

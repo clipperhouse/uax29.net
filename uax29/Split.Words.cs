@@ -3,15 +3,6 @@
 public static partial class Split
 {
 	/// <summary>
-	/// Split the words in the given <see cref="Span"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
-	/// </summary>
-	/// <param name="input">The UTF-8 bytes to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<byte> Words(Span<byte> input, Options options = Options.None) => new(input, UAX29.Words.SplitBytes, options);
-
-	/// <summary>
 	/// Split the words in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
 	/// </summary>
 	/// <param name="input">The UTF-8 bytes to tokenize.</param>
@@ -21,61 +12,6 @@ public static partial class Split
 	public static SplitEnumerator<byte> Words(ReadOnlySpan<byte> input, Options options = Options.None) => new(input, UAX29.Words.SplitBytes, options);
 
 	/// <summary>
-	/// Split the words in the given <see cref="Memory"/> of UTF-8 encoded bytes.
-	/// </summary>
-	/// <param name="input">The UTF-8 bytes to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<byte> Words(Memory<byte> input, Options options = Options.None) => new(input.Span, UAX29.Words.SplitBytes, options);
-
-	/// <summary>
-	/// Split the words in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
-	/// </summary>
-	/// <param name="input">The UTF-8 bytes to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<byte> Words(ReadOnlyMemory<byte> input, Options options = Options.None) => new(input.Span, UAX29.Words.SplitBytes, options);
-
-	/// <summary>
-	/// Split the words in the given array of UTF-8 encoded bytes.
-	/// </summary>
-	/// <param name="input">The UTF-8 bytes to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<byte> Words(byte[] input, Options options = Options.None) => new(input.AsSpan(), UAX29.Words.SplitBytes, options);
-
-	/// <summary>
-	/// Split the words in the given string.
-	/// </summary>
-	/// <param name="input">The string to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<char> Words(string input, Options options = Options.None) => new(input.AsSpan(), UAX29.Words.SplitChars, options);
-
-	/// <summary>
-	/// Split the words in the given string.
-	/// </summary>
-	/// <param name="input">The string to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<char> Words(char[] input, Options options = Options.None) => new(input.AsSpan(), UAX29.Words.SplitChars, options);
-
-	/// <summary>
-	/// Split the words in the given <see cref="Span"/> of <see cref="char"/>.
-	/// </summary>
-	/// <param name="input">The chars to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	///
-	public static SplitEnumerator<char> Words(Span<char> input, Options options = Options.None) => new(input, UAX29.Words.SplitChars, options);
-
-	/// <summary>
 	/// Split the words in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
 	/// </summary>
 	/// <param name="input">The chars to tokenize.</param>
@@ -83,24 +19,6 @@ public static partial class Split
 	/// An enumerator of words. Use foreach (var word in words).
 	/// </returns>
 	public static SplitEnumerator<char> Words(ReadOnlySpan<char> input, Options options = Options.None) => new(input, UAX29.Words.SplitChars, options);
-
-	/// <summary>
-	/// Split the words in the given <see cref="Memory"/> of <see cref="char"/>.
-	/// </summary>
-	/// <param name="input">The chars to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<char> Words(Memory<char> input, Options options = Options.None) => new(input.Span, UAX29.Words.SplitChars, options);
-
-	/// <summary>
-	/// Split the words in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
-	/// </summary>
-	/// <param name="input">The chars to tokenize.</param>
-	/// <returns>
-	/// An enumerator of words. Use foreach (var word in words).
-	/// </returns>
-	public static SplitEnumerator<char> Words(ReadOnlyMemory<char> input, Options options = Options.None) => new(input.Span, UAX29.Words.SplitChars, options);
 
 	/// <summary>
 	/// Split the words in the given <see cref="Stream"/> of UTF-8 encoded bytes.

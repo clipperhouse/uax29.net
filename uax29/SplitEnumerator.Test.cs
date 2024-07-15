@@ -73,14 +73,10 @@ public class TestTokenizer
 		expected++;     // char[]
 		expected++;     // Span<char>
 		expected++;     // ReadOnlySpan<char>
-		expected++;     // Memory<char>
-		expected++;     // ReadOnlyMemory<char>
 
 		expected++;     // byte[]
 		expected++;     // Span<byte>
 		expected++;     // ReadOnlySpan<byte>
-		expected++;     // Memory<byte>
-		expected++;     // ReadOnlyMemory<byte>
 
 		expected++;     // Stream
 		expected++;     // TextReader
@@ -104,9 +100,8 @@ public class TestTokenizer
 		using var stream = new MemoryStream(bytes);
 		using var reader = new StreamReader(stream);
 
+		// Chars
 		{
-			// chars
-
 			Split.Words(input); got++;
 
 			var array = input.ToCharArray();
@@ -118,19 +113,9 @@ public class TestTokenizer
 			ReadOnlySpan<char> rspan = input.AsSpan();
 			Split.Words(rspan); got++;
 
-			var mem = new Memory<char>(array);
-			Split.Words(mem); got++;
-
-			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Split.Words(rmem); got++;
-
 			Split.Words(reader); got++;
 		}
-
-
 		{
-			// chars
-
 			Split.Graphemes(input); got++;
 
 			var array = input.ToCharArray();
@@ -142,19 +127,9 @@ public class TestTokenizer
 			ReadOnlySpan<char> rspan = input.AsSpan();
 			Split.Graphemes(rspan); got++;
 
-			var mem = new Memory<char>(array);
-			Split.Graphemes(mem); got++;
-
-			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Split.Graphemes(rmem); got++;
-
 			Split.Graphemes(reader); got++;
 		}
-
-
 		{
-			// chars
-
 			Split.Sentences(input); got++;
 
 			var array = input.ToCharArray();
@@ -166,18 +141,11 @@ public class TestTokenizer
 			ReadOnlySpan<char> rspan = input.AsSpan();
 			Split.Sentences(rspan); got++;
 
-			var mem = new Memory<char>(array);
-			Split.Sentences(mem); got++;
-
-			ReadOnlyMemory<char> rmem = input.AsMemory();
-			Split.Sentences(rmem); got++;
-
 			Split.Sentences(reader); got++;
 		}
 
+		// Bytes
 		{
-			// bytes
-
 			Split.Words(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
@@ -186,19 +154,9 @@ public class TestTokenizer
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
 			Split.Words(rspan); got++;
 
-			Memory<byte> mem = bytes.AsMemory();
-			Split.Words(mem); got++;
-
-			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Split.Words(rmem); got++;
-
 			Split.Words(stream); got++;
 		}
-
-
 		{
-			// bytes
-
 			Split.Graphemes(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
@@ -207,19 +165,9 @@ public class TestTokenizer
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
 			Split.Graphemes(rspan); got++;
 
-			Memory<byte> mem = bytes.AsMemory();
-			Split.Graphemes(mem); got++;
-
-			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Split.Graphemes(rmem); got++;
-
 			Split.Graphemes(stream); got++;
 		}
-
-
 		{
-			// bytes
-
 			Split.Sentences(bytes); got++;
 
 			Span<byte> span = bytes.AsSpan();
@@ -227,12 +175,6 @@ public class TestTokenizer
 
 			ReadOnlySpan<byte> rspan = bytes.AsSpan();
 			Split.Sentences(rspan); got++;
-
-			Memory<byte> mem = bytes.AsMemory();
-			Split.Sentences(mem); got++;
-
-			ReadOnlyMemory<byte> rmem = bytes.AsMemory();
-			Split.Sentences(rmem); got++;
 
 			Split.Sentences(stream); got++;
 		}
@@ -244,9 +186,7 @@ public class TestTokenizer
 	public void Enumerator()
 	{
 		var input = "Hello, how are you?";
-		var mem = input.AsMemory();
 		var bytes = Encoding.UTF8.GetBytes(input);
-		Split.Words(mem);
 
 		var tokens = Split.Words(input);
 		var first = new List<string>();
@@ -257,11 +197,11 @@ public class TestTokenizer
 		}
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
-		var tokens2 = Split.Words(input);
+		var tokens2 = Split.Words(bytes);
 		var second = new List<string>();
 		foreach (var token in tokens2)
 		{
-			var s = token.ToString();
+			var s = Encoding.UTF8.GetString(token);
 			second.Add(s);
 		}
 		Assert.That(first.SequenceEqual(second));

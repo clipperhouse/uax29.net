@@ -67,27 +67,21 @@ public class TestRangeTokenizer
 	public void Enumerator()
 	{
 		var input = "Hello, how are you?";
-		var mem = input.AsMemory();
-		Split.Words(mem);
 
 		var words = Split.Words(input);
-		var ranges = words.Ranges;
-
-		var first = new List<Range>();
-		while (ranges.MoveNext())
+		var first = new List<string>();
+		foreach (var word in words)
 		{
-			first.Add(ranges.Current);
+			first.Add(word.ToString());
 		}
+
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
-
-		var tokens2 = Split.Words(input);
-		var ranges2 = words.Ranges;
-
-		var second = new List<Range>();
-		foreach (var range in ranges2)
+		var ranges = Split.Words(input).Ranges;
+		var second = new List<string>();
+		foreach (var range in ranges)
 		{
-			second.Add(range);
+			second.Add(input[range]);
 		}
 		Assert.That(first.SequenceEqual(second));
 	}

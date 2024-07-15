@@ -3,15 +3,6 @@
 public static partial class Split
 {
     /// <summary>
-    /// Split the sentences in the given <see cref="Span"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
-    /// </summary>
-    /// <param name="input">The UTF-8 bytes to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<byte> Sentences(Span<byte> input) => new(input, UAX29.Sentences.SplitBytes);
-
-    /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
     /// </summary>
     /// <param name="input">The UTF-8 bytes to tokenize.</param>
@@ -21,61 +12,6 @@ public static partial class Split
     public static SplitEnumerator<byte> Sentences(ReadOnlySpan<byte> input) => new(input, UAX29.Sentences.SplitBytes);
 
     /// <summary>
-    /// Split the sentences in the given <see cref="Memory"/> of UTF-8 encoded bytes.
-    /// </summary>
-    /// <param name="input">The UTF-8 bytes to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<byte> Sentences(Memory<byte> input) => new(input.Span, UAX29.Sentences.SplitBytes);
-
-    /// <summary>
-    /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
-    /// </summary>
-    /// <param name="input">The UTF-8 bytes to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<byte> Sentences(ReadOnlyMemory<byte> input) => new(input.Span, UAX29.Sentences.SplitBytes);
-
-    /// <summary>
-    /// Split the sentences in the given array of UTF-8 encoded bytes.
-    /// </summary>
-    /// <param name="input">The UTF-8 bytes to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<byte> Sentences(byte[] input) => new(input.AsSpan(), UAX29.Sentences.SplitBytes);
-
-    /// <summary>
-    /// Split the sentences in the given string.
-    /// </summary>
-    /// <param name="input">The string to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<char> Sentences(string input) => new(input.AsSpan(), UAX29.Sentences.SplitChars);
-
-    /// <summary>
-    /// Split the sentences in the given string.
-    /// </summary>
-    /// <param name="input">The string to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<char> Sentences(char[] input) => new(input.AsSpan(), UAX29.Sentences.SplitChars);
-
-    /// <summary>
-    /// Split the sentences in the given <see cref="Span"/> of <see cref="char"/>.
-    /// </summary>
-    /// <param name="input">The chars to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    ///
-    public static SplitEnumerator<char> Sentences(Span<char> input) => new(input, UAX29.Sentences.SplitChars);
-
-    /// <summary>
     /// Split the sentences in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
     /// </summary>
     /// <param name="input">The chars to tokenize.</param>
@@ -83,26 +19,6 @@ public static partial class Split
     /// An enumerator of sentences. Use foreach (var sentence in sentences).
     /// </returns>
     public static SplitEnumerator<char> Sentences(ReadOnlySpan<char> input) => new(input, UAX29.Sentences.SplitChars);
-
-    /// <summary>
-    /// Split the sentences in the given <see cref="Memory"/> of <see cref="char"/>.
-    /// </summary>
-    /// <param name="input">The chars to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<char> Sentences(Memory<char> input) => new(input.Span, UAX29.Sentences.SplitChars);
-
-    /// <summary>
-    /// Split the sentences in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
-    /// </summary>
-    /// <param name="input">The chars to tokenize.</param>
-    /// <returns>
-    /// An enumerator of sentences. Use foreach (var sentence in sentences).
-    /// </returns>
-    public static SplitEnumerator<char> Sentences(ReadOnlyMemory<char> input) => new(input.Span, UAX29.Sentences.SplitChars);
-
-
 
     /// <summary>
     /// Split the sentences in the given <see cref="Stream"/> of UTF-8 encoded bytes.
