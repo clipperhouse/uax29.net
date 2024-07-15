@@ -84,7 +84,7 @@ public ref struct SplitEnumerator<T> where T : struct
 	}
 
 	/// <summary>
-	/// Resets the tokenizer back to the first token.
+	/// Resets the enumerator back to the first token.
 	/// </summary>
 	public void Reset()
 	{
@@ -144,11 +144,11 @@ public ref struct SplitEnumerator<T> where T : struct
 	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input
 	/// using [range] or .AsSpan(range) to get the tokens.
 	/// </returns>
-	public readonly RangeTokenizer<T> Ranges
+	public readonly RangeEnumerator<T> Ranges
 	{
 		get
 		{
-			return new RangeTokenizer<T>(this);
+			return new RangeEnumerator<T>(this);
 		}
 	}
 }

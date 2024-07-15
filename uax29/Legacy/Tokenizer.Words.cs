@@ -125,11 +125,11 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<byte> GetWords(Stream stream, Options options = Options.None, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamEnumerator<byte> GetWords(Stream stream, Options options = Options.None, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamTokenizer<byte>(buffer, Words.SplitBytes, options);
+        return new StreamEnumerator<byte>(buffer, Words.SplitBytes, options);
     }
 
     /// <summary>
@@ -155,10 +155,10 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<char> GetWords(TextReader stream, Options options = Options.None, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamEnumerator<char> GetWords(TextReader stream, Options options = Options.None, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
-        return new StreamTokenizer<char>(buffer, Words.SplitChars, options);
+        return new StreamEnumerator<char>(buffer, Words.SplitChars, options);
     }
 }

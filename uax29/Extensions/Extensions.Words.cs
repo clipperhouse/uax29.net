@@ -126,7 +126,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<byte> SplitWords(this Stream stream, Options options = Options.None, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamEnumerator<byte> SplitWords(this Stream stream, Options options = Options.None, int minBufferBytes = 1024, byte[]? bufferStorage = null)
         => Tokenizer.GetWords(stream, options, minBufferBytes, bufferStorage);
 
     /// <summary>
@@ -152,6 +152,6 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static StreamTokenizer<char> SplitWords(this TextReader stream, Options options = Options.None, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamEnumerator<char> SplitWords(this TextReader stream, Options options = Options.None, int minBufferChars = 1024, char[]? bufferStorage = null)
       => Tokenizer.GetWords(stream, options, minBufferChars, bufferStorage);
 }

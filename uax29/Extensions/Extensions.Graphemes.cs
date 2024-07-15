@@ -126,7 +126,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<byte> SplitGraphemes(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null) => Tokenizer.GetGraphemes(stream, minBufferBytes, bufferStorage);
+    public static StreamEnumerator<byte> SplitGraphemes(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null) => Tokenizer.GetGraphemes(stream, minBufferBytes, bufferStorage);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="TextReader"/> / <see cref="StreamReader"/>.
@@ -151,5 +151,5 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<char> SplitGraphemes(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null) => Tokenizer.GetGraphemes(stream, minBufferChars, bufferStorage);
+    public static StreamEnumerator<char> SplitGraphemes(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null) => Tokenizer.GetGraphemes(stream, minBufferChars, bufferStorage);
 }

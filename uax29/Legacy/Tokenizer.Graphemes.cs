@@ -125,11 +125,11 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<byte> GetGraphemes(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
+    public static StreamEnumerator<byte> GetGraphemes(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
     {
         bufferStorage ??= new byte[minBufferBytes * 2];
         var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamTokenizer<byte>(buffer, Graphemes.SplitBytes);
+        return new StreamEnumerator<byte>(buffer, Graphemes.SplitBytes);
     }
 
     /// <summary>
@@ -155,10 +155,10 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<char> GetGraphemes(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
+    public static StreamEnumerator<char> GetGraphemes(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
     {
         bufferStorage ??= new char[minBufferChars * 2];
         var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
-        return new StreamTokenizer<char>(buffer, Graphemes.SplitChars);
+        return new StreamEnumerator<char>(buffer, Graphemes.SplitChars);
     }
 }

@@ -6,9 +6,9 @@ using System.Diagnostics;
 using Property = uint;
 
 /// <summary>
-/// StreamTokenizer is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
+/// StreamEnumerator is a small data structure for splitting strings from Streams or TextReaders. It implements GetEnumerator.
 /// </summary>
-public ref struct StreamTokenizer<T> where T : struct
+public ref struct StreamEnumerator<T> where T : struct
 {
 	internal Buffer<T> buffer;
 	readonly Split<T> split;
@@ -27,11 +27,11 @@ public ref struct StreamTokenizer<T> where T : struct
 	bool begun = false;
 
 	/// <summary>
-	/// StreamTokenizer is a small data structure for splitting strings.
+	/// StreamEnumerator is a small data structure for splitting strings.
 	/// </summary>
 	/// <param name="buffer">For backing storage, typically created from a Stream or TextReader.</param>
 	/// <param name="split">A delegate that does the tokenizing. See Split<T> for details.</param>
-	internal StreamTokenizer(Buffer<T> buffer, Split<T> split, Options options = Options.None)
+	internal StreamEnumerator(Buffer<T> buffer, Split<T> split, Options options = Options.None)
 	{
 		this.buffer = buffer;
 		this.split = split;
@@ -72,7 +72,7 @@ public ref struct StreamTokenizer<T> where T : struct
 		}
 	}
 
-	public readonly StreamTokenizer<T> GetEnumerator()
+	public readonly StreamEnumerator<T> GetEnumerator()
 	{
 		return this;
 	}
@@ -115,19 +115,19 @@ public ref struct StreamTokenizer<T> where T : struct
 public static class StreamExtensions
 {
 	/// <summary>
-	/// Resets an existing tokenizer with a new stream. You might choose this as an optimization, as it will re-use a buffer, avoiding allocations.
+	/// Resets an existing StreamEnumerator with a new stream. You might choose this as an optimization, as it will re-use a buffer, avoiding allocations.
 	/// </summary>
 	/// <param name="stream">The new stream</param>
-	public static void SetStream(ref this StreamTokenizer<byte> tokenizer, Stream stream)
+	public static void SetStream(ref this StreamEnumerator<byte> tokenizer, Stream stream)
 	{
 		tokenizer.buffer.SetRead(stream.Read);
 	}
 
 	/// <summary>
-	/// Resets an existing tokenizer with a new stream. You might choose this as an optimization, as it will re-use a buffer, avoiding allocations.
+	/// Resets an existing StreamEnumerator with a new stream. You might choose this as an optimization, as it will re-use a buffer, avoiding allocations.
 	/// </summary>
 	/// <param name="stream">The new stream</param>
-	public static void SetStream(ref this StreamTokenizer<char> tokenizer, TextReader stream)
+	public static void SetStream(ref this StreamEnumerator<char> tokenizer, TextReader stream)
 	{
 		tokenizer.buffer.SetRead(stream.Read);
 	}

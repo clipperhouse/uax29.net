@@ -283,7 +283,7 @@ public class TestTokenizer
 
 		Assert.That(list, Has.Count.EqualTo(i), "ToList should return the same number of tokens as iteration");
 
-		// Tokenizer should reset back to the beginning
+		// Enumerator should reset back to the beginning
 		Assert.That(tokens.start, Is.EqualTo(0));
 		Assert.That(tokens.end, Is.EqualTo(0));
 
