@@ -11,15 +11,15 @@ dotnet add package UAX29
 ```
 
 ```csharp
-using UAX29;
 using System.Text;
+using UAX29.Extensions;
 
 var example = "Hello, 🌏 world. 你好，世界.";
 
 // The tokenizer can split words, graphemes or sentences.
 // It operates on strings, UTF-8 bytes, and streams.
 
-var words = Tokenizer.GetWords(example);
+var words = example.SplitWords();
 
 // Iterate over the tokens
 foreach (var word in words)
@@ -47,7 +47,7 @@ world
 */
 
 var utf8bytes = Encoding.UTF8.GetBytes(example);
-var graphemes = Tokenizer.GetGraphemes(utf8bytes);
+var graphemes = utf8bytes.SplitGraphemes();
 
 // Iterate over the tokens
 foreach (var grapheme in graphemes)
@@ -96,7 +96,7 @@ We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
-This is the same algorithm that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
+This is the same spec that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
 
 ### Performance
 
@@ -104,9 +104,9 @@ When tokenizing words, I get around 120MB/s on my Macbook M2. For typical text, 
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
 
-Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
+Calling `SplitWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
 
-For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `SplitWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
 
 ### Options
 

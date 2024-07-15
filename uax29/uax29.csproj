@@ -18,8 +18,8 @@
 
   <!-- Remove test files from Release build -->
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <None Remove="*.Test.cs" />
-    <Compile Remove="*.Test.cs" />
+    <None Remove="**/*.Test.cs" />
+    <Compile Remove="**/*.Test.cs" />
   </ItemGroup>
 
   <!-- Only test in Debug configuration -->

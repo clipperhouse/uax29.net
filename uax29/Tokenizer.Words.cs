@@ -9,7 +9,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(Span<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
+    public static SplitEnumerator<byte> GetWords(Span<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -18,7 +18,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(ReadOnlySpan<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
+    public static SplitEnumerator<byte> GetWords(ReadOnlySpan<byte> input, Options options = Options.None) => new(input, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -27,7 +27,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(Memory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
+    public static SplitEnumerator<byte> GetWords(Memory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -36,7 +36,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(ReadOnlyMemory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
+    public static SplitEnumerator<byte> GetWords(ReadOnlyMemory<byte> input, Options options = Options.None) => new(input.Span, Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given array of UTF-8 encoded bytes.
@@ -45,7 +45,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<byte> GetWords(byte[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitBytes, options);
+    public static SplitEnumerator<byte> GetWords(byte[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitBytes, options);
 
     /// <summary>
     /// Split the words in the given string.
@@ -54,7 +54,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(string input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(string input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given string.
@@ -63,7 +63,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(char[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(char[] input, Options options = Options.None) => new(input.AsSpan(), Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Span"/> of <see cref="char"/>.
@@ -73,7 +73,7 @@ public static partial class Tokenizer
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
     ///
-    public static Tokenizer<char> GetWords(Span<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(Span<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -82,7 +82,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(ReadOnlySpan<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(ReadOnlySpan<char> input, Options options = Options.None) => new(input, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -91,7 +91,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(Memory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(Memory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -100,7 +100,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static Tokenizer<char> GetWords(ReadOnlyMemory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
+    public static SplitEnumerator<char> GetWords(ReadOnlyMemory<char> input, Options options = Options.None) => new(input.Span, Words.SplitChars, options);
 
     /// <summary>
     /// Split the words in the given <see cref="Stream"/> of UTF-8 encoded bytes.

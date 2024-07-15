@@ -20,7 +20,7 @@ public class TestUnicode
 	{
 	}
 
-	internal static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
+	internal static void TestTokenizerBytes(SplitEnumerator<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -44,7 +44,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
+	internal static void TestTokenizerChars(SplitEnumerator<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -68,11 +68,11 @@ public class TestUnicode
 		}
 	}
 
-	private delegate Tokenizer<byte> ByteMethod(byte[] input);
+	private delegate SplitEnumerator<byte> ByteMethod(byte[] input);
 	static readonly ByteMethod byteWords = (byte[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
 	static readonly ByteMethod[] byteMethods = [byteWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 
-	private delegate Tokenizer<char> CharMethod(char[] input);
+	private delegate SplitEnumerator<char> CharMethod(char[] input);
 	static readonly CharMethod charWords = (char[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
 	static readonly CharMethod[] charMethods = [charWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
 

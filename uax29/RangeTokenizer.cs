@@ -9,14 +9,14 @@ using Property = uint;
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 public ref struct RangeTokenizer<T> where T : struct
 {
-	Tokenizer<T> tokenizer;
+	SplitEnumerator<T> tokenizer;
 	bool begun = false;
 
 	/// <summary>
 	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
-	internal RangeTokenizer(Tokenizer<T> tokenizer)
+	internal RangeTokenizer(SplitEnumerator<T> tokenizer)
 	{
 		this.tokenizer = tokenizer;
 	}

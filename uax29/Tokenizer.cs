@@ -6,7 +6,7 @@ namespace UAX29;
 /// Splits an input string (UTF-8 or UTF-16) and provides an enumerator over the splits.
 /// </summary>
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-public ref struct Tokenizer<T> where T : struct
+public ref struct SplitEnumerator<T> where T : struct
 {
 	ReadOnlySpan<T> input;
 
@@ -31,7 +31,7 @@ public ref struct Tokenizer<T> where T : struct
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="split">A func/method meeting the Split delegate signature.</param>
 	/// <param name="options">Options for handling the input text.</param>
-	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
+	internal SplitEnumerator(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
 	{
 		this.input = input;
 		this.split = split;
@@ -78,7 +78,7 @@ public ref struct Tokenizer<T> where T : struct
 		}
 	}
 
-	public readonly Tokenizer<T> GetEnumerator()
+	public readonly SplitEnumerator<T> GetEnumerator()
 	{
 		return this;
 	}

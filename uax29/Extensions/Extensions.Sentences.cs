@@ -10,7 +10,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> SplitSentences(this Span<byte> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<byte> SplitSentences(this Span<byte> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -19,7 +19,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> SplitSentences(this ReadOnlySpan<byte> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<byte> SplitSentences(this ReadOnlySpan<byte> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -28,7 +28,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> SplitSentences(this Memory<byte> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<byte> SplitSentences(this Memory<byte> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -37,7 +37,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> SplitSentences(this ReadOnlyMemory<byte> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<byte> SplitSentences(this ReadOnlyMemory<byte> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given array of UTF-8 encoded bytes.
@@ -46,7 +46,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> SplitSentences(this byte[] input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<byte> SplitSentences(this byte[] input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -55,7 +55,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> SplitSentences(this string input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this string input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -64,7 +64,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> SplitSentences(this char[] input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this char[] input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Span"/> of <see cref="char"/>.
@@ -74,7 +74,7 @@ public static partial class Extensions
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
     ///
-    public static Tokenizer<char> SplitSentences(this Span<char> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this Span<char> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -83,7 +83,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> SplitSentences(this ReadOnlySpan<char> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this ReadOnlySpan<char> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -92,7 +92,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> SplitSentences(this Memory<char> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this Memory<char> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -101,7 +101,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> SplitSentences(this ReadOnlyMemory<char> input) => Tokenizer.GetSentences(input);
+    public static SplitEnumerator<char> SplitSentences(this ReadOnlyMemory<char> input) => Tokenizer.GetSentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Stream"/> of UTF-8 encoded bytes.
