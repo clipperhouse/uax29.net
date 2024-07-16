@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 [TestFixture]
-public class TestTokenizer
+public class TestEnumerator
 {
 	[SetUp]
 	public void Setup()
@@ -256,7 +256,7 @@ public class TestTokenizer
 
 		Assert.That(array, Has.Length.EqualTo(i), "ToArray should return the same number of tokens as iteration");
 
-		// Tokenizer should reset back to the beginning
+		// Should reset back to the beginning
 		Assert.That(tokens.start, Is.EqualTo(0));
 		Assert.That(tokens.end, Is.EqualTo(0));
 

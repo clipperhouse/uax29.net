@@ -130,7 +130,6 @@ public class TestUnicode
 		{
 			var bytes = new byte[i];
 			rng.GetBytes(bytes);
-			var s = Encoding.UTF8.GetChars(bytes);
 
 			foreach (var method in byteMethods)
 			{
@@ -146,6 +145,7 @@ public class TestUnicode
 				}
 			}
 
+			var s = Encoding.UTF8.GetChars(bytes);
 			foreach (var method in charMethods)
 			{
 				var tokens = method(s);

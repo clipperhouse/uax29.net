@@ -26,7 +26,7 @@ public ref struct SplitEnumerator<T> where T : struct
 	bool begun = false;
 
 	/// <summary>
-	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// Splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="split">A func/method meeting the Split delegate signature.</param>

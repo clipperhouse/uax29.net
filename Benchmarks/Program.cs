@@ -40,7 +40,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeBytes()
+	public void SplitBytes()
 	{
 		var tokens = Split.Words(sample);
 		foreach (var token in tokens)
@@ -49,7 +49,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeBytesOmitWhitespace()
+	public void SplitBytesOmitWhitespace()
 	{
 		var tokens = Split.Words(sample, Options.OmitWhitespace);
 		foreach (var token in tokens)
@@ -58,7 +58,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeString()
+	public void SplitString()
 	{
 		var tokens = Split.Words(sampleStr);
 		foreach (var token in tokens)
@@ -67,7 +67,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeStringOmitWhitespace()
+	public void SplitStringOmitWhitespace()
 	{
 		var tokens = Split.Words(sampleStr, Options.OmitWhitespace);
 		foreach (var token in tokens)
@@ -76,7 +76,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeStream()
+	public void SplitStream()
 	{
 		sampleStream.Seek(0, SeekOrigin.Begin);
 		var tokens = Split.Words(sampleStream);
@@ -86,7 +86,7 @@ public class Benchmark
 	static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
 	[Benchmark]
-	public void TokenizeStreamArrayPool()
+	public void SplitStreamArrayPool()
 	{
 		var storage = pool.Rent(2048);
 
@@ -108,7 +108,7 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizerGraphemes()
+	public void SplitGraphemes()
 	{
 		var tokens = Split.Graphemes(sample);
 		foreach (var token in tokens)

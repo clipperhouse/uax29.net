@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 [TestFixture]
-public class TestRangeTokenizer
+public class TestRangeEnumerator
 {
 	[SetUp]
 	public void Setup()
@@ -43,7 +43,7 @@ public class TestRangeTokenizer
 	static readonly Options[] options = [Options.None, Options.OmitWhitespace];
 
 	[Test]
-	public void MatchesTokenizer()
+	public void MatchesSplit()
 	{
 		var example = "abcdefghijk lmnopq r \tstu vwxyz; ABC DEFG \r\nHIJKL MNOP Q RSTUV WXYZ! 你好，世界.\r";
 
