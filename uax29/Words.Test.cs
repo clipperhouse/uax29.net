@@ -41,7 +41,7 @@ public class WordsTests
 		TestUnicode.TestTextReader(tokens, test);
 	}
 
-	internal readonly static UnicodeTest[] UnicodeTests = [
+	readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0001, 0x0001], [[0x0001], [0x0001]], "÷ [0.2] <START OF HEADING> (Other) ÷ [999.0] <START OF HEADING> (Other) ÷ [0.3]"),
 		new([0x0001, 0x00CC, 0x0088, 0x0001], [[0x0001, 0x00CC, 0x0088], [0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [4.0] COMBINING DIAERESIS (Extend_FE) ÷ [999.0] <START OF HEADING> (Other) ÷ [0.3]"),
 		new([0x0001, 0x000D], [[0x0001], [0x000D]], "÷ [0.2] <START OF HEADING> (Other) ÷ [3.2] <CARRIAGE RETURN (CR)> (CR) ÷ [0.3]"),

@@ -215,7 +215,7 @@ public class {typ}sTests
 		TestUnicode.TestTextReader(tokens, test);
 	}}
 
-	internal readonly static UnicodeTest[] UnicodeTests = [
+	readonly static UnicodeTest[] UnicodeTests = [
 ");
 			while (true)
 			{
