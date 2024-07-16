@@ -7,6 +7,40 @@ using UAX29;
 [TestFixture]
 public class GraphemesTests
 {
+	static UnicodeTest[] Tests => UnicodeTests;
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{
+		var tokens = Split.Graphemes(test.input);
+		TestUnicode.TestBytes(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Split.Graphemes(s);
+		TestUnicode.TestChars(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Split.Graphemes(stream);
+		TestUnicode.TestStream(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Split.Graphemes(reader);
+		TestUnicode.TestTextReader(tokens, test);
+	}
+
 	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0020, 0x0020], [[0x0020], [0x0020]], "÷ [0.2] SPACE (Other) ÷ [999.0] SPACE (Other) ÷ [0.3]"),
 		new([0x0020, 0x00CC, 0x0088, 0x0020], [[0x0020, 0x00CC, 0x0088], [0x0020]], "÷ [0.2] SPACE (Other) × [9.0] COMBINING DIAERESIS (Extend_ExtCccZwj) ÷ [999.0] SPACE (Other) ÷ [0.3]"),
@@ -612,38 +646,4 @@ public class GraphemesTests
 		new([0x0061, 0x00E2, 0x0080, 0x008D, 0x00E2, 0x009C, 0x0081], [[0x0061, 0x00E2, 0x0080, 0x008D], [0x00E2, 0x009C, 0x0081]], "÷ [0.2] LATIN SMALL LETTER A (Other) × [9.0] ZERO WIDTH JOINER (ZWJ_ExtCccZwj) ÷ [999.0] UPPER BLADE SCISSORS (Other) ÷ [0.3]"),
 
 	];
-
-	static readonly UnicodeTest[] Tests = UnicodeTests;
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Bytes(UnicodeTest test)
-	{
-		var tokens = Split.Graphemes(test.input);
-		TestUnicode.TestTokenizerBytes(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void String(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Split.Graphemes(s);
-		TestUnicode.TestTokenizerChars(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Stream(UnicodeTest test)
-	{
-		using var stream = new MemoryStream(test.input);
-		var tokens = Split.Graphemes(stream);
-		TestUnicode.TestTokenizerStream(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void TextReader(UnicodeTest test)
-	{
-		using var stream = new MemoryStream(test.input);
-		using var reader = new StreamReader(stream);
-		var tokens = Split.Graphemes(reader);
-		TestUnicode.TestTokenizerTextReader(tokens, test);
-	}
 }

@@ -21,7 +21,7 @@ internal static partial class Graphemes
 	const Property ZWJ = 4096;
 	const Property Extended_Pictographic = 8192;
 
-	internal static readonly Dict Dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0600, Prepend},

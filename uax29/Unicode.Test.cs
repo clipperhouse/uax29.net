@@ -20,7 +20,7 @@ public class TestUnicode
 	{
 	}
 
-	internal static void TestTokenizerBytes(SplitEnumerator<byte> tokens, UnicodeTest test)
+	internal static void TestBytes(SplitEnumerator<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -32,7 +32,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerStream(StreamEnumerator<byte> tokens, UnicodeTest test)
+	internal static void TestStream(StreamEnumerator<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -44,7 +44,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerChars(SplitEnumerator<char> tokens, UnicodeTest test)
+	internal static void TestChars(SplitEnumerator<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -56,7 +56,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerTextReader(StreamEnumerator<char> tokens, UnicodeTest test)
+	internal static void TestTextReader(StreamEnumerator<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)

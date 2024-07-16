@@ -21,7 +21,7 @@ internal static partial class Sentences
 	const Property Close = 4096;
 	const Property SContinue = 8192;
 
-	internal static readonly Dict Dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x000D, CR},

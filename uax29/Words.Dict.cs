@@ -27,7 +27,7 @@ internal static partial class Words
 	const Property Extended_Pictographic = 262144;
 	const Property Tab = 524288;
 
-	internal static readonly Dict Dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 		{0x0022, Double_Quote},

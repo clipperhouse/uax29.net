@@ -7,6 +7,40 @@ using UAX29;
 [TestFixture]
 public class SentencesTests
 {
+	static UnicodeTest[] Tests => UnicodeTests;
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{
+		var tokens = Split.Sentences(test.input);
+		TestUnicode.TestBytes(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Split.Sentences(s);
+		TestUnicode.TestChars(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Split.Sentences(stream);
+		TestUnicode.TestStream(tokens, test);
+	}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Split.Sentences(reader);
+		TestUnicode.TestTextReader(tokens, test);
+	}
+
 	internal readonly static UnicodeTest[] UnicodeTests = [
 		new([0x0001, 0x0001], [[0x0001, 0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [998.0] <START OF HEADING> (Other) ÷ [0.3]"),
 		new([0x0001, 0x00CC, 0x0088, 0x0001], [[0x0001, 0x00CC, 0x0088, 0x0001]], "÷ [0.2] <START OF HEADING> (Other) × [5.0] COMBINING DIAERESIS (Extend_FE) × [998.0] <START OF HEADING> (Other) ÷ [0.3]"),
@@ -512,38 +546,4 @@ public class SentencesTests
 		new([0x00E2, 0x0081, 0x00A0, 0x0021, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x00E2, 0x0081, 0x00A0], [[0x00E2, 0x0081, 0x00A0, 0x0021, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x0020, 0x00E2, 0x0081, 0x00A0, 0x00E2, 0x0081, 0x00A0]], "÷ [0.2] WORD JOINER (Format_FE) × [998.0] EXCLAMATION MARK (STerm) × [5.0] WORD JOINER (Format_FE) × [9.0] SPACE (Sp) × [5.0] WORD JOINER (Format_FE) × [10.0] SPACE (Sp) × [5.0] WORD JOINER (Format_FE) × [5.0] WORD JOINER (Format_FE) ÷ [0.3]"),
 
 	];
-
-	static readonly UnicodeTest[] Tests = UnicodeTests;
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Bytes(UnicodeTest test)
-	{
-		var tokens = Split.Sentences(test.input);
-		TestUnicode.TestTokenizerBytes(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void String(UnicodeTest test)
-	{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Split.Sentences(s);
-		TestUnicode.TestTokenizerChars(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Stream(UnicodeTest test)
-	{
-		using var stream = new MemoryStream(test.input);
-		var tokens = Split.Sentences(stream);
-		TestUnicode.TestTokenizerStream(tokens, test);
-	}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void TextReader(UnicodeTest test)
-	{
-		using var stream = new MemoryStream(test.input);
-		using var reader = new StreamReader(stream);
-		var tokens = Split.Sentences(reader);
-		TestUnicode.TestTokenizerTextReader(tokens, test);
-	}
 }
