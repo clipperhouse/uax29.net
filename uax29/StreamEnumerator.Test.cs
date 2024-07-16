@@ -4,7 +4,7 @@ using System.Text;
 using UAX29;
 
 [TestFixture]
-public class TestStreamTokenizer
+public class TestStreamEnumerator
 {
     [SetUp]
     public void Setup()
