@@ -19,15 +19,15 @@ public ref struct Buffer<T>
     /// </summary>
     public bool EOF { get; private set; }
 
-    public Buffer(Read<T> read, int minItems, T[]? storage = null)
+    public Buffer(Read<T> read, int minBuffer, T[]? storage = null)
     {
         this.read = read;
-        this.minItems = minItems;
-        if (storage != null && storage.Length < minItems)
+        this.minItems = minBuffer;
+        if (storage != null && storage.Length < minBuffer)
         {
-            throw new ArgumentException($"Storage ({typeof(T)}[{storage.Length}]) must be at least as large as minItems ({minItems}).");
+            throw new ArgumentException($"Storage ({typeof(T)}[{storage.Length}]) must be at least as large as minBuffer ({minBuffer}).");
         }
-        storage ??= new T[minItems];
+        storage ??= new T[minBuffer];
         this.storage = storage;
     }
 

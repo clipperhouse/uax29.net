@@ -20,7 +20,7 @@ public class TestUnicode
 	{
 	}
 
-	internal static void TestTokenizerBytes(Tokenizer<byte> tokens, UnicodeTest test)
+	internal static void TestBytes(SplitEnumerator<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -32,7 +32,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerStream(StreamTokenizer<byte> tokens, UnicodeTest test)
+	internal static void TestStream(StreamEnumerator<byte> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -44,7 +44,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerChars(Tokenizer<char> tokens, UnicodeTest test)
+	internal static void TestChars(SplitEnumerator<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -56,7 +56,7 @@ public class TestUnicode
 		}
 	}
 
-	internal static void TestTokenizerTextReader(StreamTokenizer<char> tokens, UnicodeTest test)
+	internal static void TestTextReader(StreamEnumerator<char> tokens, UnicodeTest test)
 	{
 		var i = 0;
 		foreach (var token in tokens)
@@ -68,13 +68,13 @@ public class TestUnicode
 		}
 	}
 
-	private delegate Tokenizer<byte> ByteMethod(byte[] input);
-	static readonly ByteMethod byteWords = (byte[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
-	static readonly ByteMethod[] byteMethods = [byteWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	private delegate SplitEnumerator<byte> ByteMethod(ReadOnlySpan<byte> input);
+	static readonly ByteMethod byteWords = (ReadOnlySpan<byte> input) => Split.Words(input);     // because of the optional parameter
+	static readonly ByteMethod[] byteMethods = [byteWords, Split.Graphemes, Split.Graphemes];
 
-	private delegate Tokenizer<char> CharMethod(char[] input);
-	static readonly CharMethod charWords = (char[] input) => Tokenizer.GetWords(input);     // because of the optional parameter
-	static readonly CharMethod[] charMethods = [charWords, Tokenizer.GetGraphemes, Tokenizer.GetSentences];
+	private delegate SplitEnumerator<char> CharMethod(ReadOnlySpan<char> input);
+	static readonly CharMethod charWords = (ReadOnlySpan<char> input) => Split.Words(input);     // because of the optional parameter
+	static readonly CharMethod[] charMethods = [charWords, Split.Graphemes, Split.Sentences];
 
 	[Test]
 	public void InvalidEncoding()
@@ -130,7 +130,6 @@ public class TestUnicode
 		{
 			var bytes = new byte[i];
 			rng.GetBytes(bytes);
-			var s = Encoding.UTF8.GetChars(bytes);
 
 			foreach (var method in byteMethods)
 			{
@@ -146,6 +145,7 @@ public class TestUnicode
 				}
 			}
 
+			var s = Encoding.UTF8.GetChars(bytes);
 			foreach (var method in charMethods)
 			{
 				var tokens = method(s);

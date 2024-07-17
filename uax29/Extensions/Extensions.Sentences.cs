@@ -1,6 +1,7 @@
-﻿namespace UAX29;
+﻿namespace UAX29.Extensions;
+using UAX29;
 
-public static partial class Tokenizer
+public static partial class Extensions
 {
     /// <summary>
     /// Split the graphemes in the given <see cref="Span"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -9,7 +10,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> GetGraphemes(Span<byte> input) => new(input, Graphemes.SplitBytes);
+    public static SplitEnumerator<byte> SplitSentences(this Span<byte> input) => Split.Sentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of UTF-8 encoded bytes, according to the Unicode UAX #29 spec. https://unicode.org/reports/tr29/
@@ -18,7 +19,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> GetGraphemes(ReadOnlySpan<byte> input) => new(input, Graphemes.SplitBytes);
+    public static SplitEnumerator<byte> SplitSentences(this ReadOnlySpan<byte> input) => Split.Sentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of UTF-8 encoded bytes.
@@ -27,7 +28,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> GetGraphemes(Memory<byte> input) => new(input.Span, Graphemes.SplitBytes);
+    public static SplitEnumerator<byte> SplitSentences(this Memory<byte> input) => Split.Sentences(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of UTF-8 encoded bytes.
@@ -36,7 +37,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> GetGraphemes(ReadOnlyMemory<byte> input) => new(input.Span, Graphemes.SplitBytes);
+    public static SplitEnumerator<byte> SplitSentences(this ReadOnlyMemory<byte> input) => Split.Sentences(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given array of UTF-8 encoded bytes.
@@ -45,7 +46,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<byte> GetGraphemes(byte[] input) => new(input.AsSpan(), Graphemes.SplitBytes);
+    public static SplitEnumerator<byte> SplitSentences(this byte[] input) => Split.Sentences(input.AsSpan());
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -54,7 +55,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> GetGraphemes(string input) => new(input.AsSpan(), Graphemes.SplitChars);
+    public static SplitEnumerator<char> SplitSentences(this string input) => Split.Sentences(input);
 
     /// <summary>
     /// Split the graphemes in the given string.
@@ -63,7 +64,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> GetGraphemes(char[] input) => new(input.AsSpan(), Graphemes.SplitChars);
+    public static SplitEnumerator<char> SplitSentences(this char[] input) => Split.Sentences(input.AsSpan());
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Span"/> of <see cref="char"/>.
@@ -72,8 +73,8 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    /// 
-    public static Tokenizer<char> GetGraphemes(Span<char> input) => new(input, Graphemes.SplitChars);
+    ///
+    public static SplitEnumerator<char> SplitSentences(this Span<char> input) => Split.Sentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlySpan"/> of <see cref="char"/>.
@@ -82,7 +83,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> GetGraphemes(ReadOnlySpan<char> input) => new(input, Graphemes.SplitChars);
+    public static SplitEnumerator<char> SplitSentences(this ReadOnlySpan<char> input) => Split.Sentences(input);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Memory"/> of <see cref="char"/>.
@@ -91,7 +92,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> GetGraphemes(Memory<char> input) => new(input.Span, Graphemes.SplitChars);
+    public static SplitEnumerator<char> SplitSentences(this Memory<char> input) => Split.Sentences(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="ReadOnlyMemory"/> of <see cref="char"/>.
@@ -100,7 +101,7 @@ public static partial class Tokenizer
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static Tokenizer<char> GetGraphemes(ReadOnlyMemory<char> input) => new(input.Span, Graphemes.SplitChars);
+    public static SplitEnumerator<char> SplitSentences(this ReadOnlyMemory<char> input) => Split.Sentences(input.Span);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="Stream"/> of UTF-8 encoded bytes.
@@ -109,28 +110,23 @@ public static partial class Tokenizer
     /// <param name="minBufferBytes">
     /// Optional, the minimum bytes to buffer from the Stream. This determines the maximum grapheme token size. Tokens that exceed the bytes in the buffer
     /// will simply be cut off at this length, no error will occur.
-    /// 
+    ///
     /// Default is 256 bytes.
     /// </param>
     /// <param name="bufferStorage">
     /// Optional, a byte array for underlying buffer storage. It must be at least as large at minBufferBytes.
-    /// 
+    ///
     /// If not provided, storage of 2 * minBufferBytes will be allocated by default.
-    /// 
-    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferBytes allows fewer, larger reads the stream, 
+    ///
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferBytes allows fewer, larger reads the stream,
     /// which is more efficient, but will increase memory usage.
-    /// 
+    ///
     /// You might also wish to use ArrayPool<byte> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<byte> GetGraphemes(Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null)
-    {
-        bufferStorage ??= new byte[minBufferBytes * 2];
-        var buffer = new Buffer<byte>(stream.Read, minBufferBytes, bufferStorage);
-        return new StreamTokenizer<byte>(buffer, Graphemes.SplitBytes);
-    }
+    public static StreamEnumerator<byte> SplitSentences(this Stream stream, int minBufferBytes = 1024, byte[]? bufferStorage = null) => Split.Sentences(stream, minBufferBytes, bufferStorage);
 
     /// <summary>
     /// Split the graphemes in the given <see cref="TextReader"/> / <see cref="StreamReader"/>.
@@ -139,26 +135,21 @@ public static partial class Tokenizer
     /// <param name="minBufferChars">
     /// Optional, the minimum chars to buffer from the reader. This determines the maximum grapheme token size. Tokens that exceed the chars in the buffer
     /// will simply be cut off at this length, no error will occur.
-    /// 
+    ///
     /// Default is 256 chars.
     /// </param>
     /// <param name="bufferStorage">
     /// Optional, a char array for underlying buffer storage. It must be at least as large at minBufferChars.
-    /// 
+    ///
     /// If not provided, storage of 2 * minBufferChars will be allocated by default.
-    /// 
-    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferChars allows fewer, larger reads the reader, 
+    ///
+    /// This parameter is a choice about performance and memory usage. A buffer larger than minBufferChars allows fewer, larger reads the reader,
     /// which is more efficient, but will increase memory usage.
-    /// 
+    ///
     /// You might also wish to use ArrayPool<char> to reuse the storage and minimize allocations.
     /// </param>
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static StreamTokenizer<char> GetGraphemes(TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null)
-    {
-        bufferStorage ??= new char[minBufferChars * 2];
-        var buffer = new Buffer<char>(stream.Read, minBufferChars, bufferStorage);
-        return new StreamTokenizer<char>(buffer, Graphemes.SplitChars);
-    }
+    public static StreamEnumerator<char> SplitSentences(this TextReader stream, int minBufferChars = 1024, char[]? bufferStorage = null) => Split.Sentences(stream, minBufferChars, bufferStorage);
 }

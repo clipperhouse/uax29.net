@@ -27,7 +27,7 @@ internal static partial class Graphemes
 		/// <param name="input">The string in which to split graphemes.</param>
 		/// <param name="seen">Ignore, only applicable to splitting words, not graphemes.</param>
 		/// <returns>The number of bytes/chars that comprise the grapheme.</returns>
-		internal int Split(ReadOnlySpan<TSpan> input, out Property _)   // this out param is only relevant in Words.Splitter
+		internal int Split(ReadOnlySpan<TSpan> input, out bool _)   // this out param is only relevant in Words.Splitter
 		{
 			Debug.Assert(input.Length > 0);
 
@@ -163,7 +163,7 @@ internal static partial class Graphemes
 				break;
 			}
 
-			_ = 0;  // see the Property out parameter at tops
+			_ = false;  // see the out parameter at top
 			return pos;
 		}
 	}

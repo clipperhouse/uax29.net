@@ -4,19 +4,19 @@ namespace UAX29;
 using Property = uint;
 
 /// <summary>
-/// Tokenizer splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
+/// RangeEnumerator splits strings or UTF-8 bytes as words, sentences or graphemes, per the Unicode UAX #29 spec.
 /// </summary>
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-public ref struct RangeTokenizer<T> where T : struct
+public ref struct RangeEnumerator<T> where T : struct
 {
-	Tokenizer<T> tokenizer;
+	SplitEnumerator<T> tokenizer;
 	bool begun = false;
 
 	/// <summary>
-	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// RangeEnumerator splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
-	internal RangeTokenizer(Tokenizer<T> tokenizer)
+	internal RangeEnumerator(SplitEnumerator<T> tokenizer)
 	{
 		this.tokenizer = tokenizer;
 	}
@@ -42,7 +42,7 @@ public ref struct RangeTokenizer<T> where T : struct
 		}
 	}
 
-	public readonly RangeTokenizer<T> GetEnumerator()
+	public readonly RangeEnumerator<T> GetEnumerator()
 	{
 		return this;
 	}
@@ -55,7 +55,7 @@ public ref struct RangeTokenizer<T> where T : struct
 	{
 		if (begun)
 		{
-			throw new InvalidOperationException("ToArray must not be called after iteration has begun. You may wish to call Reset() on the tokenizer.");
+			throw new InvalidOperationException("ToArray must not be called after iteration has begun. You may wish to call Reset() on the enumerator.");
 		}
 
 		var result = new List<Range>();

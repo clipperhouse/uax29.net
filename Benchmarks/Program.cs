@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -39,70 +40,62 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizeBytes()
+	public void SplitBytes()
 	{
-		var tokens = Tokenizer.GetWords(sample);
+		var tokens = Split.Words(sample);
 		foreach (var token in tokens)
 		{
 		}
 	}
 
 	[Benchmark]
-	public void TokenizeBytesOmitWhitespace()
+	public void SplitBytesOmitWhitespace()
 	{
-		var tokens = Tokenizer.GetWords(sample, Options.OmitWhitespace);
+		var tokens = Split.Words(sample, Options.OmitWhitespace);
 		foreach (var token in tokens)
 		{
 		}
 	}
 
 	[Benchmark]
-	public void TokenizeString()
+	public void SplitString()
 	{
-		var tokens = Tokenizer.GetWords(sampleStr);
+		var tokens = Split.Words(sampleStr);
 		foreach (var token in tokens)
 		{
 		}
 	}
 
 	[Benchmark]
-	public void TokenizeStringOmitWhitespace()
+	public void SplitStringOmitWhitespace()
 	{
-		var tokens = Tokenizer.GetWords(sampleStr, Options.OmitWhitespace);
+		var tokens = Split.Words(sampleStr, Options.OmitWhitespace);
 		foreach (var token in tokens)
 		{
 		}
 	}
 
 	[Benchmark]
-	public void TokenizeStream()
+	public void SplitStream()
 	{
-		var stream = new MemoryStream(sample);
-		var tokens = Tokenizer.GetWords(stream);
-		foreach (var token in tokens)
-		{
-		}
+		sampleStream.Seek(0, SeekOrigin.Begin);
+		var tokens = Split.Words(sampleStream);
+		foreach (var token in tokens) { }
 	}
 
+	static readonly ArrayPool<byte> pool = ArrayPool<byte>.Shared;
+
 	[Benchmark]
-	public void TokenizeSetStream()
+	public void SplitStreamArrayPool()
 	{
-		// This is to test to observe allocations.
+		var storage = pool.Rent(2048);
 
-		// The creation will allocate a buffer of 1024 bytes
-		var tokens = Tokenizer.GetWords(sampleStream);
+		sampleStream.Seek(0, SeekOrigin.Begin);
+		var tokens = Split.Words(sampleStream, minBufferBytes: 1024, bufferStorage: storage);
+		tokens.SetStream(sampleStream);
+		foreach (var token in tokens) { }
 
-		var runs = 10;
-		// keep in mind the 10 runs when interpreting the benchmark
-		for (var i = 0; i < runs; i++)
-		{
-			// subsequent runs should allocate less by using SetStream
-			sampleStream.Seek(0, SeekOrigin.Begin);
-			tokens.SetStream(sampleStream);
-			foreach (var token in tokens)
-			{
-			}
-		}
+		pool.Return(storage);
 	}
 
 	[Benchmark]
@@ -115,9 +108,9 @@ public class Benchmark
 	}
 
 	[Benchmark]
-	public void TokenizerGraphemes()
+	public void SplitGraphemes()
 	{
-		var tokens = Tokenizer.GetGraphemes(sample);
+		var tokens = Split.Graphemes(sample);
 		foreach (var token in tokens)
 		{
 		}

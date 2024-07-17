@@ -6,6 +6,8 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 ### Example
 
+_⚠️ This documentation on `main` refers to v3, which is not yet published on Nuget. See [v2 documentation](https://github.com/clipperhouse/uax29.net/blob/v2.2.0/README.md) until then._
+
 ```
 dotnet add package UAX29
 ```
@@ -19,7 +21,7 @@ var example = "Hello, 🌏 world. 你好，世界.";
 // The tokenizer can split words, graphemes or sentences.
 // It operates on strings, UTF-8 bytes, and streams.
 
-var words = Tokenizer.GetWords(example);
+var words = Split.Words(example);
 
 // Iterate over the tokens
 foreach (var word in words)
@@ -47,7 +49,7 @@ world
 */
 
 var utf8bytes = Encoding.UTF8.GetBytes(example);
-var graphemes = Tokenizer.GetGraphemes(utf8bytes);
+var graphemes = Split.Graphemes(utf8bytes);
 
 // Iterate over the tokens
 foreach (var grapheme in graphemes)
@@ -84,11 +86,21 @@ d
 */
 ```
 
+There are also optional extension methods in the spirit of `string.Split`:
+
+```csharp
+using UAX29.Extensions;
+
+example.SplitWords();
+```
+
 ### Data types
 
 For UTF-8 bytes, pass `byte[]`, `Span<byte>` or `Stream`; the resulting tokens will be `ReadOnlySpan<byte>`.
 
 For strings/chars, pass `string`, `char[]`, `Span<char>` or `TextReader`/`StreamReader`; the resulting tokens will be `ReadOnlySpan<char>`.
+
+If you have `Memory<byte|char>`, pass `Memory.Span`.
 
 ### Conformance
 
@@ -96,7 +108,7 @@ We use the official Unicode [test suites](https://unicode.org/reports/tr41/tr41-
 
 [![.NET](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/clipperhouse/uax29.net/actions/workflows/dotnet.yml)
 
-This is the same algorithm that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
+This is the same spec that is implemented in Lucene's [StandardTokenizer](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html).
 
 ### Performance
 
@@ -104,27 +116,33 @@ When tokenizing words, I get around 120MB/s on my Macbook M2. For typical text, 
 
 The tokenizer is implemented as a `ref struct`, so you should see zero allocations for static text such as `byte[]` or `string`/`char`.
 
-Calling `GetWords` et al returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
+Calling `Split.Words` returns a lazy enumerator, and will not allocate per-token. There are `ToList` and `ToArray` methods for convenience, which will allocate.
 
-For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `GetWords`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.arraypool-1). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
+For `Stream` or `TextReader`/`StreamReader`, a buffer needs to be allocated behind the scenes. You can specify the size when calling `Split.Words`. You can also optionally pass your own `byte[]` or `char[]` to do your own allocation, perhaps with [ArrayPool](https://github.com/clipperhouse/uax29.net/blob/main/Benchmarks/Program.cs#L89). Or, you can re-use the buffer by calling `SetStream` on an existing tokenizer, which will avoid re-allocation.
 
 ### Options
 
-Pass `Options.OmitWhitespace` if you would like whitespace-only tokens not to be returned.
+Pass `Options.OmitWhitespace` if you would like whitespace-only tokens not to be returned (for words only).
 
 ### Invalid inputs
 
-The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/uax29/Unicode.Test.cs#L55) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
+The tokenizer expects valid (decodable) UTF-8 bytes or UTF-16 chars as input. We [make an effort](https://github.com/clipperhouse/uax29.net/blob/main/uax29/Unicode.Test.cs#L80) to ensure that all bytes will be returned even if invalid, i.e. to be lossless in any case, though the resulting tokenization may not be useful. Garbage in, garbage out.
 
 ### Major version changes
 
-If you are using v1.x of this package, v2 has been renamed:
+#### v2 → v3
+
+Renamed methods:
+
+`Tokenizer.GetWords(input)` → `Split.Words(input)`
+
+#### v1 → v2
+
+Renamed package, namespace and methods:
 
 `dotnet add package uax29.net` → `dotnet add package UAX29`
 
 `using uax29` → `using UAX29`
-
-We renamed the methods:
 
 `Tokenizer.Create(input)` → `Tokenizer.GetWords(input)`
 

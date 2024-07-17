@@ -81,6 +81,44 @@ public class TestBuffer
 			Assert.That(buffer.end, Is.EqualTo(storageSize));
 		}
 	}
+
+	[Test]
+	public void MinBufferSize()
+	{
+		var input = "Hello, how are you?";
+		var bytes = Encoding.UTF8.GetBytes(input);
+		using var stream = new MemoryStream(bytes);
+
+		{
+			var storage = new byte[1024];
+			var minBufferBytes = 1024;
+			bool threw = false;
+			try
+			{
+				var words = new Buffer<byte>(stream.Read, minBufferBytes, storage); // ok
+			}
+			catch (ArgumentException)
+			{
+				threw = true;
+			}
+			Assert.That(threw, Is.False);
+		}
+		{
+			var storage = new byte[1024];
+			var minBufferBytes = 1025;
+
+			bool threw = false;
+			try
+			{
+				var words = new Buffer<byte>(stream.Read, minBufferBytes, storage); // not ok
+			}
+			catch (ArgumentException)
+			{
+				threw = true;
+			}
+			Assert.That(threw, Is.True);
+		}
+	}
 }
 
 

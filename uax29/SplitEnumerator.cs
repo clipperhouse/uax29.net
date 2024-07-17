@@ -6,7 +6,7 @@ namespace UAX29;
 /// Splits an input string (UTF-8 or UTF-16) and provides an enumerator over the splits.
 /// </summary>
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
-public ref struct Tokenizer<T> where T : struct
+public ref struct SplitEnumerator<T> where T : struct
 {
 	ReadOnlySpan<T> input;
 
@@ -26,12 +26,12 @@ public ref struct Tokenizer<T> where T : struct
 	bool begun = false;
 
 	/// <summary>
-	/// Tokenizer splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
+	/// Splits strings (or UTF-8 bytes) as words, sentences or graphemes, per the Unicode UAX #29 spec.
 	/// </summary>
 	/// <param name="input">A string, or UTF-8 byte array.</param>
 	/// <param name="split">A func/method meeting the Split delegate signature.</param>
 	/// <param name="options">Options for handling the input text.</param>
-	internal Tokenizer(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
+	internal SplitEnumerator(ReadOnlySpan<T> input, Split<T> split, Options options = Options.None)
 	{
 		this.input = input;
 		this.split = split;
@@ -48,14 +48,14 @@ public ref struct Tokenizer<T> where T : struct
 
 		while (end < input.Length)
 		{
-			var advance = this.split(input[end..], out var seen);
+			var advance = this.split(input[end..], out var whitespace);
 			Debug.Assert(advance > 0);
 
 			start = end;
 			end += advance;
 
 			// This option is only supported for words; prevent other uses at the static API level
-			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
+			if (whitespace && options.Includes(Options.OmitWhitespace))
 			{
 				continue;
 			}
@@ -78,13 +78,13 @@ public ref struct Tokenizer<T> where T : struct
 		}
 	}
 
-	public readonly Tokenizer<T> GetEnumerator()
+	public readonly SplitEnumerator<T> GetEnumerator()
 	{
 		return this;
 	}
 
 	/// <summary>
-	/// Resets the tokenizer back to the first token.
+	/// Resets the enumerator back to the first token.
 	/// </summary>
 	public void Reset()
 	{
@@ -144,11 +144,11 @@ public ref struct Tokenizer<T> where T : struct
 	/// An enumerator of Range. Use foreach to iterate over the ranges. Apply them to your original input
 	/// using [range] or .AsSpan(range) to get the tokens.
 	/// </returns>
-	public readonly RangeTokenizer<T> Ranges
+	public readonly RangeEnumerator<T> Ranges
 	{
 		get
 		{
-			return new RangeTokenizer<T>(this);
+			return new RangeEnumerator<T>(this);
 		}
 	}
 }

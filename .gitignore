@@ -3,3 +3,4 @@ BenchmarkDotNet.Artifacts
 bin
 obj
 .vscode/tasks.json
+global.json

@@ -115,11 +115,26 @@ internal class Program
 
 			if (typ == "Word")
 			{
-				// hack in a Tab category that the spec doesn't use, be we do
-				const string tab = "Tab";
+				const string ws = "Whitespace";
 				currentCat <<= 1;
-				cats.Add(tab, currentCat);
-				catsByRune.Add(0x09, tab);
+				cats.Add(ws, currentCat);
+
+				for (var i = 0; i < char.MaxValue; i++)
+				{
+					var ch = (char)i;
+					if (char.IsWhiteSpace(ch))
+					{
+						var r = new Rune(ch);
+						if (catsByRune.TryGetValue(r.Value, out string? existing))
+						{
+							catsByRune[r.Value] = $"{existing} | {ws}";
+						}
+						else
+						{
+							catsByRune.Add(r.Value, ws);
+						}
+					}
+				}
 			}
 
 			// write the file
@@ -142,7 +157,7 @@ internal static partial class {typ}s
 			}
 
 			dict.Write(@"
-	internal static readonly Dict Dict = new(GetDict());
+	static readonly Dict Dict = new(GetDict());
 	static Dictionary<int, Property> GetDict() => new()
 	{
 ");
@@ -181,7 +196,41 @@ using UAX29;
 [TestFixture]
 public class {typ}sTests
 {{
-	internal readonly static UnicodeTest[] UnicodeTests = [
+	static UnicodeTest[] Tests => UnicodeTests;
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Bytes(UnicodeTest test)
+	{{
+		var tokens = Split.{typ}s(test.input);
+		TestUnicode.TestBytes(tokens, test);
+	}}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void String(UnicodeTest test)
+	{{
+		var s = Encoding.UTF8.GetString(test.input);
+		var tokens = Split.{typ}s(s);
+		TestUnicode.TestChars(tokens, test);
+	}}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void Stream(UnicodeTest test)
+	{{
+		using var stream = new MemoryStream(test.input);
+		var tokens = Split.{typ}s(stream);
+		TestUnicode.TestStream(tokens, test);
+	}}
+
+	[Test, TestCaseSource(nameof(Tests))]
+	public void TextReader(UnicodeTest test)
+	{{
+		using var stream = new MemoryStream(test.input);
+		using var reader = new StreamReader(stream);
+		var tokens = Split.{typ}s(reader);
+		TestUnicode.TestTextReader(tokens, test);
+	}}
+
+	readonly static UnicodeTest[] UnicodeTests = [
 ");
 			while (true)
 			{
@@ -241,40 +290,6 @@ public class {typ}sTests
 			}
 			dict.Write(@$"
 	];
-
-	static readonly UnicodeTest[] Tests = UnicodeTests;
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Bytes(UnicodeTest test)
-	{{
-		var tokens = Tokenizer.Get{typ}s(test.input);
-		TestUnicode.TestTokenizerBytes(tokens, test);
-	}}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void String(UnicodeTest test)
-	{{
-		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Tokenizer.Get{typ}s(s);
-		TestUnicode.TestTokenizerChars(tokens, test);
-	}}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void Stream(UnicodeTest test)
-	{{
-		using var stream = new MemoryStream(test.input);
-		var tokens = Tokenizer.Get{typ}s(stream);
-		TestUnicode.TestTokenizerStream(tokens, test);
-	}}
-
-	[Test, TestCaseSource(nameof(Tests))]
-	public void TextReader(UnicodeTest test)
-	{{
-		using var stream = new MemoryStream(test.input);
-		using var reader = new StreamReader(stream);
-		var tokens = Tokenizer.Get{typ}s(reader);
-		TestUnicode.TestTokenizerTextReader(tokens, test);
-	}}
 }}
 ");
 		}

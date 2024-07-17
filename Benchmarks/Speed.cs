@@ -11,9 +11,9 @@ public class Speed : IColumn
             return "N/A";
         }
         var ourReport = summary.Reports.First(x => x.BenchmarkCase.Equals(benchmarkCase));
-        long length = new System.IO.FileInfo("sample.txt").Length;
-        var mean = ourReport.ResultStatistics.Mean;
-        return $"{(length / ourReport.ResultStatistics.Mean):#####.000}";
+        long length = new FileInfo("sample.txt").Length;
+        var mean = ourReport.ResultStatistics!.Mean;
+        return $"{length / mean:#####.000} GB/s";
     }
 
     public string GetValue(Summary summary, BenchmarkCase benchmarkCase, SummaryStyle style) => GetValue(summary, benchmarkCase);
@@ -21,7 +21,7 @@ public class Speed : IColumn
     public bool IsAvailable(Summary summary) => true;
 
     public string Id { get; } = nameof(Speed);
-    public string ColumnName { get; } = "Speed (GB/s)";
+    public string ColumnName { get; } = "Throughput";
     public bool AlwaysShow { get; } = true;
     public ColumnCategory Category { get; } = ColumnCategory.Custom;
     public int PriorityInCategory { get; }

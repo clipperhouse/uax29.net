@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using UAX29;
+using UAX29.Extensions;
 
 namespace Tests;
-
 
 [TestFixture]
 public class TestExample
@@ -21,7 +21,7 @@ public class TestExample
         // The tokenizer can split words, graphemes or sentences.
         // It operates on strings, UTF-8 bytes, and streams.
 
-        var words = Tokenizer.GetWords(example);
+        var words = example.SplitWords();
 
         // Iterate over the tokens
         foreach (var word in words)
@@ -34,12 +34,12 @@ public class TestExample
         /*
         Hello
         ,
-        
+
         🌏
-        
+
         world
         .
-        
+
         你
         好
         ，
@@ -49,9 +49,9 @@ public class TestExample
         */
 
         var utf8bytes = Encoding.UTF8.GetBytes(example);
-        var graphemes = Tokenizer.GetGraphemes(utf8bytes);
+        var graphemes = utf8bytes.SplitGraphemes();
 
-        // Iterate over the tokens		
+        // Iterate over the tokens
         foreach (var grapheme in graphemes)
         {
             // grapheme is a ReadOnlySpan<byte> of UTF-8 bytes
@@ -67,16 +67,16 @@ public class TestExample
         l
         o
         ,
-        
+
         🌏
-        
+
         w
         o
         r
         l
         d
         .
-        
+
         你
         好
         ，
