@@ -115,11 +115,26 @@ internal class Program
 
 			if (typ == "Word")
 			{
-				// hack in a Tab category that the spec doesn't use, be we do
-				const string tab = "Tab";
+				const string ws = "Whitespace";
 				currentCat <<= 1;
-				cats.Add(tab, currentCat);
-				catsByRune.Add(0x09, tab);
+				cats.Add(ws, currentCat);
+
+				for (var i = 0; i < char.MaxValue; i++)
+				{
+					var ch = (char)i;
+					if (char.IsWhiteSpace(ch))
+					{
+						var r = new Rune(ch);
+						if (catsByRune.TryGetValue(r.Value, out string? existing))
+						{
+							catsByRune[r.Value] = $"{existing} | {ws}";
+						}
+						else
+						{
+							catsByRune.Add(r.Value, ws);
+						}
+					}
+				}
 			}
 
 			// write the file

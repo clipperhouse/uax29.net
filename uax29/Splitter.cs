@@ -11,7 +11,7 @@ using Property = uint;
 /// <typeparam name="T">byte or char, indicating the type of the input, and by implication, the output.</typeparam>
 /// <param name="input">The string to split/tokenize.</param>
 /// <returns>How many bytes/chars were consumed from the input.</returns>
-internal delegate int Split<T>(ReadOnlySpan<T> input, out Property seen);
+internal delegate int Split<T>(ReadOnlySpan<T> input, out bool whitespace);
 
 internal static class PropertyExtensions
 {

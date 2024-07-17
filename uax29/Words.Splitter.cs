@@ -8,8 +8,6 @@ using Property = uint;
 
 internal static partial class Words
 {
-	internal const Property Whitespace = CR | LF | WSegSpace | Tab;
-
 	internal static readonly Split<byte> SplitBytes = new Splitter<byte>(Decoders.Utf8).Split;
 	internal static readonly Split<char> SplitChars = new Splitter<char>(Decoders.Char).Split;
 
@@ -31,14 +29,14 @@ internal static partial class Words
 		/// <param name="input">The string in which to split words.</param>
 		/// <param name="seen">Categories that were seen in the first word.</param>
 		/// <returns>The number of bytes/chars that comprise the word.</returns>
-		internal int Split(ReadOnlySpan<TSpan> input, out Property seen)
+		internal int Split(ReadOnlySpan<TSpan> input, out bool whitespace)
 		{
 			Debug.Assert(input.Length > 0);
 
 			// These vars are stateful across loop iterations
 			int pos = 0;
 			int w;
-			seen = 0;
+			whitespace = true;
 			Property current = 0;
 			Property lastExIgnore = 0;      // "last excluding ignored categories"
 			Property lastLastExIgnore = 0;  // "the last one before that"
@@ -58,7 +56,7 @@ internal static partial class Words
 
 				pos += w;
 				current = Dict.Lookup(rune.Value);
-				seen |= current;
+				whitespace = whitespace && current.Is(Whitespace);
 			}
 
 			// https://unicode.org/reports/tr29/#WB2
@@ -79,7 +77,7 @@ internal static partial class Words
 					lastExIgnore = last;
 				}
 
-				seen |= last;
+				whitespace = whitespace && current.Is(Whitespace);
 
 				current = Dict.Lookup(rune.Value);
 

@@ -47,13 +47,13 @@ public ref struct StreamEnumerator<T> where T : struct
 			count += end;
 			buffer.Consume(this.Current.Length);    // previous token
 
-			var advance = this.split(buffer.Contents, out Property seen);
+			var advance = this.split(buffer.Contents, out var whitespace);
 			Debug.Assert(advance > 0);
 
 			end = advance;
 
 			// This option is only supported for words; prevent other uses at the static API level
-			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
+			if (whitespace && options.Includes(Options.OmitWhitespace))
 			{
 				continue;
 			}

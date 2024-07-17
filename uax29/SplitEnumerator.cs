@@ -48,14 +48,14 @@ public ref struct SplitEnumerator<T> where T : struct
 
 		while (end < input.Length)
 		{
-			var advance = this.split(input[end..], out var seen);
+			var advance = this.split(input[end..], out var whitespace);
 			Debug.Assert(advance > 0);
 
 			start = end;
 			end += advance;
 
 			// This option is only supported for words; prevent other uses at the static API level
-			if (options.Includes(Options.OmitWhitespace) && seen.IsExclusively(Words.Whitespace))
+			if (whitespace && options.Includes(Options.OmitWhitespace))
 			{
 				continue;
 			}
