@@ -25,19 +25,4 @@ internal static class PropertyExtensions
 	{
 		return (lookup & properties) != 0;
 	}
-
-	/// <summary>
-	/// Determines if property consists entirely of compare, i.e. no other values (flags) besides the ones in compare.
-	/// </summary>
-	/// <param name="property">The property to test; the haystack.</param>
-	/// <param name="compare">The property to test against; the needle.</param>
-	/// <returns>True if property consists entirely of compare, otherwise false.</returns>
-	internal static bool IsExclusively(this Property property, Property compare)
-	{
-		Debug.Assert(compare > 0);
-		return
-			(property & compare) != 0 &&    // compare appears in property
-			(property & ~compare) == 0      // but no others do
-		;
-	}
 }
