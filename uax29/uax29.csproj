@@ -16,9 +16,8 @@
     <Version>2.2.0</Version>
     <Authors>clipperhouse</Authors>
     <Description>Tokenizes (split) words, graphemes and sentences, based on Unicode text segmentation (UAX #29). https://unicode.org/reports/tr29/</Description>
-    <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://example.com</PackageProjectUrl>
-    <PackageIcon>icon.png</PackageIcon> -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/clipperhouse/uax29.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/clipperhouse/uax29.net</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
