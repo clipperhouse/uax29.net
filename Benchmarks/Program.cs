@@ -5,7 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
 using UAX29;
-
+using Microsoft.Extensions.Primitives;
 BenchmarkRunner.Run<Benchmark>();
 
 [SimpleJob(launchCount: 1, warmupCount: 3, iterationCount: 3)]
@@ -37,6 +37,17 @@ public class Benchmark
 		sample = File.ReadAllBytes("sample.txt");
 		sampleStr = Encoding.UTF8.GetString(sample);
 		sampleStream = new MemoryStream(sample);
+	}
+
+	[Benchmark]
+	public void Naive()
+	{
+		char[] separators = new char[] { ' ', '\t', '\n', '\r' };
+
+		var tokenizer = new StringTokenizer(sampleStr, separators);
+		foreach (var token in tokenizer)
+		{
+		}
 	}
 
 	[Benchmark]
