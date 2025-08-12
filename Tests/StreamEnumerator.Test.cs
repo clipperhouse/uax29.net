@@ -40,8 +40,8 @@ public class TestStreamEnumerator
                 {
                     staticTokens.MoveNext();
 
-                    var expected = Encoding.UTF8.GetString(staticTokens.Current);
-                    var got = Encoding.UTF8.GetString(streamToken);
+                    var expected = Encoding.UTF8.GetString(staticTokens.Current.ToArray());
+                    var got = Encoding.UTF8.GetString(streamToken.ToArray());
 
                     Assert.That(got, Is.EqualTo(expected));
                 }
@@ -79,7 +79,7 @@ public class TestStreamEnumerator
                 foreach (var streamToken in streamTokens)
                 {
                     staticTokens.MoveNext();
-                    var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current);
+                    var staticCurrent = Encoding.UTF8.GetString(staticTokens.Current.ToArray());
 
                     Assert.That(staticCurrent, Is.EqualTo(streamToken.ToString()));
                 }
@@ -102,7 +102,7 @@ public class TestStreamEnumerator
         var first = new List<string>();
         foreach (var token in tokens)
         {
-            var s = Encoding.UTF8.GetString(token);
+            var s = Encoding.UTF8.GetString(token.ToArray());
             first.Add(s);
         }
 
@@ -115,7 +115,7 @@ public class TestStreamEnumerator
         var second = new List<string>();
         foreach (var token in tokens)
         {
-            var s = Encoding.UTF8.GetString(token);
+            var s = Encoding.UTF8.GetString(token.ToArray());
             second.Add(s);
         }
 

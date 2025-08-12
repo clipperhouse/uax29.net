@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net462</TargetFrameworks>
     <PackageId>UAX29</PackageId>
     <Version>3.0.0</Version>
     <Authors>clipperhouse</Authors>
@@ -28,5 +28,11 @@
   <ItemGroup>
     <Folder Include="Legacy/" />
     <Folder Include="Extensions/" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.8" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))" />
+	<PackageReference Include="Shim.System.Text.Rune" Version="6.0.2" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp3.0'))" />
+	<PackageReference Include="System.Collections.Immutable" Version="9.0.8" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
   </ItemGroup>
 </Project>

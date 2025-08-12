@@ -51,7 +51,7 @@ public class TestUnicode
 		{
 			var got = token;
 			var expected = Encoding.UTF8.GetString(test.expected[i]);
-			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
+			Assert.That(got.SequenceEqual(expected.AsSpan()), $"{test.comment}");
 			i++;
 		}
 	}
@@ -63,7 +63,7 @@ public class TestUnicode
 		{
 			var got = token;
 			var expected = Encoding.UTF8.GetString(test.expected[i]);
-			Assert.That(got.SequenceEqual(expected), $"{test.comment}");
+			Assert.That(got.SequenceEqual(expected.AsSpan()), $"{test.comment}");
 			i++;
 		}
 	}
@@ -99,7 +99,7 @@ public class TestUnicode
 			var tokens = method(invalidUtf8Bytes);
 			foreach (var token in tokens)
 			{
-				results.AddRange(token);
+				results.AddRange(token.ToArray());
 			}
 
 			Assert.That(results.SequenceEqual(invalidUtf8Bytes));
@@ -119,7 +119,7 @@ public class TestUnicode
 			var tokens = method(invalidChars);
 			foreach (var token in tokens)
 			{
-				results.AddRange(token);
+				results.AddRange(token.ToArray());
 			}
 
 			Assert.That(results.SequenceEqual(invalidChars));
@@ -139,7 +139,7 @@ public class TestUnicode
 					var results = new List<byte>();
 					foreach (var token in tokens)
 					{
-						results.AddRange(token);
+						results.AddRange(token.ToArray());
 					}
 					Assert.That(results.SequenceEqual(bytes));
 				}
@@ -153,7 +153,7 @@ public class TestUnicode
 				var results = new List<char>();
 				foreach (var token in tokens)
 				{
-					results.AddRange(token);
+					results.AddRange(token.ToArray());
 				}
 				Assert.That(results.SequenceEqual(s));
 			}

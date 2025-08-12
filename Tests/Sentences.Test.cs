@@ -20,7 +20,7 @@ public class SentencesTests
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Split.Sentences(s);
+		var tokens = Split.Sentences(s.AsSpan());
 		TestUnicode.TestChars(tokens, test);
 	}
 

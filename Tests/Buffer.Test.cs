@@ -22,12 +22,12 @@ public class TestBuffer
 
 		while (buffer.Contents.Length > 0)
 		{
-			var contents = Encoding.UTF8.GetString(buffer.Contents);
+			var contents = Encoding.UTF8.GetString(buffer.Contents.ToArray());
 			Assert.That(input[consumed..], Does.StartWith(contents));
 
 			var remaining = buffer.Contents.Length;
 			var toConsume = remaining > consume ? remaining : consume;
-			result += Encoding.UTF8.GetString(buffer.Contents[0..toConsume]);
+			result += Encoding.UTF8.GetString(buffer.Contents[0..toConsume].ToArray());
 			buffer.Consume(toConsume);
 			consumed += toConsume;
 		}

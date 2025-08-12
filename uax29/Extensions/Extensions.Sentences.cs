@@ -55,7 +55,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of graphemes. Use foreach (var grapheme in graphemes).
     /// </returns>
-    public static SplitEnumerator<char> SplitSentences(this string input) => Split.Sentences(input);
+    public static SplitEnumerator<char> SplitSentences(this string input) => Split.Sentences(input.AsSpan());
 
     /// <summary>
     /// Split the graphemes in the given string.

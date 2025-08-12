@@ -20,7 +20,7 @@ public class GraphemesTests
 	public void String(UnicodeTest test)
 	{
 		var s = Encoding.UTF8.GetString(test.input);
-		var tokens = Split.Graphemes(s);
+		var tokens = Split.Graphemes(s.AsSpan());
 		TestUnicode.TestChars(tokens, test);
 	}
 

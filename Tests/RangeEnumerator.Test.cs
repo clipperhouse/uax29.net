@@ -18,7 +18,7 @@ public class TestRangeEnumerator
 		var example = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(example);
 
-		var words = Split.Words(example);
+		var words = Split.Words(example.AsSpan());
 		var ranges = words.Ranges;
 
 		var first = new List<Range>();
@@ -49,14 +49,14 @@ public class TestRangeEnumerator
 
 		foreach (var option in options)
 		{
-			var tokens = Split.Words(example, option);
+			var tokens = Split.Words(example.AsSpan(), option);
 			var ranges = tokens.Ranges;
 
 			foreach (var range in ranges)
 			{
 				tokens.MoveNext();
 
-				var ranged = example.AsSpan(range);
+				var ranged = example.AsSpan(range.Start.Value, range.End.Value - range.Start.Value);
 				var token = tokens.Current;
 				Assert.That(token.SequenceEqual(ranged));
 			}
@@ -68,7 +68,7 @@ public class TestRangeEnumerator
 	{
 		var input = "Hello, how are you?";
 
-		var words = Split.Words(input);
+		var words = Split.Words(input.AsSpan());
 		var first = new List<string>();
 		foreach (var word in words)
 		{
@@ -77,7 +77,7 @@ public class TestRangeEnumerator
 
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
-		var ranges = Split.Words(input).Ranges;
+		var ranges = Split.Words(input.AsSpan()).Ranges;
 		var second = new List<string>();
 		foreach (var range in ranges)
 		{
@@ -90,7 +90,7 @@ public class TestRangeEnumerator
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var words = Split.Words(example);
+		var words = Split.Words(example.AsSpan());
 		var ranges = words.Ranges;
 		var list = ranges.ToList();
 
@@ -120,7 +120,7 @@ public class TestRangeEnumerator
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var words = Split.Words(example);
+		var words = Split.Words(example.AsSpan());
 		var ranges = words.Ranges;
 		var array = ranges.ToArray();
 

@@ -55,7 +55,7 @@ public static partial class Extensions
     /// <returns>
     /// An enumerator of words. Use foreach (var word in words).
     /// </returns>
-    public static SplitEnumerator<char> SplitWords(this string input, Options options = Options.None) => Split.Words(input, options);
+    public static SplitEnumerator<char> SplitWords(this string input, Options options = Options.None) => Split.Words(input.AsSpan(), options);
 
     /// <summary>
     /// Split the words in the given string.

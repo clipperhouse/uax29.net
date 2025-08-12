@@ -56,7 +56,7 @@ public class TestExample
         {
             // grapheme is a ReadOnlySpan<byte> of UTF-8 bytes
             // If you need it back as a string:
-            var s = Encoding.UTF8.GetString(grapheme);
+            var s = Encoding.UTF8.GetString(grapheme.ToArray());
             Console.WriteLine(s);
         }
 

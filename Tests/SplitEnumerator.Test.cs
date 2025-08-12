@@ -18,7 +18,7 @@ public class TestEnumerator
 		var example = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(example);
 
-		var tokens = Split.Words(example);
+		var tokens = Split.Words(example.AsSpan());
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -44,7 +44,7 @@ public class TestEnumerator
 	{
 		var example = "Hello, how are you?";
 
-		var tokens = Split.Words(example);
+		var tokens = Split.Words(example.AsSpan());
 
 		var first = new List<string>();
 		foreach (var token in tokens)
@@ -54,7 +54,7 @@ public class TestEnumerator
 
 		Assert.That(first, Has.Count.GreaterThan(1));   // just make sure it did the thing
 
-		tokens.SetText(example);
+		tokens.SetText(example.AsSpan());
 
 		var second = new List<string>();
 		foreach (var token in tokens)
@@ -102,7 +102,7 @@ public class TestEnumerator
 
 		// Chars
 		{
-			Split.Words(input); got++;
+			Split.Words(input.AsSpan()); got++;
 
 			var array = input.ToCharArray();
 			Split.Words(array); got++;
@@ -116,7 +116,7 @@ public class TestEnumerator
 			Split.Words(reader); got++;
 		}
 		{
-			Split.Graphemes(input); got++;
+			Split.Graphemes(input.AsSpan()); got++;
 
 			var array = input.ToCharArray();
 			Split.Graphemes(array); got++;
@@ -130,7 +130,7 @@ public class TestEnumerator
 			Split.Graphemes(reader); got++;
 		}
 		{
-			Split.Sentences(input); got++;
+			Split.Sentences(input.AsSpan()); got++;
 
 			var array = input.ToCharArray();
 			Split.Sentences(array); got++;
@@ -188,7 +188,7 @@ public class TestEnumerator
 		var input = "Hello, how are you?";
 		var bytes = Encoding.UTF8.GetBytes(input);
 
-		var tokens = Split.Words(input);
+		var tokens = Split.Words(input.AsSpan());
 		var first = new List<string>();
 		while (tokens.MoveNext())
 		{
@@ -201,7 +201,7 @@ public class TestEnumerator
 		var second = new List<string>();
 		foreach (var token in tokens2)
 		{
-			var s = Encoding.UTF8.GetString(token);
+			var s = Encoding.UTF8.GetString(token.ToArray());
 			second.Add(s);
 		}
 		Assert.That(first.SequenceEqual(second));
@@ -211,7 +211,7 @@ public class TestEnumerator
 	public void ToList()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Split.Words(example);
+		var tokens = Split.Words(example.AsSpan());
 		var list = tokens.ToList();
 
 		var i = 0;
@@ -244,7 +244,7 @@ public class TestEnumerator
 	public void ToArray()
 	{
 		var example = "abcdefghijk lmnopq r stu vwxyz; ABC DEFG HIJKL MNOP Q RSTUV WXYZ! 你好，世界.";
-		var tokens = Split.Words(example);
+		var tokens = Split.Words(example.AsSpan());
 		var array = tokens.ToArray();
 
 		var i = 0;
@@ -279,7 +279,7 @@ public class TestEnumerator
 		var example = "Hello, how are you?";
 
 		{
-			var tokens = Split.Words(example);
+			var tokens = Split.Words(example.AsSpan());
 			tokens.MoveNext();
 			Assert.That(tokens.Position, Is.EqualTo(0));
 			tokens.MoveNext();
@@ -327,7 +327,7 @@ public class TestEnumerator
 			// Options.None should be lossless
 			var expected = example;
 			var got = string.Concat(
-				Split.Words(example, Options.None)
+				Split.Words(example.AsSpan(), Options.None)
 				.ToList()
 				.SelectMany(c => c)
 			);
@@ -339,7 +339,7 @@ public class TestEnumerator
 			// Options.OmitWhitespace should have no whitespace
 			var expected = new string(example.Where(c => !char.IsWhiteSpace(c)).ToArray());
 			var got = string.Concat(
-				Split.Words(example, Options.OmitWhitespace)
+				Split.Words(example.AsSpan(), Options.OmitWhitespace)
 				.ToList()
 				.SelectMany(c => c)
 			);
